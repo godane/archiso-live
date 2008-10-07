@@ -1,10 +1,25 @@
 timeout 300
-default 0
+default 1
 color light-blue/blue black/light-grey
 splashimage=/boot/splash.xpm.gz
 
-title  Boot ArchLive
-kernel /boot/vmlinuz26 lang=en locale=en_US.UTF-8 ramdisk_size=75%
+title  Boot ArchLive Default
+kernel /boot/vmlinuz26 keymap=us locale=en_US.UTF-8 ramdisk_size=60%
+initrd /boot/archlive.img
+
+title  Boot ArchLive Desktop
+kernel /boot/vmlinuz26 keymap=us locale=en_US.UTF-8 ramdisk_size=60% aufs custom
+initrd /boot/archlive.img
+
+title  Select Desktop with Autologin
+configfile /boot/grub/desktop.lst
+
+title  Boot ArchLive Desktop in failsafe mode
+kernel /boot/vmlinuz26 keymap=us locale=en_US.UTF-8 ramdisk_size=60% aufs custom noxconf acpi=off
+initrd /boot/archlive.img
+
+title  Boot ArchLive Desktop with unionfs
+kernel /boot/vmlinuz26 keymap=us locale=en_US.UTF-8 ramdisk_size=60% custom
 initrd /boot/archlive.img
 
 title Tools...
