@@ -1,0 +1,18 @@
+CPIOCONFIG="$(pwd)/archiso-mkinitcpio.conf"
+CUSTOM_CONFIG_DIR="$(pwd)/custom-config"
+DEF_CONFIG_DIR="$(pwd)/default-config"
+#MODULES="archlive 001_xorg 002_lxde 003_xfce 004_e17cvs 005_lib 006_gtkapps 007_xapps 008_libgnome 009_gnomeapps 010_gnome"
+MODULES="archlive 001_desktop 002_lib 003_gnome"
+#001_xorg 002_e17cvs 003_xfce 004_lib 005_gtkapps 006_libgnome 007_gnome 008_xlib 009_xapps"
+PKGFILE="$(pwd)/packages.list"
+PKGLIST=""
+QUIET="y"
+FORCE="n"
+ADDON_DIR=""
+CACHE="/var/cache/pacman/pkg"
+
+command_name=""
+work_dir=""
+imgname=""
+
+APPNAME=$(basename "${0}")

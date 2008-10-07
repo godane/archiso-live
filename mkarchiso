@@ -1,18 +1,6 @@
 #!/bin/bash
 
-CPIOCONFIG="$(pwd)/archiso-mkinitcpio.conf"
-DEF_CONFIG_DIR="$(pwd)/default-config"
-PKGFILE="$(pwd)/packages.list"
-PKGLIST=""
-QUIET="y"
-FORCE="n"
-ADDON_DIR=""
-
-command_name=""
-work_dir=""
-imgname=""
-
-APPNAME=$(basename "${0}")
+. config
 
 # usage: usage <exitvalue>
 usage ()
@@ -21,8 +9,11 @@ usage ()
     echo " general options:"
     echo "    -f               Force overwrite of working files/squashfs image/bootable image"
     echo "    -i CPIO_CONFIG   Use CONFIG file for mkinitcpio. default: ${CPIOCONFIG}"
-    echo "    -P PKGFILE       File with list of packages to install. default: ${PKGFILE}"
-    echo "    -p PACKAGE       Additional package to install, can be used multiple times"
+    #echo "    -P PKGFILE       File with list of packages to install. default: ${PKGFILE}"
+    #echo "    -p PACKAGE       Additional package to install, can be used multiple times"
+    echo "    -c CACHE	       Cache folder for the packages going in iso. default: ${CACHE}"
+    echo "    -M MODULES       Modules for livecd. default: ${MODULES}"
+    echo "    -m MODULESCOPY   Copy modules from a folder to modules place in imgroot. default: none"
     echo "    -a ADDON_DIR     Use addons from DIR. default: none"
     echo "    -t <iso,disk>    Type of image to create. Defaults to iso."
     echo "    -v               Enable verbose output."
@@ -35,11 +26,15 @@ usage ()
     exit $1
 }
 
-while getopts 'i:P:p:a:t:fvh' arg; do
+#while getopts 'i:P:p:a:t:fvh' arg; do
+while getopts 'i:P:c:M:m:a:t:fvh' arg; do
     case "${arg}" in
         i) CPIOCONFIG="${OPTARG}" ;;
-        P) PKGFILE="${OPTARG}" ;;
-        p) PKGLIST="${PKGLIST} ${OPTARG}" ;;
+        #P) PKGFILE="${OPTARG}" ;;
+        #p) PKGLIST="${PKGLIST} ${OPTARG}" ;;
+	c) CACHE="${OPTARG}" ;;
+	M) MODULES="${OPTARG}" ;;
+	m) MODULESCOPY="${OPTARG}" ;;
         a) ADDON_DIR="${OPTARG}" ;;
         t) IMG_TYPE="${OPTARG}" ;;
         f) FORCE="y" ;;
@@ -72,7 +67,15 @@ esac
 [ "x${work_dir}" = "x" ] && (echo "please specify a working directory" && usage 1)
 
 imgroot="${work_dir}/img"
-instroot="${work_dir}/install"
+union="${work_dir}/union"
+lastbr="${work_dir}/empty"
+moduleplace="${imgroot}/modules"
+moduledir="${work_dir}/modules"
+instroot="${moduledir}/archlive"
+rootcopy="${imgroot}/rootcopy"
+optional="${imgroot}/optional"
+changes="${imgroot}/changes"
+cache="${CACHE}"
 
 _kversion ()
 {
@@ -111,6 +114,31 @@ install_pkgfile ()
     fi
 }
 
+copy2root()
+{
+	cp -rp $1/* ${union}
+}
+
+remove()
+{
+   rm -vRf "$@"
+   return
+}
+
+install_package()
+{
+	#local PKGNAME CANDIDATE
+		
+	#CANDIDATE="$2"
+	#cd "$1"
+	#if [ -n "$CANDIDATE" ]; then
+		pacman -S --noprogressbar --noconfirm --needed --cachedir $1 -r $3 $2
+	#else
+		
+	#	echo "WARNING: $2 not found on repository" >> warnings.log
+	#fi
+}
+
 # Go through the main commands in order. If 'all' was specified, then we want
 # to do everything. Start with 'install'.
 if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
@@ -122,46 +150,117 @@ if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
 
     mkdir -p "${imgroot}"
     mkdir -p "${instroot}"
+    mkdir -p "${lastbr}"
+    mkdir -p "${union}"
+    mkdir -p "${moduleplace}"
+    mkdir -p "${moduledir}"
+    mkdir -p "${cache}"
+    mkdir -p "${rootcopy}"
+    mkdir -p "${optional}"
+    mkdir -p "${changes}"
 
-    echo "Installing packages..."
-    echo " Installing packages from '${PKGFILE}'"
-    install_pkgfile "${PKGFILE}"
+    modprobe aufs
+    if [ $? -ne 0 ]; then
+	echo "Error loading Union filesystem module."
+	exit 1
+    fi
 
-    for pkg in ${PKGLIST}; do
-        echo "   Installing package '${pkg}'"
-        _pacman "${pkg}"
-    done
+    mount -t aufs -o br:${lastbr}=rw aufs ${union}
+    if [ $? -ne 0 ]; then 
+	echo "Error mounting $UNION."
+	exit 1
+    fi
+
+    #echo "Installing packages..."
+    #echo " Installing packages from '${PKGFILE}'"
+    #install_pkgfile "${PKGFILE}"
+    
+    #for pkg in ${PKGLIST}; do
+    #    echo "   Installing package '${pkg}'"
+    #    _pacman "${pkg}"
+    #done
+
+
+
+    for mod in ${MODULES}; do
+	mkdir -p "${moduledir}/${mod}"
+	mount -o remount,add:0:${moduledir}/${mod}=rw aufs ${union}
+	mount -o remount,mod:${lastbr}=ro aufs ${union}
+	lastbr="${moduledir}/${mod}"
+
+if [ -e "${union}/var/lib/pacman/db.lck" ]; then
+	rm -f ${union}/var/lib/pacman/db.lck
+fi
+	mkdir -p "${union}/var/lib/pacman"	
+
+pacman -Sy --noprogressbar --noconfirm --cachedir "${cache}" -fr "${union}"
+
+	cat  "list/${mod}.list" | grep -v "^#" | while read pkgname; do
+		echo "   Installing package $pkgname"
+		pacman -S --noprogressbar --needed --noconfirm --cachedir "$cache" -r "$union" $pkgname
+		#install_package $cache "$pkgname" $union
+	done
+	
+	if [ -e "list/${mod}.removelist" ]; then
+	cat "list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
+		echo "	Removeing package $pkgname"
+		pacman -R -d --noprogressbar --needed --noconfirm --cachedir "$cache" -r "$union" $pkgname
+	done
+	fi
+	
+	if [ -e "${union}/etc/ld.so.conf" ]; then
+		ldconfig -r ${union}
+	fi
+
+	if [ -d "${union}/usr/share/icons" ]; then
+	remove "${union}/usr/share/icons/hicolor/icon-theme.cache"
+	remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
+	fi
 
     echo "Updating kernel module dependencies"
     kernelver=$(_kversion)
-    depmod -a -b "${instroot}" "${kernelver}"
+    depmod -a -b "${union}" "${kernelver}"
     # remove the initcpio images that were generated for the host system
-    find "${instroot}/boot" -name *.img -delete
+    find "${union}/boot" -name *.img -delete
 
     echo "Creating default home directory"
-    install -d -o1000 -g100 -m0755 "${instroot}/home/arch"
+    install -d -o1001 -g100 -m0755 "${union}/home/arch"
 
     # Cleanup
     echo "Cleaning up image root files..."
-    find "${instroot}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+    find "${union}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
 
     # delete a lot of unnecessary cache/log files
-    kill_dirs="var/abs var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd"
+    kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd"
     for x in ${kill_dirs}; do
-        if [ -e "${instroot}/${x}" ]; then
-            rm -rf "${instroot}/${x}"
+        if [ -e "${union}/${x}" ]; then
+            rm -rf "${union}/${x}"
         fi
     done
 
     # pacman DBs are big, delete all sync dbs
-    rm -rf "${instroot}/var/lib/pacman/sync"
+    rm -rf ${union}/var/lib/pacman/sync/*
 
     # copy over kernel and grub configs for boot
-    if [ -e "${instroot}/boot" -a -e "${DEF_CONFIG_DIR}/boot" ]; then
+    if [ -e "${union}/boot" -a -e "${DEF_CONFIG_DIR}/boot" ]; then
         rm -rf "${imgroot}/boot"
-        cp -r "${instroot}/boot" "${imgroot}"
+        cp -r "${union}/boot" "${imgroot}"
         cp -rf "${DEF_CONFIG_DIR}/boot" "${imgroot}"
     fi
+   done
+   
+   if [ -e "$(pwd)/isolinux" ]; then
+   		cp -r "$(pwd)/isolinux" "${imgroot}"
+   fi
+
+# Unmount union
+echo "Unmounting union."
+umount -l ${union}
+
+# Clean up unionfs whiteout files
+#echo "Removing unionfs .wh. files."
+find ${moduledir} -type f -name ".wh.*" -exec rm {} \;
+find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
 
     # TODO: this might belong somewhere else
     mkdir -p "${imgroot}/addons"
@@ -173,36 +272,58 @@ if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
     # always make an addon out of DEF_CONFIG_DIR
     echo "Creating default-config addon..."
     if [ "${QUIET}" = "y" ]; then
-        mksquashfs "${DEF_CONFIG_DIR}" "${imgroot}/addons/default-config.sqfs" -noappend >/dev/null
+        /sbin/mksquashfs "${DEF_CONFIG_DIR}" "${imgroot}/addons/default-config.sqfs" -noappend >/dev/null
+	/sbin/mksquashfs "${CUSTOM_CONFIG_DIR}" "${imgroot}/addons/custom-config.sqfs" -noappend >/dev/null
     else
-        mksquashfs "${DEF_CONFIG_DIR}" "${imgroot}/addons/default-config.sqfs" -noappend
+        /sbin/mksquashfs "${DEF_CONFIG_DIR}" "${imgroot}/addons/default-config.sqfs" -noappend
+	/sbin/mksquashfs "${CUSTOM_CONFIG_DIR}" "${imgroot}/addons/custom-config.sqfs" -noappend
     fi
 fi
 
 # Squash is the next step.
 if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
     echo "====> Generating SquashFS image"
-    imagename="${imgroot}/archlive.sqfs"
-    if [ -e "${imagename}" ]; then
-        if [ "${FORCE}" = "y" ]; then
-            echo -n "Removing old SquashFS image..."
-            rm "${imagename}"
-            echo "done."
-        else
-            echo "error: SquashFS image '${imagename}' already exists, aborting."
-            exit 1
-        fi
+    #imagename="${imgroot}/archlive.sqfs"
+    #if [ -e "${imagename}" ]; then
+    #    if [ "${FORCE}" = "y" ]; then
+    #        echo -n "Removing old SquashFS image..."
+    #        rm "${imagename}"
+    #        echo "done."
+    #    else
+    #        echo "error: SquashFS image '${imagename}' already exists, aborting."
+    #        exit 1
+    #    fi
+    #fi
+
+    #echo "Creating squashfs base image. This may take some time..."
+    #start=$(date +%s)
+    #if [ "${QUIET}" = "y" ]; then
+    #    /sbin/mksquashfs "${instroot}" "${imagename}" -noappend >/dev/null
+    #else
+    #    /sbin/mksquashfs "${instroot}" "${imagename}" -noappend
+    #fi
+    #minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
+    #echo "Base image creation done in $minutes minutes."
+
+echo "Creating modules procede..."
+start=$(date +%s)
+    if [ -d "${MODULESCOPY}" ]; then
+	cp -r ${MODULESCOPY}/* "${imgroot}/modules"
     fi
 
-    echo "Creating squashfs image. This may take some time..."
-    start=$(date +%s)
-    if [ "${QUIET}" = "y" ]; then
-        mksquashfs "${instroot}" "${imagename}" -noappend >/dev/null
-    else
-        mksquashfs "${instroot}" "${imagename}" -noappend
-    fi
+for DIR in $MODULES; do
+	MOD="$(basename $DIR).sqfs"
+	echo "building $MOD"
+	/sbin/mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend > /dev/null
+	chmod 0444 ${moduleplace}/$MOD
+done
     minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
-    echo "Image creation done in $minutes minutes."
+    echo "Modules creation done in $minutes minutes."
+    cp -af $(pwd)/mkiso.sh ${imgroot}/mkiso.sh
+    if [ -e ${moduleplace}/archlive.sqfs ]; then
+	mv ${moduleplace}/archlive.sqfs ${imgroot}/archlive.sqfs
+    fi
+
 fi
 
 # Finally, make the image.
@@ -254,6 +375,7 @@ if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
             -input-charset=UTF-8 -p "prepared by $NAME" \
             -A "Arch Linux Live/Rescue CD" \
             -o "${imgname}" "${imgroot}"
+       md5sum "${imgname}" > "${imgname}".md5
     fi
 fi
 
