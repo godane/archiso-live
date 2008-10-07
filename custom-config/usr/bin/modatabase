@@ -1,0 +1,67 @@
+#!/bin/bash
+
+if [ -e /bootmnt/archlive.sqfs ]; then
+		touch /bootmnt/empty 2>/dev/null
+		rm -f /bootmnt/empty 2>/dev/null
+fi
+
+find /bootmnt/modules/extras -name "*.sqfs" | sort > /bootmnt/modules/extras/db.mod
+
+sed -i "s|/bootmnt/modules/extras/||g" /bootmnt/modules/extras/db.mod
+
+sed -i "s|.sqfs||g" /bootmnt/modules/extras/db.mod
+
+sed -i "s|-i686||g" /bootmnt/modules/extras/db.mod
+
+#pacman -Qeu > /bootmnt/modules/extras/db.update
+
+#cp -f /bootmnt/modules/extras/db.mod /bootmnt/modules/extras/db.mod1
+#sed -i "s|-[0-9].*||g" /bootmnt/modules/extras/db.mod1
+
+#varwordline=$(wc -l /bootmnt/modules/extras/db.mod | sed "s| /bootmnt/modules/extras/db.mod||g")
+
+#PWD=$(pwd)
+
+pkg()
+{
+	if [ "$1" != "" ]; then
+	TMPDIR="$(pwd)/pkg2lzm$$"
+	mkdir -p $TMPDIR/var/lib/pacman/local
+	#sync
+	
+	#if [ $(whereis yaourt) ]; then
+	pacman -Sw "$1" --noconfirm
+	PKG=$(ls /var/cache/pacman/pkg/$1-[0-9]*.pkg.tar.gz)
+	pacman -U -d -r $TMPDIR $PKG
+	#else
+	#pacman -Sw "$1" --noconfirm
+	#pacman -U -d -r $TMPDIR $PKG
+	#fi
+	
+	echo "Creating module ..."
+
+	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.gz).sqfs"
+	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
+	
+	if [ $? -ne 0 ]; then 
+	echo "Error building module"
+	exit
+	fi
+	echo $DESTINATION
+	chmod 0755 $DESTINATION
+	fi
+}
+
+pacman -Sy
+
+cat "/bootmnt/modules/extras/db.mod" | while read pkgname; do
+if [ $pkgname != "" ]; then
+	if [ ! $(find /var/lib/pacman/sync -name $pkgname) ]; then
+	mkdir -p /bootmnt/old
+	cd /bootmnt/modules/extras
+	mv $pkgname* /bootmnt/old
+	pkgname=$(echo $pkgname | sed "s|-[0-9].*||g")
+    pkg $pkgname
+    fi
+fi
+done

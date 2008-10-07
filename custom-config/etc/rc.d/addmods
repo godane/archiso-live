@@ -1,0 +1,31 @@
+#!/bin/sh
+
+. /usr/lib/liblinuxlive
+
+MEMORY="/mnt/live/memory"
+CHANGES="${MEMORY}/changes"
+XINO="${MEMORY}/xino"
+IMAGES="/mnt/live/memory/images"
+FROM="$(cmdline_value from)"
+UNION="/"
+DATA="/bootmnt"
+#if [ "${FROM}" != "" ]; then
+#DATA="/live"
+#fi
+
+mkdir -p ${IMAGES}/archlive.sqfs
+	if [ -e "/bootmnt/archlive.sqfs" ]; then
+		mount -t squashfs -o loop /bootmnt/archlive.sqfs ${IMAGES}/archlive.sqfs
+	elif [ -e "/live/archlive.sqfs" ]; then
+		mount -t squashfs -o loop /live/archlive.sqfs ${IMAGES}/archlive.sqfs
+	else
+		echo "cant mount archlive.sqfs to $IMAGES"
+	fi
+
+
+mkdir -p "${IMAGES}"
+union_insert_modules "${UNION}" "${DATA}" "${IMAGES}"
+#rootcopy
+
+touch "/etc/fstab"
+fstab_update /
