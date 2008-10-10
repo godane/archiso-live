@@ -56,9 +56,9 @@ fi
 
 
 # noxconf: Skip X (video & keyboard) auto configuration
-#if [ ! "`cmdline_parameter noxconf`" ]; then
-#    [[ -x /usr/sbin/videoconfig ]] && /usr/sbin/videoconfig silent
-#fi
+if [ ! "`cmdline_parameter noxconf`" ]; then
+    [[ -x /usr/sbin/videoconfig ]] && /usr/sbin/videoconfig silent
+fi
 
 
 # numlock: Override default numlock settings
