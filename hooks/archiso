@@ -126,7 +126,11 @@ run_hook ()
     else
 
     # always layer default configuration
-    _mnt_squashfs "${addon_dir}/default-config.sqfs"
+    if [ "${custom}" = "y" ]; then
+    	_mnt_squashfs "${addon_dir}/custom-config.sqfs"
+    else
+    	_mnt_squashfs "${addon_dir}/default-config.sqfs"
+    fi
 
     if [ -e "${addon_dir}/config" ]; then
         msg ":: Mounting addons"
