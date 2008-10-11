@@ -460,7 +460,7 @@ union_insert_dir()
    if [ "$(cmdline_parameter aufs)" ]; then
    mount -n -o remount,add:2:$2=rr aufs $1
    else
-   mount -t unionfs -o remount,add=:$2=ro aufs $1
+   mount -t unionfs -o remount,add=:$2=ro none $1
    fi
 }
 
