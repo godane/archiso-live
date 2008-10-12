@@ -1,0 +1,5 @@
+gtk-theme-name="Clearlooks"
+gtk-icon-theme-name="nuoveXT2"
+gtk=font-name="Sans 10"
+gtk-toolbar-style=2
+include "~/.gtkrc-2.0.mine"
