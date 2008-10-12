@@ -90,7 +90,7 @@ run_hook ()
 
     msg ":: Mounting root (union) filesystem"
     if [ "${aufs}" = "y" ]; then
-    /bin/modprobe -q aufs >/dev/null 2>&1
+    /bin/modprobe -q aufs brs=1 >/dev/null 2>&1
     /bin/mount -t aufs -o nowarn_perm,br:/tmpfs=rw aufs /real_root
     else
     /bin/modprobe -q unionfs >/dev/null 2>&1
