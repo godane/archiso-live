@@ -32,7 +32,7 @@ gid=$uid
 
 echo "Setting up account $login " #for $fullname..."
 
-echo ${login}:x:${uid}:${gid}:${fullname}:${homedir}:$shell >> $pwfile
+echo ${login}:x:${uid}:${gid}:${fullname}:${homedir}:/bin/bash >> $pwfile
 echo ${login}:*:11647:0:99999:7::: >> $shadowfile
 
 echo "${login}:x:${gid}:users" >> $gfile
@@ -40,7 +40,7 @@ echo "${login}:x:${gid}:users" >> $gfile
 mkdir $homedir
 cp -R /etc/skel/.[a-zA-Z]* $homedir
 chmod 755 $homedir
-find $homedir -print | xargs chown ${login}:$login 
+find $homedir -print | xargs chown ${login}:users
 
 # setting an initial password
 #passwd $login

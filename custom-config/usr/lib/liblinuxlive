@@ -536,9 +536,10 @@ union_insert_module()
 union_insert_modules()
 {
    debug_log "union_insert_modules" "$*"
-   local INSERTED
-
-   list_modules $2 | while read MODULE; do
+   local INSERTED modlist
+   modlist="/tmp/modlist$$"
+   list_modules $2 > $modlist
+   cat $modlist | while read MODULE; do
       INSERTED=$(union_insert_module $1 $MODULE $3 ${#2})
       if [ "$INSERTED" != "" ]; then echolog " -> $(echo $INSERTED | sed -r s:^/::)"; fi
    done

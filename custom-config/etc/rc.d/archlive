@@ -6,7 +6,6 @@
 
 . /usr/lib/liblinuxlive
 
-
 # passwd: Change root's password at startup
 newrootpass="`cmdline_value passwd`"
 if [ "$newrootpass" = "ask" ]; then
@@ -78,11 +77,10 @@ if [ "$session" != "" ]; then
 fi
 
 #autologin: Enables autologin
-#if [ "`cmdline_value autologin`" ]; then
-#   	/etc/rc.d/adduser "${autologin}"
-#   	/bin/su ${autologin} -l -c "/bin/sh --login  -c /usr/bin/startx > /dev/null 2>/dev/null"
-if [ "`cmdline_parameter autologin`" ]; then
-	/etc/rc.d/adduser arch
-	/bin/su arch -l -c "/bin/sh --login  -c /usr/bin/startx > /dev/null 2>/dev/null"
+if [ "`cmdline_vaule autologin`" ]; then
+   	/etc/rc.d/adduser "${autologin}"
+   	/bin/su ${autologin} -l -c "/bin/bash --login  -c /usr/bin/startx > /dev/null 2>/dev/null"
+else
+   	/etc/rc.d/adduser arch
+   	/bin/su arch -l -c "/bin/bash --login  -c /usr/bin/startx > /dev/null 2>/dev/null"
 fi
-

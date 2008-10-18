@@ -3,4 +3,5 @@
 depmod
 modprobe vboxdrv
 sleep 3
-chmod 0777 /dev/vboxdrv
+#chmod 0777 /dev/vboxdrv
+chown root:vboxusers /dev/vboxdrv

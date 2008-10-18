@@ -15,7 +15,7 @@ title  Select Desktop with Autologin
 configfile /boot/grub/desktop.lst
 
 title  Boot ArchLive Desktop in failsafe mode
-kernel /boot/vmlinuz26 keymap=us locale=en_US.UTF-8 ramdisk_size=60% aufs custom noxconf acpi=off
+kernel /boot/vmlinuz26 keymap=us locale=en_US.UTF-8 ramdisk_size=60% custom noxconf acpi=off
 initrd /boot/archlive.img
 
 title  Boot ArchLive Desktop with unionfs

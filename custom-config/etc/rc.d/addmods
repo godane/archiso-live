@@ -13,6 +13,12 @@ DATA="/bootmnt"
 #DATA="/live"
 #fi
 
+rootcopy()
+{
+	cp -a "$1/rootcopy" "$2"
+}
+
+if [ ! $(cmdline_parameter nomodules) ]; then
 mkdir -p ${IMAGES}/archlive.sqfs
 	if [ -e "/bootmnt/archlive.sqfs" ]; then
 		mount -t squashfs -o loop /bootmnt/archlive.sqfs ${IMAGES}/archlive.sqfs
@@ -25,7 +31,12 @@ mkdir -p ${IMAGES}/archlive.sqfs
 
 mkdir -p "${IMAGES}"
 union_insert_modules "${UNION}" "${DATA}" "${IMAGES}"
-#rootcopy
+fi
+
+#if [ ! $(cmdline_parameter norootcopy) ]; then
+#rootcopy "${DATA}" "${UNION}"
+#fi
 
 touch "/etc/fstab"
 fstab_update /
+
