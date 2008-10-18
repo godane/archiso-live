@@ -170,7 +170,7 @@ if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
 	echo "Error mounting $UNION."
 	exit 1
     fi
-
+    
     #echo "Installing packages..."
     #echo " Installing packages from '${PKGFILE}'"
     #install_pkgfile "${PKGFILE}"
@@ -197,14 +197,14 @@ pacman -Sy --noprogressbar --noconfirm --cachedir "${cache}" -fr "${union}"
 
 	cat  "list/${mod}.list" | grep -v "^#" | while read pkgname; do
 		echo "   Installing package $pkgname"
-		pacman -S --noprogressbar --needed --noconfirm --cachedir "$cache" -r "$union" $pkgname
+		pacman -S -f --noprogressbar --needed --noconfirm --cachedir "$cache" -r "$union" $pkgname
 		#install_package $cache "$pkgname" $union
 	done
 	
 	if [ -e "list/${mod}.removelist" ]; then
 	cat "list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
 		echo "	Removeing package $pkgname"
-		pacman -R -d --noprogressbar --needed --noconfirm --cachedir "$cache" -r "$union" $pkgname
+		pacman -R -d -n --noprogressbar --needed --noconfirm --cachedir "$cache" -r "$union" $pkgname
 	done
 	fi
 	
