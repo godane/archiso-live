@@ -1,9 +1,0 @@
-qtmod
-kdemod-kde-common
-kdemod-kdelibs
-kdemod-kdepimlibs
-kdemod-kdebase-runtime
-kdemod-kdebase-runtime-icons
-kdemod-kdebase-apps
-kdemod-kdebase-workspace
-#kdemod-kdebase-workspace-wallpapers

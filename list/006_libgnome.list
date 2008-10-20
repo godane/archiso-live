@@ -10,3 +10,5 @@ libgnomecanvas
 gnome-python-desktop
 gnome-python-extras
 libgtop
+gnome-doc-utils
+wv
