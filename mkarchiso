@@ -225,16 +225,18 @@ pacman -Sy --noprogressbar --noconfirm --cachedir "${cache}" -fr "${union}"
 
     echo "Creating default home directory"
     install -d -o1001 -g100 -m0755 "${union}/home/arch"
+	chown -R arch:users "${CUSTOM_CONFIG_DIR}home/arch"
+	chmod -R 755 "${CUSTOM_CONFIG_DIR}/home/arch"
 
     # Cleanup
     echo "Cleaning up image root files..."
     find "${union}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
 
     # delete a lot of unnecessary cache/log files
-    kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd"
+    kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd usr/share/devhelp usr/share/doc usr/share/gtk-doc"
     for x in ${kill_dirs}; do
         if [ -e "${union}/${x}" ]; then
-            rm -rf "${union}/${x}"
+            rm -Rf "${union}/${x}"
         fi
     done
 
