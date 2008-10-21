@@ -77,7 +77,7 @@ fi
 # if we are here, the module has been successfuly removed from aufs union
 # so now we have to umount the lzm file and then free the loop device
 LOOP=$(cat /proc/mounts | grep "$IMAGES/$MODULE " | cut -d " " -f 1)
-umount -n "$IMAGES/$MODULE" 2>/dev/null
+umount -l -n "$IMAGES/$MODULE" 2>/dev/null
 if [ $? -ne 0 ]; then
    exit 4
 fi
