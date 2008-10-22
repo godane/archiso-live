@@ -24,40 +24,40 @@ if [ "`cmdline_parameter ldconfig`" ]; then
 fi
 
 # lang: Override default language
-lang="`cmdline_value locale`"
-if [ "$locale" ]; then
+#lang="`cmdline_value locale`"
+#if [ "$locale" ]; then
 	#echo "$lang ISO-8859-1" >> /etc/locale.gen
-    echo "$locale UTF-8" > /etc/locale.gen
+#    echo "$locale UTF-8" > /etc/locale.gen
     #echo "$lang UTF-8" >> /etc/locale.gen
-    locale-gen
+#    locale-gen
 	#[[ "`locale -a | grep -w $lang`" ]] && \
 	#sed -i -e 's/^ *\(LOCALE=\).*$/\1$lang.UTF-8/' /etc/rc.conf
-fi
+#fi
 
 # Make firefox match OS locale
-if [ -w /usr/lib/firefox/greprefs/all.js ]; then
-    sed -i -e 's/pref("intl.locale.matchOS",                 false);/pref("intl.locale.matchOS",                 true);/g' /usr/lib/firefox-3.0/greprefs/all.js
-fi
+#if [ -w /usr/lib/firefox/greprefs/all.js ]; then
+#    sed -i -e 's/pref("intl.locale.matchOS",                 false);/pref("intl.locale.matchOS",                 true);/g' /usr/lib/firefox-3.0/greprefs/all.js
+#fi
 
 # Make thunderbird match OS locale
-if [ -w /usr/lib/thunderbird/greprefs/all.js ]; then
-    sed -i -e 's/pref("intl.locale.matchOS",                 false);/pref("intl.locale.matchOS",                 true);/g' /usr/lib/thunderbird/greprefs/all.js
-fi
+#if [ -w /usr/lib/thunderbird/greprefs/all.js ]; then
+#    sed -i -e 's/pref("intl.locale.matchOS",                 false);/pref("intl.locale.matchOS",                 true);/g' /usr/lib/thunderbird/greprefs/all.js
+#fi
 
 
 # keyb: Override default keyboard layout
-keyb="`cmdline_value keyb`"
-if [ "$keyb" ]; then
-   if [ -x /bin/loadkeys ]; then
- 	/bin/loadkeys $keyb
-   fi
-fi
+#keyb="`cmdline_value keyb`"
+#if [ "$keyb" ]; then
+#   if [ -x /bin/loadkeys ]; then
+# 	/bin/loadkeys $keyb
+#   fi
+#fi
 
 
 # noxconf: Skip X (video & keyboard) auto configuration
-if [ ! "`cmdline_parameter noxconf`" ]; then
-    [[ -x /usr/sbin/videoconfig ]] && /usr/sbin/videoconfig silent
-fi
+#if [ ! "`cmdline_parameter noxconf`" ]; then
+#    [[ -x /usr/sbin/videoconfig ]] && /usr/sbin/videoconfig silent
+#fi
 
 
 # numlock: Override default numlock settings
@@ -77,7 +77,7 @@ if [ "$session" != "" ]; then
 fi
 
 #autologin: Enables autologin
-if [ "`cmdline_vaule autologin`" ]; then
+if [ "`cmdline_value autologin`" ]; then
    	/etc/rc.d/adduser "${autologin}"
    	/bin/su ${autologin} -l -c "/bin/bash --login  -c /usr/bin/startx > /dev/null 2>/dev/null"
 else
