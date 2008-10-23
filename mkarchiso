@@ -218,9 +218,6 @@ if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
 	remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
 	fi
 
-    echo "Updating kernel module dependencies"
-    kernelver=$(_kversion)
-    depmod -a -b "${union}" "${kernelver}"
     # remove the initcpio images that were generated for the host system
     find "${union}/boot" -name *.img -delete
 
@@ -260,6 +257,10 @@ if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
 echo "Unmounting union."
 umount -l ${union}
 
+echo "Updating kernel module dependencies"
+kernelver=$(_kversion)
+depmod -a -b "${instroot}" "${kernelver}"
+	
 # Clean up unionfs whiteout files
 #echo "Removing unionfs .wh. files."
 find ${moduledir} -type f -name ".wh.*" -exec rm {} \;
