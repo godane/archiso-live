@@ -65,6 +65,7 @@ desktop-file-utils
 archlinux-menus
 archlinux-xdg-menu
 fam
+xdialog
 #fonts
 ttf-dejavu
 gsfonts

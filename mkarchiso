@@ -188,12 +188,13 @@ if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
 	mount -o remount,mod:${lastbr}=ro aufs ${union}
 	lastbr="${moduledir}/${mod}"
 
-if [ -e "${union}/var/lib/pacman/db.lck" ]; then
-	rm -f ${union}/var/lib/pacman/db.lck
-fi
+	if [ -e "${union}/var/lib/pacman/db.lck" ]; then
+		rm -f ${union}/var/lib/pacman/db.lck
+	fi
+	
 	mkdir -p "${union}/var/lib/pacman"	
 
-pacman -Sy --noprogressbar --noconfirm --cachedir "${cache}" -fr "${union}"
+	pacman -Sy --noprogressbar --noconfirm --cachedir "${cache}" -fr "${union}"
 
 	cat  "list/${mod}.list" | grep -v "^#" | while read pkgname; do
 		echo "   Installing package $pkgname"

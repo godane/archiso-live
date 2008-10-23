@@ -54,6 +54,7 @@ mc
 htop
 dbus-glib
 hal
+policykit
 virtualbox-modules
 screen
 irssi
