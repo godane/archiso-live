@@ -96,7 +96,8 @@ remove()
 
 # Go through the main commands in order. If 'all' was specified, then we want
 # to do everything. Start with 'install'.
-if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
+#if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
+command_install () {
     echo "====> Installing/building image root"
     if [ -e "${work_dir}" -a "${FORCE}" = "n" ]; then
         echo "error: Working dir '${work_dir}' already exists, aborting."
@@ -225,10 +226,12 @@ find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
         /sbin/mksquashfs "${DEF_CONFIG_DIR}" "${imgroot}/addons/default-config.sqfs" -noappend
 	/sbin/mksquashfs "${CUSTOM_CONFIG_DIR}" "${imgroot}/addons/custom-config.sqfs" -noappend
     fi
-fi
+#fi
+}
 
 # Squash is the next step.
-if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
+#if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
+command_squash () {
     echo "====> Generating SquashFS image"
 echo "Creating modules procede..."
 start=$(date +%s)
@@ -248,11 +251,12 @@ done
     if [ -e ${moduleplace}/archlive.sqfs ]; then
 	mv ${moduleplace}/archlive.sqfs ${imgroot}/archlive.sqfs
     fi
-
-fi
+#fi
+}
 
 # Finally, make the image.
-if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
+#if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
+command_img () {
     echo "====> Making bootable image"
     [ "x${imgname}" = "x" ] && (echo "Bootable image name must be specified" && usage 1)
     if [ -e "${imgname}" ]; then
@@ -302,6 +306,15 @@ if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
             -o "${imgname}" "${imgroot}"
        md5sum "${imgname}" > "${imgname}".md5
     fi
-fi
+}
 
+if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
+	command_install
+fi
+if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
+	command_squash
+fi
+if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
+	command_img
+fi
 # vim:ts=4:sw=4:et:
