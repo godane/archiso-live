@@ -56,6 +56,9 @@ if [ "$EUID" != "0" ]; then
 fi
 
 command_name="${1}"
+work_dir=""
+imgname=""
+
 case "${command_name}" in
     install) work_dir="${2}" ;;
     squash) work_dir="${2}" ;;
@@ -64,7 +67,15 @@ case "${command_name}" in
     *) echo "invalid command name '${command_name}'"; usage 1 ;;
 esac
 
+[ "x${imgname}" = "x" ] && (echo "Bootable image name must be specified" && usage 1)
 [ "x${work_dir}" = "x" ] && (echo "please specify a working directory" && usage 1)
+
+echo "${APPNAME} : Configuration Settings"
+echo "   mkinitcpio config file:   ${CPIOCONFIG}"
+#echo "   mount description file:   ${MOUNTFILE}"
+echo "        working directory:   ${work_dir}"
+echo "               image name:   ${imgname}"
+echo "               image type:   ${IMG_TYPE}"
 
 IMGROOT="${work_dir}/img"
 union="${work_dir}/union"
@@ -258,7 +269,6 @@ done
 #if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
 command_img () {
     echo "====> Making bootable image"
-    [ "x${imgname}" = "x" ] && (echo "Bootable image name must be specified" && usage 1)
     if [ -e "${imgname}" ]; then
         if [ "${FORCE}" = "y" ]; then
             echo "Removing existing bootable image..."
