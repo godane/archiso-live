@@ -13,7 +13,7 @@ usage ()
     #echo "    -p PACKAGE       Additional package to install, can be used multiple times"
     echo "    -c CACHE	       Cache folder for the packages going in iso. default: ${CACHE}"
     echo "    -M MODULES       Modules for livecd. default: ${MODULES}"
-    echo "    -m MODULESCOPY   Copy modules from a folder to modules place in imgroot. default: none"
+    echo "    -m MODULESCOPY   Copy modules from a folder to modules place in IMGROOT. default: none"
     echo "    -a ADDON_DIR     Use addons from DIR. default: none"
     echo "    -t <iso,disk>    Type of image to create. Defaults to iso."
     echo "    -v               Enable verbose output."
@@ -66,20 +66,20 @@ esac
 
 [ "x${work_dir}" = "x" ] && (echo "please specify a working directory" && usage 1)
 
-imgroot="${work_dir}/img"
+IMGROOT="${work_dir}/img"
 union="${work_dir}/union"
 lastbr="${work_dir}/empty"
-moduleplace="${imgroot}/modules"
+moduleplace="${IMGROOT}/modules"
 moduledir="${work_dir}/modules"
-instroot="${moduledir}/archlive"
-rootcopy="${imgroot}/rootcopy"
-optional="${imgroot}/optional"
-changes="${imgroot}/changes"
+INSTROOT="${moduledir}/archlive"
+rootcopy="${IMGROOT}/rootcopy"
+optional="${IMGROOT}/optional"
+changes="${IMGROOT}/changes"
 cache="${CACHE}"
 
 _kversion ()
 {
-    source ${instroot}/etc/mkinitcpio.d/kernel26.kver
+    source ${INSTROOT}/etc/mkinitcpio.d/kernel26.kver
     echo ${ALL_kver}
 }
 
@@ -104,8 +104,8 @@ command_install () {
         exit 1
     fi
 
-    mkdir -p "${imgroot}"
-    mkdir -p "${instroot}"
+    mkdir -p "${IMGROOT}"
+    mkdir -p "${INSTROOT}"
     mkdir -p "${lastbr}"
     mkdir -p "${union}"
     mkdir -p "${moduleplace}"
@@ -187,14 +187,14 @@ command_install () {
 
     # copy over kernel and grub configs for boot
     if [ -e "${union}/boot" -a -e "${DEF_CONFIG_DIR}/boot" ]; then
-        rm -rf "${imgroot}/boot"
-        cp -r "${union}/boot" "${imgroot}"
-        cp -rf "${DEF_CONFIG_DIR}/boot" "${imgroot}"
+        rm -rf "${IMGROOT}/boot"
+        cp -r "${union}/boot" "${IMGROOT}"
+        cp -rf "${DEF_CONFIG_DIR}/boot" "${IMGROOT}"
     fi
    done
    
    if [ -e "$(pwd)/isolinux" ]; then
-   		cp -r "$(pwd)/isolinux" "${imgroot}"
+   		cp -r "$(pwd)/isolinux" "${IMGROOT}"
    fi
 
 # Unmount union
@@ -203,7 +203,7 @@ umount -l ${union}
 
 echo "Updating kernel module dependencies"
 kernelver=$(_kversion)
-depmod -a -b "${instroot}" "${kernelver}"
+depmod -a -b "${INSTROOT}" "${kernelver}"
 	
 # Clean up unionfs whiteout files
 #echo "Removing unionfs .wh. files."
@@ -211,20 +211,20 @@ find ${moduledir} -type f -name ".wh.*" -exec rm {} \;
 find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
 
     # TODO: this might belong somewhere else
-    mkdir -p "${imgroot}/addons"
+    mkdir -p "${IMGROOT}/addons"
     if [ -d "${ADDON_DIR}" ]; then
         echo "Copying addons from ${ADDON_DIR}..."
-        cp -r ${ADDON_DIR}/* "${imgroot}/addons"
+        cp -r ${ADDON_DIR}/* "${IMGROOT}/addons"
     fi
 
     # always make an addon out of DEF_CONFIG_DIR
     echo "Creating default-config addon..."
     if [ "${QUIET}" = "y" ]; then
-        /sbin/mksquashfs "${DEF_CONFIG_DIR}" "${imgroot}/addons/default-config.sqfs" -noappend >/dev/null
-	/sbin/mksquashfs "${CUSTOM_CONFIG_DIR}" "${imgroot}/addons/custom-config.sqfs" -noappend >/dev/null
+        /sbin/mksquashfs "${DEF_CONFIG_DIR}" "${IMGROOT}/addons/default-config.sqfs" -noappend >/dev/null
+	/sbin/mksquashfs "${CUSTOM_CONFIG_DIR}" "${IMGROOT}/addons/custom-config.sqfs" -noappend >/dev/null
     else
-        /sbin/mksquashfs "${DEF_CONFIG_DIR}" "${imgroot}/addons/default-config.sqfs" -noappend
-	/sbin/mksquashfs "${CUSTOM_CONFIG_DIR}" "${imgroot}/addons/custom-config.sqfs" -noappend
+        /sbin/mksquashfs "${DEF_CONFIG_DIR}" "${IMGROOT}/addons/default-config.sqfs" -noappend
+	/sbin/mksquashfs "${CUSTOM_CONFIG_DIR}" "${IMGROOT}/addons/custom-config.sqfs" -noappend
     fi
 #fi
 }
@@ -236,7 +236,7 @@ command_squash () {
 echo "Creating modules procede..."
 start=$(date +%s)
     if [ -d "${MODULESCOPY}" ]; then
-	cp -r ${MODULESCOPY}/* "${imgroot}/modules"
+	cp -r ${MODULESCOPY}/* "${IMGROOT}/modules"
     fi
 
 for DIR in $MODULES; do
@@ -247,9 +247,9 @@ for DIR in $MODULES; do
 done
     minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
     echo "Modules creation done in $minutes minutes."
-    cp -af $(pwd)/mkiso.sh ${imgroot}/mkiso.sh
+    cp -af $(pwd)/mkiso.sh ${IMGROOT}/mkiso.sh
     if [ -e ${moduleplace}/archlive.sqfs ]; then
-	mv ${moduleplace}/archlive.sqfs ${imgroot}/archlive.sqfs
+	mv ${moduleplace}/archlive.sqfs ${IMGROOT}/archlive.sqfs
     fi
 #fi
 }
@@ -274,14 +274,14 @@ command_img () {
     fi
 
     kernelver=$(_kversion)
-    basedir=${instroot}
-    [ "${instroot:0:1}" != "/" ] && basedir="$(pwd)/${instroot}"
+    basedir=${INSTROOT}
+    [ "${INSTROOT:0:1}" != "/" ] && basedir="$(pwd)/${INSTROOT}"
     echo "Generating initcpio for image..."
     if [ "${QUIET}" = "y" ]; then
-        mkinitcpio -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${imgroot}/boot/archlive.img" >/dev/null
+        mkinitcpio -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${IMGROOT}/boot/archlive.img" >/dev/null
         ret=$?
     else
-        mkinitcpio -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${imgroot}/boot/archlive.img"
+        mkinitcpio -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${IMGROOT}/boot/archlive.img"
         ret=$?
     fi
     if [ $ret -ne 0 ]; then
@@ -289,11 +289,11 @@ command_img () {
         exit 1
     fi
 
-    cp ${instroot}/usr/lib/grub/i386-pc/* "${imgroot}/boot/grub"
+    cp ${INSTROOT}/usr/lib/grub/i386-pc/* "${IMGROOT}/boot/grub"
 
     if [ "x$IMG_TYPE" == "xdisk" ]; then
         echo "Creating DISK image..."
-        mkusbimg "${imgroot}" "${imgname}"
+        mkusbimg "${IMGROOT}" "${imgname}"
     else
         echo "Creating ISO image..."
         q=""
@@ -303,7 +303,7 @@ command_img () {
             -publisher "Arch Linux <archlinux.org>" \
             -input-charset=UTF-8 -p "prepared by $NAME" \
             -A "Arch Linux Live/Rescue CD" \
-            -o "${imgname}" "${imgroot}"
+            -o "${imgname}" "${IMGROOT}"
        md5sum "${imgname}" > "${imgname}".md5
     fi
 }
