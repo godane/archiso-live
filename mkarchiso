@@ -19,10 +19,10 @@ usage ()
     echo "    -v               Enable verbose output."
     echo "    -h               This message."
     echo " commands:"
-    echo " install <working dir>        : where to build the image root"
-    echo " squash <working dir>         : generate a squashfs image of the installed root"
-    echo " img <working dir> <image name> : build an image from the working directory"
-    echo " all <working dir> <image name> : perform all of the above, in order"
+    echo "     install <working dir>        : install packages to the working dir"
+    echo "     squash <working dir>         : generate a squashfs image of the installed root"
+    echo "     img <working dir> <image name> : build an image from the working directory"
+    echo "     all <working dir> <image name> : perform all of the above, in order"
     exit $1
 }
 
