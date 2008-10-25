@@ -1,0 +1,328 @@
+#!/bin/bash
+
+. $(pwd)/config
+
+# usage: usage <exitvalue>
+usage ()
+{
+    echo "usage ${APPNAME} [options] command <command options>"
+    echo " general options:"
+    echo "    -f               Force overwrite of working files/squashfs image/bootable image"
+    echo "    -i CPIO_CONFIG   Use CONFIG file for mkinitcpio. default: ${CPIOCONFIG}"
+    #echo "    -P PKGFILE       File with list of packages to install. default: ${PKGFILE}"
+    #echo "    -p PACKAGE       Additional package to install, can be used multiple times"
+    echo "    -c CACHE	       Cache folder for the packages going in iso. default: ${CACHE}"
+    echo "    -M MODULES       Modules for livecd. default: ${MODULES}"
+    echo "    -m MODULESCOPY   Copy modules from a folder to modules place in IMGROOT. default: none"
+    echo "    -a ADDON_DIR     Use addons from DIR. default: none"
+    echo "    -t <iso,disk>    Type of image to create. Defaults to iso."
+    echo "    -v               Enable verbose output."
+    echo "    -h               This message."
+    echo " commands:"
+    echo "     install <working dir>        : install packages to the working dir"
+    echo "     squash <working dir>         : generate a squashfs image of the installed root"
+    echo "     img <working dir> <image name> : build an image from the working directory"
+    echo "     all <working dir> <image name> : perform all of the above, in order"
+    exit $1
+}
+
+#while getopts 'i:P:p:a:t:fvh' arg; do
+while getopts 'i:P:c:M:m:a:t:fvh' arg; do
+    case "${arg}" in
+        i) CPIOCONFIG="${OPTARG}" ;;
+        #P) PKGFILE="${OPTARG}" ;;
+        #p) PKGLIST="${PKGLIST} ${OPTARG}" ;;
+	c) CACHE="${OPTARG}" ;;
+	M) MODULES="${OPTARG}" ;;
+	m) MODULESCOPY="${OPTARG}" ;;
+        a) ADDON_DIR="${OPTARG}" ;;
+        t) IMG_TYPE="${OPTARG}" ;;
+        f) FORCE="y" ;;
+        v) QUIET="n" ;;
+        h|?) usage 0 ;;
+        *) echo "invalid argument '${arg}'"; usage 1 ;;
+    esac
+done
+
+shift $(($OPTIND - 1))
+echo "ARGS: $@"
+
+[ $# -le 1 ] && usage 1
+
+# do UID checking here so someone can at least get usage instructions
+if [ "$EUID" != "0" ]; then
+    echo "error: This script must be run as root."
+    exit 1
+fi
+
+command_name="${1}"
+work_dir=""
+imgname=""
+
+case "${command_name}" in
+    install) work_dir="${2}" ;;
+    squash) work_dir="${2}" ;;
+    img) work_dir="${2}"; imgname="${3}" ;;
+    all) work_dir="${2}"; imgname="${3}" ;;
+    *) echo "invalid command name '${command_name}'"; usage 1 ;;
+esac
+
+[ "x${imgname}" = "x" ] && (echo "Bootable image name must be specified" && usage 1)
+[ "x${work_dir}" = "x" ] && (echo "please specify a working directory" && usage 1)
+
+echo "${APPNAME} : Configuration Settings"
+echo "   mkinitcpio config file:   ${CPIOCONFIG}"
+#echo "   mount description file:   ${MOUNTFILE}"
+echo "        working directory:   ${work_dir}"
+echo "               image name:   ${imgname}"
+echo "               image type:   ${IMG_TYPE}"
+
+IMGROOT="${work_dir}/img"
+union="${work_dir}/union"
+lastbr="${work_dir}/empty"
+moduleplace="${IMGROOT}/modules"
+moduledir="${work_dir}/modules"
+INSTROOT="${moduledir}/archlive"
+#rootcopy="${IMGROOT}/rootcopy"
+#optional="${IMGROOT}/optional"
+#changes="${IMGROOT}/changes"
+CDROOT="$(pwd)/cd-root"
+cache="${CACHE}"
+
+_kversion ()
+{
+    source ${INSTROOT}/etc/mkinitcpio.d/kernel26.kver
+    echo ${ALL_kver}
+}
+
+copy2root()
+{
+	cp -rp $1/* ${union}
+}
+
+remove()
+{
+   rm -vRf "$@"
+   return
+}
+
+# Go through the main commands in order. If 'all' was specified, then we want
+# to do everything. Start with 'install'.
+#if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
+command_install () {
+    echo "====> Installing/building image root"
+    if [ -e "${work_dir}" -a "${FORCE}" = "n" ]; then
+        echo "error: Working dir '${work_dir}' already exists, aborting."
+        exit 1
+    fi
+
+    mkdir -p "${IMGROOT}"
+    mkdir -p "${INSTROOT}"
+    mkdir -p "${lastbr}"
+    mkdir -p "${union}"
+    mkdir -p "${moduleplace}"
+    mkdir -p "${moduledir}"
+    mkdir -p "${cache}"
+	cp -af ${CDROOT}/* "${IMGROOT}"
+
+    modprobe aufs
+    if [ $? -ne 0 ]; then
+	echo "Error loading Union filesystem module."
+	exit 1
+    fi
+
+    mount -t aufs -o br:${lastbr}=rw aufs ${union}
+    if [ $? -ne 0 ]; then 
+	echo "Error mounting $UNION."
+	exit 1
+    fi
+
+    for mod in ${MODULES}; do
+	mkdir -p "${moduledir}/${mod}"
+	mount -o remount,add:0:${moduledir}/${mod}=rw aufs ${union}
+	mount -o remount,mod:${lastbr}=ro aufs ${union}
+	lastbr="${moduledir}/${mod}"
+
+	if [ -e "${union}/var/lib/pacman/db.lck" ]; then
+		rm -f ${union}/var/lib/pacman/db.lck
+	fi
+	
+	mkdir -p "${union}/var/lib/pacman"	
+
+	pacman -Sy --noprogressbar --noconfirm --cachedir "${cache}" -fr "${union}"
+
+	cat  "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
+		echo "   Installing package $pkgname"
+		pacman -S -f --noprogressbar --needed --noconfirm --cachedir "$cache" -r "$union" $pkgname
+	done
+	
+	if [ -e "$(pwd)/list/${mod}.removelist" ]; then
+	cat "$(pwd)/list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
+		echo "	Removeing package $pkgname"
+		pacman -R -d -n --noprogressbar --needed --noconfirm --cachedir "$cache" -r "$union" $pkgname
+	done
+	fi
+	
+	if [ -e "${union}/etc/ld.so.conf" ]; then
+		ldconfig -r ${union}
+	fi
+
+	if [ -d "${union}/usr/share/icons" ]; then
+	remove "${union}/usr/share/icons/hicolor/icon-theme.cache"
+	remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
+	fi
+
+    # remove the initcpio images that were generated for the host system
+    find "${union}/boot" -name *.img -delete
+
+    echo "Creating default home directory"
+    install -d -o1001 -g100 -m0755 "${union}/home/arch"
+	if [ -d "${OVERLAY}/home/arch" ]; then
+	chown -R arch:users "${OVERLAY}/home/arch"
+	chmod -R 755 "${OVERLAY}/home/arch"
+	fi
+
+    # Cleanup
+    echo "Cleaning up image root files..."
+    find "${union}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+
+    # delete a lot of unnecessary cache/log files
+    kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd usr/share/devhelp usr/share/doc usr/share/gtk-doc"
+    for x in ${kill_dirs}; do
+        if [ -e "${union}/${x}" ]; then
+            rm -Rf "${union}/${x}"
+        fi
+    done
+
+    # pacman DBs are big, delete all sync dbs
+    rm -rf ${union}/var/lib/pacman/sync/*
+
+    # copy over kernel and grub configs for boot
+    if [ -e "${union}/boot" -a -e "${OVERLAY}/boot" ]; then
+        rm -rf "${IMGROOT}/boot"
+        cp -r "${union}/boot" "${IMGROOT}"
+        cp -rf "${OVERLAY}/boot" "${IMGROOT}"
+    fi
+   done
+   
+   if [ -e "$(pwd)/isolinux" ]; then
+   		cp -r "$(pwd)/isolinux" "${IMGROOT}"
+   fi
+
+# Unmount union
+echo "Unmounting union."
+umount -l ${union}
+
+echo "Updating kernel module dependencies"
+kernelver=$(_kversion)
+depmod -a -b "${INSTROOT}" "${kernelver}"
+	
+# Clean up unionfs whiteout files
+#echo "Removing unionfs .wh. files."
+find ${moduledir} -type f -name ".wh.*" -exec rm {} \;
+find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
+
+    # TODO: this might belong somewhere else
+    mkdir -p "${IMGROOT}/addons"
+    if [ -d "${ADDON_DIR}" ]; then
+        echo "Copying addons from ${ADDON_DIR}..."
+        cp -r ${ADDON_DIR}/* "${IMGROOT}/addons"
+    fi
+
+    # always make an addon out of DEF_CONFIG_DIR
+    echo "Creating default-config addon..."
+    if [ "${QUIET}" = "y" ]; then
+        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend >/dev/null
+    else
+		/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend
+    fi
+#fi
+}
+
+# Squash is the next step.
+#if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
+command_squash () {
+    echo "====> Generating SquashFS image"
+echo "Creating modules procede..."
+start=$(date +%s)
+    if [ -d "${MODULESCOPY}" ]; then
+	cp -r ${MODULESCOPY}/* "${IMGROOT}/modules"
+    fi
+
+for DIR in $MODULES; do
+	MOD="$(basename $DIR).sqfs"
+	echo "building $MOD"
+	/sbin/mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend > /dev/null
+	chmod 0444 ${moduleplace}/$MOD
+done
+    minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
+    echo "Modules creation done in $minutes minutes."
+    if [ -e ${moduleplace}/archlive.sqfs ]; then
+	mv ${moduleplace}/archlive.sqfs ${IMGROOT}/archlive.sqfs
+    fi
+#fi
+}
+
+# Finally, make the image.
+#if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
+command_img () {
+    echo "====> Making bootable image"
+    if [ -e "${imgname}" ]; then
+        if [ "${FORCE}" = "y" ]; then
+            echo "Removing existing bootable image..."
+            rm -rf "${imgname}"
+        else
+            echo "error: Image '${imgname}' already exists, aborting."
+            exit 1
+        fi
+    fi
+    if [ ! -e "${CPIOCONFIG}" ]; then
+        echo "error: mkinitcpio config '${CPIOCONFIG}' does not exist, aborting."
+        exit 1
+    fi
+
+    kernelver=$(_kversion)
+    basedir=${INSTROOT}
+    [ "${INSTROOT:0:1}" != "/" ] && basedir="$(pwd)/${INSTROOT}"
+    echo "Generating initcpio for image..."
+    if [ "${QUIET}" = "y" ]; then
+        mkinitcpio -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${IMGROOT}/boot/archlive.img" >/dev/null
+        ret=$?
+    else
+        mkinitcpio -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${IMGROOT}/boot/archlive.img"
+        ret=$?
+    fi
+    if [ $ret -ne 0 ]; then
+        echo "error: initcpio image creation failed..."
+        exit 1
+    fi
+
+    cp ${INSTROOT}/usr/lib/grub/i386-pc/* "${IMGROOT}/boot/grub"
+
+    if [ "x$IMG_TYPE" == "xdisk" ]; then
+        echo "Creating DISK image..."
+        mkusbimg "${IMGROOT}" "${imgname}"
+    else
+        echo "Creating ISO image..."
+        q=""
+        [ "${QUIET}" = "y" ] && qflag="-q"
+        mkisofs ${qflag} -r -l -b "boot/grub/stage2_eltorito" -uid 0 -gid 0 \
+            -no-emul-boot -boot-load-size 4 -boot-info-table \
+            -publisher "Arch Linux <archlinux.org>" \
+            -input-charset=UTF-8 -p "prepared by $NAME" \
+            -A "Arch Linux Live/Rescue CD" \
+            -o "${imgname}" "${IMGROOT}"
+       md5sum "${imgname}" > "${imgname}".md5
+    fi
+}
+
+if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
+	command_install
+fi
+if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
+	command_squash
+fi
+if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
+	command_img
+fi
+# vim:ts=4:sw=4:et:
