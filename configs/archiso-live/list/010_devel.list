@@ -1,4 +1,5 @@
 base-devel
+bin86
 abs
 git
 subversion
@@ -7,3 +8,4 @@ nasm
 yaourt
 pacbuilder-svn
 devtools
+perl

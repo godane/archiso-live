@@ -18,7 +18,8 @@ tcl
 xchat
 qt
 openexr
-dillo
+fltk2
+#dillo
 strigi
 recorder
 #libs
