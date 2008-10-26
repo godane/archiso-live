@@ -22,6 +22,7 @@ lvm2
 nano
 net-tools
 netcfg
+nfs-utils
 ntfs-3g
 man-pages
 pacman
@@ -87,8 +88,10 @@ apr-util
 rsync
 #server
 apache
+lighttpd
 libmysqlclient
 postgresql-libs
+nmap
 #kernel-modules
 ndiswrapper
 madwifi
