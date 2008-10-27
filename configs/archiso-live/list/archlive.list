@@ -24,6 +24,7 @@ net-tools
 netcfg
 nfs-utils
 ntfs-3g
+man
 man-pages
 pacman
 perl
