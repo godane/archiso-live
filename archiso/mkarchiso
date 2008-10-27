@@ -1,12 +1,20 @@
 #!/bin/bash
 
+CPIOCONFIG="$(pwd)/archiso-mkinitcpio.conf"
+OVERLAY="$(pwd)/overlay"
+CACHE="/var/cache/pacman/pkg"
+PKGFILE="$(pwd)/packages.list"
 PKGLIST=""
 QUIET="y"
 FORCE="n"
 #MOUNTFILE="$(pwd)/mounts"
 IMG_TYPE="iso"
 
+if [ -f $(pwd)/config ]; then
 . $(pwd)/config
+fi
+
+APPNAME=$(basename "${0}")
 
 # usage: usage <exitvalue>
 usage ()
@@ -50,6 +58,9 @@ while getopts 'i:P:c:M:m:a:t:fvh' arg; do
     esac
 done
 
+#trim spaces
+PKGLIST="$(echo $PKGLIST)"
+
 shift $(($OPTIND - 1))
 echo "ARGS: $@"
 
@@ -89,9 +100,6 @@ lastbr="${work_dir}/empty"
 moduleplace="${IMGROOT}/modules"
 moduledir="${work_dir}/modules"
 INSTROOT="${moduledir}/archlive"
-#rootcopy="${IMGROOT}/rootcopy"
-#optional="${IMGROOT}/optional"
-#changes="${IMGROOT}/changes"
 CDROOT="$(pwd)/cd-root"
 cache="${CACHE}"
 
@@ -174,8 +182,8 @@ command_install () {
 	fi
 
 	if [ -d "${union}/usr/share/icons" ]; then
-	remove "${union}/usr/share/icons/hicolor/icon-theme.cache"
-	remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
+		remove "${union}/usr/share/icons/hicolor/icon-theme.cache"
+		remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
 	fi
 
     # remove the initcpio images that were generated for the host system
@@ -183,9 +191,10 @@ command_install () {
 
     echo "Creating default home directory"
     install -d -o1001 -g100 -m0755 "${union}/home/arch"
+	
 	if [ -d "${OVERLAY}/home/arch" ]; then
-	chown -R arch:users "${OVERLAY}/home/arch"
-	chmod -R 755 "${OVERLAY}/home/arch"
+		chown -R arch:users "${OVERLAY}/home/arch"
+		chmod -R 755 "${OVERLAY}/home/arch"
 	fi
 
     # Cleanup
@@ -242,11 +251,9 @@ find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
     else
 		/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend
     fi
-#fi
 }
 
 # Squash is the next step.
-#if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
 command_squash () {
     echo "====> Generating SquashFS image"
 echo "Creating modules procede..."
@@ -266,11 +273,9 @@ done
     if [ -e ${moduleplace}/archlive.sqfs ]; then
 	mv ${moduleplace}/archlive.sqfs ${IMGROOT}/archlive.sqfs
     fi
-#fi
 }
 
 # Finally, make the image.
-#if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
 command_img () {
     echo "====> Making bootable image"
     if [ -e "${imgname}" ]; then
