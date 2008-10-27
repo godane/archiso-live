@@ -43,7 +43,7 @@ wget
 wireless-tools
 #live-tools
 aufs
-squashfs-utils
+squashfs-tools
 unionfs-utils
 syslinux
 larch
@@ -82,10 +82,14 @@ hal
 pmount
 policykit
 curl
+lua
 neon
 libtool
 apr-util
 rsync
+aspell-en
+unzip
+unrar
 #server
 apache
 lighttpd
