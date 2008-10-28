@@ -13,6 +13,7 @@ gpodder
 hardinfo
 wicd
 pidgin
+#gajim
 #xchat
 shaman
 -d dillo
@@ -23,3 +24,6 @@ gtkpacman-svn
 virtualbox-ose
 geany
 isomaster
+gnome-commander
+gnome-device-manager
+ntfs-config

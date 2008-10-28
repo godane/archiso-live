@@ -64,6 +64,7 @@ parted
 ddrescue
 testdisk
 bc
+netkit-bsd-finger
 lzo
 libnewt
 -d partimage
@@ -95,6 +96,7 @@ rsync
 aspell-en
 unzip
 unrar
+libstdc++5
 #server
 apache
 lighttpd
@@ -107,6 +109,12 @@ madwifi
 virtualbox-modules
 wlan-ng26
 rt2500
+#video-drivers
+-d catalyst
+-d nvidia
+-d nvidia-173xx
+-d nvidia-71xx
+-d nvidia-96xx
 #firmware
 rt2x00-rt61-fw
 rt2x00-rt71w-fw
