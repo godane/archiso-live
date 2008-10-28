@@ -60,6 +60,7 @@ jfsutils
 parted
 ddrescue
 testdisk
+bc
 lzo
 libnewt
 -d partimage
