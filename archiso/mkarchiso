@@ -9,6 +9,7 @@ QUIET="y"
 FORCE="n"
 #MOUNTFILE="$(pwd)/mounts"
 IMG_TYPE="iso"
+DELDIR=""
 
 if [ -f $(pwd)/config ]; then
 . $(pwd)/config
@@ -202,7 +203,7 @@ command_install () {
     find "${union}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
 
     # delete a lot of unnecessary cache/log files
-    kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd usr/share/devhelp usr/share/doc usr/share/gtk-doc"
+    kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd ${DELDIR}"
     for x in ${kill_dirs}; do
         if [ -e "${union}/${x}" ]; then
             rm -Rf "${union}/${x}"
