@@ -14,7 +14,10 @@ gettext
 grep
 grub-gfx
 gzip
-initscripts
+#initscripts
+chakra-hardware-detection
+chakra-initscripts
+chakra-sysvinit
 kernel26
 licenses
 less
@@ -35,7 +38,7 @@ sed
 sshfs
 sudo
 syslog-ng
-sysvinit
+#sysvinit
 sysfsutils
 tar
 usbutils
