@@ -30,7 +30,7 @@ title Fluxbox desktop
 kernel /boot/vmlinuz26 lang=en ramdisk_size=60% aufs session=fluxbox nonfree=no
 initrd /boot/archlive.img
 
-title Autologin Icewm desktop
+title Icewm desktop
 kernel /boot/vmlinuz26 lang=en ramdisk_size=60% aufs session=icewm nonfree=no
 initrd /boot/archlive.img
 

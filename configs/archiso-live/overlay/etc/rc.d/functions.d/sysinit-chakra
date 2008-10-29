@@ -45,11 +45,11 @@ f_fscheck ()
 f_swapon ()
 {
     #+*** Copy session-save flag-file (if it exists)
-    #[ -f /larch/nosave ] && cp /larch/nosave /.livesys
+    [ -f /larch/nosave ] && cp /larch/nosave /.livesys
     #-***
 
     #*** Conditional swap activation
-    #if [ -e /.livesys/swapon ]; then
-    #    status "Activating Swap" /sbin/swapon -a
-    #fi
+    if [ -e /.livesys/swapon ]; then
+        status "Activating Swap" /sbin/swapon -a
+    fi
 }

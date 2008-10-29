@@ -23,8 +23,11 @@ storage:x:95:hal,arch
 power:x:98:root,arch
 nobody::99:
 users::100:
+partimag:x:110:
+locate:x:21:
 dbus:x:81:arch
 hal:x:82:arch
 avahi:x:84:
 gdm:x:101:
+policykit:x:111:
 vboxusers:x:108:arch

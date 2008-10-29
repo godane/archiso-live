@@ -55,9 +55,9 @@ Plugin {
         Button {
             id=firefox.desktop
         }
-        Button {
-        	id=midori.desktop
-        }
+        #Button {
+        #	id=midori.desktop
+        #}
         Button {
             id=lxterminal.desktop
         }

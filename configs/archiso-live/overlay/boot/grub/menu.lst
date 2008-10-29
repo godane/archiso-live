@@ -3,18 +3,21 @@ default 0
 color light-blue/blue black/light-grey
 splashimage=/boot/splash.xpm.gz
 
-title  Boot ArchLive Desktop
+title Boot ArchLive Desktop
 kernel /boot/vmlinuz26 lang=en ramdisk_size=60% aufs nonfree=no
 initrd /boot/archlive.img
 
-title  Select Desktop (free drivers only)
+title Select Desktop (nonfree drivers)
+configfile /boot/grub/nonfree-desktop.lst
+
+title Select Desktop (free drivers only)
 configfile /boot/grub/desktop.lst
 
-title  Boot ArchLive Desktop in failsafe mode
+title Boot ArchLive Desktop in failsafe mode
 kernel /boot/vmlinuz26 lang=en ramdisk_size=60% aufs acpi=off noapic pci=bios nonfree=no
 initrd /boot/archlive.img
 
-title  Boot ArchLive Desktop with unionfs
+title Boot ArchLive Desktop with unionfs
 kernel /boot/vmlinuz26 lang=en ramdisk_size=60% custom nonfree=no
 initrd /boot/archlive.img
 
