@@ -74,7 +74,7 @@ sdparm
 sed
 sshfs
 sysfsutils
-sysklogd
+syslog-ng
 tar
 tcp_wrappers
 tcpdump
