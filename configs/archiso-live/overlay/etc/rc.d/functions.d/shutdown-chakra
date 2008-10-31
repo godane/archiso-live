@@ -32,7 +32,18 @@ f_swapoff ()
 
 f_remountro ()
 {
-    stat_busy "Remounting Root Filesystem Read-only"
-    /bin/mount -n -o remount,ro /
-    stat_done
+	if [ -f /bootmnt/archlive.sqfs ]; then
+		if [ -n "${ejectdev}" ]; then
+        	echo "Ejecting live CD"
+        	eject ${ejectdev}
+        	echo "========================================"
+        	echo "It's safe to switch the computer off now"
+        	echo -ne "Press Enter to continue"
+        	read junk
+    	fi
+	else
+    	stat_busy "Remounting Root Filesystem Read-only"
+    	/bin/mount -n -o remount,ro /
+    	stat_done
+	fi
 }
