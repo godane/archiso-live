@@ -1,0 +1,14 @@
+#gnome-libs
+libgsf-gnome
+libgnomeui
+libgnomeprintui
+goffice
+totem-plparser
+libbeagle
+gnome-vfs
+libgnomecanvas
+gnome-python-desktop
+gnome-python-extras
+libgtop
+gnome-doc-utils
+wv
