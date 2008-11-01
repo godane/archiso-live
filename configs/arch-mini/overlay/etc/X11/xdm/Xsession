@@ -10,7 +10,7 @@
 # Fixes for $PATH (from Jim Diamond), GDM/KDM/XDM, 2003-02-07 volkerdi
 # Patched for bizzare GDM $1, 2003-09-23 volkerdi
 # Heavily modified by Jean-Philippe Guillemin for Zenwalk Linux - Wed Jul  4 19:50:38 CEST 2007
-. /usr/liblinuxlive
+. /usr/lib/liblinuxlive
 # redirect errors to a file in user's home directory if we can
 for errfile in "$HOME/.xsession-errors" "${TMPDIR-/tmp}/xses-$USER" "/tmp/xses-$USER"
 do
@@ -133,6 +133,9 @@ lxde)
 	;;
 openbox-lxde)
 	exec openbox-lxde
+	;;
+awesome)
+	exec awesome 
 	;;
 kde)
 	exec startkde
