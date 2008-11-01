@@ -10,6 +10,7 @@ FORCE="n"
 #MOUNTFILE="$(pwd)/mounts"
 IMG_TYPE="iso"
 DELDIR=""
+BOOT=""
 
 if [ -f $(pwd)/config ]; then
 . $(pwd)/config
@@ -26,6 +27,7 @@ usage ()
     echo "    -i CPIO_CONFIG   Use CONFIG file for mkinitcpio. default: ${CPIOCONFIG}"
     #echo "    -P PKGFILE       File with list of packages to install. default: ${PKGFILE}"
     #echo "    -p PACKAGE       Additional package to install, can be used multiple times"
+	echo "	  -b BOOT		   Boot option (syslinux,grub,grub-gfx)"
     echo "    -c CACHE	       Cache folder for the packages going in iso. default: ${CACHE}"
     echo "    -M MODULES       Modules for livecd. default: ${MODULES}"
     echo "    -m MODULESCOPY   Copy modules from a folder to modules place in IMGROOT. default: none"
@@ -42,11 +44,12 @@ usage ()
 }
 
 #while getopts 'i:P:p:a:t:fvh' arg; do
-while getopts 'i:P:c:M:m:a:t:fvh' arg; do
+while getopts 'i:P:b:c:M:m:a:t:fvh' arg; do
     case "${arg}" in
         i) CPIOCONFIG="${OPTARG}" ;;
         #P) PKGFILE="${OPTARG}" ;;
         #p) PKGLIST="${PKGLIST} ${OPTARG}" ;;
+		b) BOOT="${OPTARG}" ;;
 	c) CACHE="${OPTARG}" ;;
 	M) MODULES="${OPTARG}" ;;
 	m) MODULESCOPY="${OPTARG}" ;;
@@ -60,7 +63,7 @@ while getopts 'i:P:c:M:m:a:t:fvh' arg; do
 done
 
 #trim spaces
-PKGLIST="$(echo $PKGLIST)"
+PKGLIST="$(echo $MODULES)"
 
 shift $(($OPTIND - 1))
 echo "ARGS: $@"
@@ -308,24 +311,64 @@ command_img () {
         echo "error: initcpio image creation failed..."
         exit 1
     fi
-
-    cp ${INSTROOT}/usr/lib/grub/i386-pc/* "${IMGROOT}/boot/grub"
-
-    if [ "x$IMG_TYPE" == "xdisk" ]; then
+	
+	bootflags=""
+	if [ "$BOOT" = "grub" -o "$BOOT" = "grub-gfx" ]; then
+		tst=0
+		pacman -Q grub >/dev/null 2>&1
+		tst=$(($tst + $?))
+		pacman -Q grub-gfx >/dev/null 2>&1
+		tst=$(($tst + $?))
+		if [ $tst -ge 2 ]; then
+			echo "grub or grub-gfx not found on host system. Cannot install!"
+			exit 1
+		fi
+	
+		mkdir -p "${IMGROOT}/boot/grub"
+		cp -r /usr/lib/grub/i386-pc/* "${IMGROOT}/boot/grub"
+    
+		bootflags="-b boot/grub/stage2_eltorito"
+	elif [ "$BOOT" = "syslinux" ]; then
+		if ! pacman -Qi syslinux >/dev/null 2>&1; then
+			echo "$BOOT not found on host system. Cannot install!"
+			exit 1
+		fi
+		
+		mkdir -p "${IMGROOT}/isolinux"
+		cp /usr/lib/syslinux/* "${IMGROOT}/isolinux"
+		
+		if [ -f "${IMGROOT}/boot/vmlinuz26" ]; then
+			mv -f "${IMGROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
+		fi
+		
+		bootflags="-b isolinux/isolinux.bin -c isolinux/boot.cat"
+	else
+		echo "No bootloader specified. Use the -b flag to specify"
+		echo "  Supported Bootloaders:"
+		echo "     grub"
+		echo "     grub-gfx"
+		echo "     isolinux"
+		exit 1
+	fi
+	
+    if [ "$IMG_TYPE" == "disk" ]; then
         echo "Creating DISK image..."
         mkusbimg "${IMGROOT}" "${imgname}"
-    else
+    elif [ "$IMG_TYPE" = "iso" ]; then
         echo "Creating ISO image..."
-        q=""
-        [ "${QUIET}" = "y" ] && qflag="-q"
-        mkisofs ${qflag} -r -l -b "boot/grub/stage2_eltorito" -uid 0 -gid 0 \
+        qflag=""
+        #[ "${QUIET}" = "y" ] && qflag="-q"
+        mkisofs ${qflag} -r -l $bootflags -uid 0 -gid 0 \
+			-input-charset utf-8 -p "prepared by mkarchiso" \
             -no-emul-boot -boot-load-size 4 -boot-info-table \
             -publisher "Arch Linux <archlinux.org>" \
-            -input-charset=UTF-8 -p "prepared by $NAME" \
             -A "Arch Linux Live/Rescue CD" \
             -o "${imgname}" "${IMGROOT}"
        md5sum "${imgname}" > "${imgname}".md5
-    fi
+    else
+		echo "Invalid image type '$IMG_TYPE' specified"
+		exit 1
+	fi
 }
 
 if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
