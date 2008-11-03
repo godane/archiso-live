@@ -68,16 +68,7 @@ gsfonts
 awesome
 fluxbox
 icewm
-openbox
-lxappearance
-lxde-common
-lxpanel
-lxrandr
-lxsession-lite
-lxtask
-lxterminal
-pcmanfm
-gpicview
+lxde
 wicd
 firefox
 pidgin
@@ -136,3 +127,4 @@ xfce4-wavelan-plugin
 xfce4-weather-plugin
 xfce4-xkb-plugin
 squeeze
+e17-svn

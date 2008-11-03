@@ -122,5 +122,15 @@ alsa-oss
 alsa-utils
 vorbis-tools
 grub-gfx
+syslinux
 dvd+rw-tools
 htop
+aspell-en
+#server
+apache
+lighttpd
+libmysqlclient
+postgresql-libs
+nmap
+irssi
+cpufrequtils
