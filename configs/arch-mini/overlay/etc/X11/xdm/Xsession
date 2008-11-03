@@ -131,6 +131,9 @@ xfce)
 lxde)
 	exec startlxde
 	;;
+lxlauncher)
+	exec lxlauncher
+	;;
 openbox-lxde)
 	exec openbox-lxde
 	;;
