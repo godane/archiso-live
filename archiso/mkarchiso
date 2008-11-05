@@ -338,7 +338,7 @@ command_img () {
 		cp /usr/lib/syslinux/* "${IMGROOT}/isolinux"
 		
 		if [ -f "${IMGROOT}/boot/vmlinuz26" ]; then
-			mv -f "${IMGROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
+			cp -f "${IMGROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
 		fi
 		
 		bootflags="-b isolinux/isolinux.bin -c isolinux/boot.cat"
