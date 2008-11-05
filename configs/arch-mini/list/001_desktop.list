@@ -61,6 +61,7 @@ archlinux-menus
 archlinux-xdg-menu
 fam
 xdialog
+gksu
 #fonts
 ttf-dejavu
 gsfonts
