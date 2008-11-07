@@ -176,10 +176,10 @@ fi
     [ "x${udevpid}" != "x" ] && /bin/kill -9 $udevpid 2>&1 >/dev/null
     #Yep, we're bailing out here.  We don't need kinit.
     msg ":: Passing control to Archlinux Initscripts...Please Wait"
-    #/bin/umount /sys
-    #/bin/umount /proc
-	/bin/mount -o bind /sys /real_root/sys
-    /bin/mount -o bind /proc /real_root/proc
+    /bin/umount /sys
+    /bin/umount /proc
+	#/bin/mount -o bind /sys /real_root/sys
+    #/bin/mount -o bind /proc /real_root/proc
     
     STARTDIR=/
 	#TMPDIR=`mktemp -d`
