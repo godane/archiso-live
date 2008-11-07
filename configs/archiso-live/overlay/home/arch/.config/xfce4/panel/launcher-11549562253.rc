@@ -1,6 +1,6 @@
 [Entry 0]
 Name=Multimedia player
-Exec=gnome-mplayer
+Exec=smplayer
 Terminal=false
 StartupNotify=false
 Comment=Play all sort of media
