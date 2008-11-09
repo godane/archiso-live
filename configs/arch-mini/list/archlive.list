@@ -127,6 +127,7 @@ syslinux
 dvd+rw-tools
 htop
 aspell-en
+vim
 #server
 apache
 lighttpd
@@ -134,4 +135,5 @@ libmysqlclient
 postgresql-libs
 nmap
 irssi
+weechat
 cpufrequtils

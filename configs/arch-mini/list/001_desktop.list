@@ -50,6 +50,7 @@ libxevie
 libxklavier
 libxvmc
 #desktop-deps
+freeglut
 gtk-engines
 shared-mime-info
 startup-notification
