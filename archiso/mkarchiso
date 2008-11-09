@@ -105,7 +105,6 @@ moduleplace="${IMGROOT}/modules"
 moduledir="${work_dir}/modules"
 INSTROOT="${moduledir}/archlive"
 CDROOT="$(pwd)/cd-root"
-cache="${CACHE}"
 
 _kversion ()
 {
@@ -140,7 +139,7 @@ command_install () {
     mkdir -p "${union}"
     mkdir -p "${moduleplace}"
     mkdir -p "${moduledir}"
-    mkdir -p "${cache}"
+    mkdir -p "${CACHE}"
 	cp -af ${CDROOT}/* "${IMGROOT}"
 
     modprobe aufs
@@ -167,17 +166,17 @@ command_install () {
 	
 	mkdir -p "${union}/var/lib/pacman"	
 
-	pacman -Sy --noprogressbar --noconfirm --cachedir "${cache}" -fr "${union}"
+	pacman -Sy --noprogressbar --noconfirm --cachedir "${CACHE}" -fr "${union}"
 
 	cat  "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
 		echo "   Installing package $pkgname"
-		pacman -S -f --noprogressbar --needed --noconfirm --cachedir "$cache" -r "$union" $pkgname
+		pacman -S -f --noprogressbar --needed --noconfirm --cachedir "$CACHE" -r "$union" $pkgname
 	done
 	
 	if [ -e "$(pwd)/list/${mod}.removelist" ]; then
 	cat "$(pwd)/list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
 		echo "	Removeing package $pkgname"
-		pacman -R -d -n --noprogressbar --needed --noconfirm --cachedir "$cache" -r "$union" $pkgname
+		pacman -R -d -n --noprogressbar --needed --noconfirm --cachedir "$CACHE" -r "$union" $pkgname
 	done
 	fi
 	
