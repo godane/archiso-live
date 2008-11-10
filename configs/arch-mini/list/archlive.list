@@ -49,6 +49,7 @@ ethtool
 vorbis-tools
 libmysqlclient
 postgresql-libs
+nmap
 apache
 cherokee
 lzma-utils

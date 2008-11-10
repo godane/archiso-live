@@ -10,3 +10,5 @@
  */
 
 user_pref("browser.startup.homepage", "http://archlinux.org/");
+user_pref("startup.homepage_override_url", "");
+user_pref("startup.homepage_welcome_url", "");
