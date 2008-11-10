@@ -1,3 +1,4 @@
-MODULES="archlive 001_desktop 002_apps_lib 003_apps 004_media_lib 005_media_apps 006_libgnome 007_gnome_office devel"
+#MODULES="archlive 001_desktop 002_apps_lib 003_apps 004_media_lib 005_media_apps 006_libgnome 007_gnome_office devel"
+MODULES="archlive 001_xorg 002_base_libs 003_base_apps 004_xfce 005_e17_svn 006_gnome 007_kde devel"
 PKGLIST=""
 DELDIR="usr/share/doc usr/share/devhelp usr/share/gtk-doc usr/share/wallpapers usr/share/locale"
