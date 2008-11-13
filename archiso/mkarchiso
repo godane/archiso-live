@@ -88,6 +88,8 @@ case "${command_name}" in
     *) echo "invalid command name '${command_name}'"; usage 1 ;;
 esac
 
+if [ "x${BOOT}" = "x" ]; then BOOT="syslinux"; fi
+
 [ "x${imgname}" = "x" ] && (echo "Bootable image name must be specified" && usage 1)
 [ "x${work_dir}" = "x" ] && (echo "please specify a working directory" && usage 1)
 
@@ -313,8 +315,6 @@ command_img () {
     fi
 	
 	bootflags=""
-	if [ "$BOOT" = "" ]; then BOOT="syslinux"; fi
-	
 	if [ "$BOOT" = "grub" -o "$BOOT" = "grub-gfx" ]; then
 		tst=0
 		pacman -Q grub >/dev/null 2>&1
