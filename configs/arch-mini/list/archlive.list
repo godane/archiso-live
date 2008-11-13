@@ -12,6 +12,9 @@ nasm
 yaourt
 pacbuilder-svn
 devtools
+aurtools
+pkgtools
+zsh
 #live-tools
 syslinux
 aufs
@@ -30,6 +33,10 @@ madwifi
 htop
 mc
 links
+irrsi
+aspell-en
+screen
+weechat
 sudo
 rsync
 dvd+rw-tools
@@ -37,6 +44,7 @@ vim
 parted
 ddrescue
 testdisk
+sleuthkit
 fuse
 ntfs-3g
 sshfs
@@ -53,3 +61,6 @@ nmap
 apache
 cherokee
 lzma-utils
+xdelta
+lftp
+espeak
