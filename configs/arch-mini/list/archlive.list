@@ -40,6 +40,7 @@ weechat
 sudo
 rsync
 dvd+rw-tools
+cdrdao
 vim
 parted
 ddrescue
