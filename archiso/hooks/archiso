@@ -21,6 +21,22 @@ msg "::: Adding new real_root branch: ${1}"
     export LOOP_NUM=$(( $LOOP_NUM + 1 ))
 }
 
+# args: ext2 file image
+_mnt_ext2_file()
+{
+    msg "::: Adding new real_root branch: ${1}"
+    /bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
+    mkdir -p ${2}
+    if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${1} > /dev/null 2>&1; then
+        echo "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
+        echo "       Couldn't mount all addons"
+        break
+    fi
+    /bin/mount -t ext2 "/dev/loop${LOOP_NUM}" ${2}
+    export LOOP_NUM=$(( $LOOP_NUM + 1 ))
+}
+
+
 # args: image file
 _mnt_squashfs()
 {
@@ -46,6 +62,7 @@ run_hook ()
 {
 	export LOOP_NUM="0"
 	
+
     if [ "x${ramdisk_size}" = "x" ]; then
         ramdisk_size="60%"
     fi
@@ -59,6 +76,10 @@ run_hook ()
 	BOOT_MOUNT="/live"
     fi
     
+    if [ -f "${BOOT_MOUNT}/initrd" ]; then
+    	_mnt_ext2_file "${BOOT_MOUNT}/initrd" "/tmpfs"
+    fi
+
     if [ "${changes}" = "y" ]; then
 	if [ "${bootusb}" = "y" ]; then
 		if [ -d "${BOOT_MOUNT}/changes" ]; then
@@ -88,13 +109,14 @@ run_hook ()
     msg ":: Mounting squashfs image"
     /bin/modprobe -q squashfs >/dev/null 2>&1
 
+    mkdir -p /tmpfs/changes
     msg ":: Mounting root (real_root) filesystem"
     if [ "${aufs}" = "y" ]; then
     /bin/modprobe -q aufs brs=1 >/dev/null 2>&1
     /bin/mount -t aufs -o nowarn_perm,br:/tmpfs=rw aufs /real_root
     else
-    /bin/modprobe -q real_rootfs >/dev/null 2>&1
-    /bin/mount -t real_rootfs -o dirs=/tmpfs=rw none /real_root
+    /bin/modprobe -q unionfs >/dev/null 2>&1
+    /bin/mount -t unionfs -o dirs=/tmpfs=rw none /real_root
     fi
 
     
@@ -149,16 +171,20 @@ fi
 	MEMORY=/mnt/live/memory
 	CHANGES=${MEMORY}/changes
 	mkdir -p /real_root/${CHANGES}
-	/bin/mount -o bind /tmpfs /real_root/${CHANGES}
+	if [ -f "${BOOT_MOUNT}/initrd" ]; then
+		/bin/mount -o move /tmpfs /real_root/${CHANGES}
+	else
+		/bin/mount -o bind /tmpfs /real_root/${CHANGES}
+	fi
 	if [ "${bootusb}" = "y" ]; then
 		if [ "x${from}" != "x" ]; then
     		mkdir -p /real_root/device
-			mount -w -o bind "/bootmnt" "/real_root/device"
+			mount -w -o move "/bootmnt" "/real_root/device"
 		fi
 	fi
 	
 	mkdir -p /real_root/bootmnt
-	/bin/mount -o bind ${BOOT_MOUNT} /real_root/bootmnt
+	/bin/mount -o move ${BOOT_MOUNT} /real_root/bootmnt
 
     if [ "${norootcopy}" = "y" ]; then
     	msg ":: no copying of rootcopy"

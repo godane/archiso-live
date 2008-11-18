@@ -3,18 +3,8 @@ netcfg
 chakra-hardware-detection
 chakra-initscripts
 chakra-sysvinit
-base-devel
-abs
-git
-subversion
-cvs
-nasm
-yaourt
-pacbuilder-svn
-devtools
-aurtools
-pkgtools
-zsh
+libtool
+pkgconfig
 #live-tools
 syslinux
 aufs
@@ -77,3 +67,4 @@ lzma-utils
 xdelta
 lftp
 espeak
+pmount
