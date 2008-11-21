@@ -183,14 +183,14 @@ fi
 		fi
 	fi
 	
-	mkdir -p /real_root/bootmnt
-	/bin/mount -o move ${BOOT_MOUNT} /real_root/bootmnt
-
     if [ "${norootcopy}" = "y" ]; then
     	msg ":: no copying of rootcopy"
     else
 	cp -af ${BOOT_MOUNT}/rootcopy/* /real_root 2>/dev/null # may be empty
     fi
+
+	mkdir -p /real_root/bootmnt
+	/bin/mount -o move ${BOOT_MOUNT} /real_root/bootmnt
 
     if [ "${break}" = "y" ]; then
         echo ":: Break requested, type 'exit' to resume operation"
