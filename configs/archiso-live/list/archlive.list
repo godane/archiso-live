@@ -59,6 +59,7 @@ dhclient
 ethtool
 vorbis-tools
 libmysqlclient
+mysql-clients
 postgresql-libs
 nmap
 apache
