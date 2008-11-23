@@ -106,6 +106,15 @@ libcdio
 libgphoto2
 libbeagle
 streamripper
+liblrdf
+perl-html-tagset
+perl-html-parser
+perl-libwww
+libcdaudio
+fftw2
+perl-date-manip
+perl-dbd-mysql
+perl-dbi
 #games-libs
 sdl_perl
 sdl_pango

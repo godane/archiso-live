@@ -60,6 +60,7 @@ ethtool
 vorbis-tools
 libmysqlclient
 mysql-clients
+mysql-python
 postgresql-libs
 nmap
 apache

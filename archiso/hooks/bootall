@@ -27,8 +27,8 @@ if [ "x${bootiso}" != "x" ]; then
             if [ -e "${bootmnt}/${bootiso}" ]; then
             	found=1
                 msg "${usb}"
-				break
-			fi
+		break
+	    fi
         else
             echo "Failed to mount ${usb}"
         fi
