@@ -102,6 +102,14 @@ libcaptury
 #gstreamer
 gstreamer0.10-base-plugins
 gstreamer0.10-good-plugins
+gstreamer0.10-bad-plugins
+gstreamer0.10-ugly-plugins
+gstreamer0.10-python
+gstreamer0.10-ffmpeg
+python-pysqlite
+gnome-python-extras
+gtk-doc
+pyrex
 libcdio
 libgphoto2
 libbeagle
@@ -123,3 +131,5 @@ openal
 physfs
 sdl_sound
 gtkglext
+guile
+ggz-client-libs
