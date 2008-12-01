@@ -15,7 +15,8 @@ e2fsprogs
 zlib
 util-linux-ng
 udev
-chakra-initscripts
+#chakra-initscripts
+initscripts
 mkinitcpio
 module-init-tools
 #kernel26
@@ -74,7 +75,8 @@ reiserfsprogs
 rp-pppoe
 sdparm
 syslog-ng
-chakra-sysvinit
+#chakra-sysvinit
+sysvinit
 tar
 tcp_wrappers
 usbutils
@@ -85,9 +87,9 @@ wpa_supplicant
 xfsprogs
 kernel26
 netcfg
-chakra-hardware-detection
-chakra-initscripts
-chakra-sysvinit
+#chakra-hardware-detection
+#chakra-initscripts
+#chakra-sysvinit
 libtool
 pkgconfig
 #live-tools
