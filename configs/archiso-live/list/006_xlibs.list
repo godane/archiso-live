@@ -30,6 +30,8 @@ gnumeric
 virtualbox-ose
 epdfview
 gpodder
+#elisa-base
+#elisa-plugins
 #xfce
 #xfce4
 #kdemod-arts
@@ -124,6 +126,14 @@ fftw2
 perl-date-manip
 perl-dbd-mysql
 perl-dbi
+enca
+glew
+setuptools
+twisted
+twisted-web2
+pyopenssl
+python-cssutils
+python-pigment
 #games-libs
 sdl_perl
 sdl_pango

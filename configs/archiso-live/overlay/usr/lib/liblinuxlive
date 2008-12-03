@@ -352,7 +352,7 @@ is_supported_filesystem()
 {
    debug_log "is_supported_filesystem" "$*"
 
-   if [ -e /bin/ntfsmount -a "$1" = "ntfs-3g" ]; then
+   if [ -e /usr/bin/ntfsmount -a "$1" = "ntfs-3g" ]; then
       return 0
    fi
 
