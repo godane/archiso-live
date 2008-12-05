@@ -1,10 +1,9 @@
 #!/bin/bash
 
-PROFILE="$(pwd)"
-CPIOCONFIG="${PROFILE}/archiso-mkinitcpio.conf"
-OVERLAY="${PROFILE}/overlay"
+CPIOCONFIG="$(pwd)/archiso-mkinitcpio.conf"
+OVERLAY="$(pwd)/overlay"
 CACHE="/var/cache/pacman/pkg"
-#PKGFILE="$(pwd)/packages.list"
+PKGFILE="$(pwd)/packages.list"
 PKGLIST=""
 QUIET="y"
 FORCE="n"
@@ -13,8 +12,15 @@ IMG_TYPE="iso"
 DELDIR=""
 BOOT=""
 
-if [ -f "${PROFILE}/config" ]; then
-. ${PROFILE}/config
+
+if [ -f $(pwd)/config ]; then
+. $(pwd)/config
+fi
+
+if [ -f "$(pwd)/pacman.conf" ]; then
+	PACMANCONF="$(pwd)/pacman.conf"
+else
+	PACMANCONF="/etc/pacman.conf"
 fi
 
 APPNAME=$(basename "${0}")
@@ -26,7 +32,6 @@ usage ()
     echo " general options:"
     echo "    -f               Force overwrite of working files/squashfs image/bootable image"
     echo "    -i CPIO_CONFIG   Use CONFIG file for mkinitcpio. default: ${CPIOCONFIG}"
-	echo "    -P PROFILE		Set profile folder. Default: ${PROFILE}"
     #echo "    -P PKGFILE       File with list of packages to install. default: ${PKGFILE}"
     #echo "    -p PACKAGE       Additional package to install, can be used multiple times"
 	echo "	  -b BOOT		   Boot option (syslinux,grub,grub-gfx)"
@@ -45,13 +50,10 @@ usage ()
     exit $1
 }
 
-
-
 #while getopts 'i:P:p:a:t:fvh' arg; do
 while getopts 'i:P:b:c:M:m:a:t:fvh' arg; do
     case "${arg}" in
         i) CPIOCONFIG="${OPTARG}" ;;
-		P) PROFILE="${OPTARG}" ;;
         #P) PKGFILE="${OPTARG}" ;;
         #p) PKGLIST="${PKGLIST} ${OPTARG}" ;;
 		b) BOOT="${OPTARG}" ;;
@@ -98,17 +100,10 @@ if [ "x${BOOT}" = "x" ]; then BOOT="syslinux"; fi
 [ "x${imgname}" = "x" ] && (echo "Bootable image name must be specified" && usage 1)
 [ "x${work_dir}" = "x" ] && (echo "please specify a working directory" && usage 1)
 
-	if [ -f "${PROFILE}/pacman.conf" ]; then
-		PACMANCONF="${PROFILE}/pacman.conf"
-	else
-		PACMANCONF="/etc/pacman.conf"
-	fi
-
 echo "${APPNAME} : Configuration Settings"
 echo "   mkinitcpio config file:   ${CPIOCONFIG}"
 #echo "   mount description file:   ${MOUNTFILE}"
-echo "              pacman conf:   ${PACMANCONF}"
-echo "           profile folder:   ${PROFILE}"
+echo "         pacman.conf file:   ${PACMANCONF}"
 echo "                boot menu:   ${BOOT}"
 echo "        working directory:   ${work_dir}"
 echo "               image name:   ${imgname}"
@@ -120,7 +115,7 @@ lastbr="${work_dir}/empty"
 moduleplace="${IMGROOT}/modules"
 moduledir="${work_dir}/modules"
 INSTROOT="${moduledir}/archlive"
-CDROOT="${PROFILE}/cd-root"
+CDROOT="$(pwd)/cd-root"
 
 _kversion ()
 {
@@ -157,14 +152,13 @@ command_install () {
     mkdir -p "${moduledir}"
     mkdir -p "${CACHE}"
 	cp -af ${CDROOT}/* "${IMGROOT}"
-	cd "${PROFILE}"
-	
+
     modprobe aufs
     if [ $? -ne 0 ]; then
 	echo "Error loading Union filesystem module."
 	exit 1
     fi
-	
+
     mount -t aufs -o br:${lastbr}=rw aufs ${union}
     if [ $? -ne 0 ]; then 
 	echo "Error mounting $UNION."

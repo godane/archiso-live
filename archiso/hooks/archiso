@@ -100,12 +100,12 @@ run_hook ()
     	_mnt_ext2_file "${BOOT_MOUNT}/initrd" "/tmpfs"
     fi
 
-	#if [ "x${changes}" != "x" ]; then
-	#	if [ -f "${BOOT_MOUNT}/${changes}" ]; then
-	#		msg -n ":: Mounting xfs file changes. "
-	#		_mnt_xfs_file "${BOOT_MOUNT}/${changes}" "/tmpfs"
-	#	fi
-	#fi
+	if [ "x${changesfile}" != "x" ]; then
+		if [ -f "${BOOT_MOUNT}/${changes}" ]; then
+			msg -n ":: Mounting xfs file changes. "
+			_mnt_xfs_file "${BOOT_MOUNT}/${changes}" "/tmpfs"
+		fi
+	fi
 
     if [ "${changes}" = "y" ]; then
 	if [ "${bootusb}" = "y" ]; then
