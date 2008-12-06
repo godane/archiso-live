@@ -144,3 +144,4 @@ sdl_sound
 gtkglext
 guile
 ggz-client-libs
+python-pygame

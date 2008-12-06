@@ -227,11 +227,20 @@ command_install () {
     rm -rf ${union}/var/lib/pacman/sync/*
 
     # copy over kernel and grub configs for boot
-    if [ -e "${union}/boot" -a -e "${OVERLAY}/boot" ]; then
-        rm -rf "${IMGROOT}/boot"
-        cp -r "${union}/boot" "${IMGROOT}"
-        cp -rf "${OVERLAY}/boot" "${IMGROOT}"
-    fi
+	if [ "$BOOT" = "grub" -o "$BOOT" = "grub-gfx" ]; then
+		if [ -e "${union}/boot" -a -e "${OVERLAY}/boot" ]; then
+			#rm -rf "${IMGROOT}/boot"
+			cp -rf "${union}/boot" "${IMGROOT}"
+			cp -rf "${OVERLAY}/boot" "${IMGROOT}"
+		fi
+	else
+		if [ -e "${union}/boot" -a -e "${OVERLAY}/boot" ]; then
+			#rm -rf "${IMGROOT}/boot"
+			cp -rf "${union}/boot" "${IMGROOT}"
+			cp -rf "${OVERLAY}/boot" "${IMGROOT}"
+			rm -rf "${IMGROOT}/boot/grub"
+		fi
+	fi
    done
    
    if [ -e "$(pwd)/isolinux" ]; then
@@ -344,14 +353,14 @@ command_img () {
 			exit 1
 		fi
 		
-		mkdir -p "${IMGROOT}/isolinux"
-		cp /usr/lib/syslinux/* "${IMGROOT}/isolinux"
+		mkdir -p "${IMGROOT}/boot/isolinux"
+		cp /usr/lib/syslinux/* "${IMGROOT}/boot/isolinux"
 		
 		if [ -f "${IMGROOT}/boot/vmlinuz26" ]; then
 			mv -f "${IMGROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
 		fi
 		
-		bootflags="-b isolinux/isolinux.bin -c isolinux/boot.cat"
+		bootflags="-b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat"
 	else
 		echo "No bootloader specified. Use the -b flag to specify"
 		echo "  Supported Bootloaders:"
