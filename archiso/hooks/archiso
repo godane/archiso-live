@@ -85,12 +85,6 @@ _mnt_squashfs()
 run_hook ()
 {
 	export LOOP_NUM="0"
-	
-    
-    if [ "x${bootiso}" != "x" ]; then
-    	_mnt_cdimage ${BOOT_MOUNT}/${bootiso}
-    	BOOT_MOUNT="/live"
-    fi
     
     if [ "x${from}" != "x" ]; then
 	BOOT_MOUNT="/live"
@@ -99,6 +93,22 @@ run_hook ()
     if [ -f "${BOOT_MOUNT}/initrd" ]; then
     	_mnt_ext2_file "${BOOT_MOUNT}/initrd" "/tmpfs"
     fi
+
+#if [ "x${changes}" != "x" ]; then
+#	for usb in /dev/sd[a-z][0-9]; do
+#        	if mount -t ext2 "${usb}" "${BOOT_MOUNT}/changes" >/dev/null 2>&1; then
+#			if [ -d "${bootchanges}/${changes}" ]; then
+#				found=1
+#				msg "${usb} for changes"
+#				break
+#			elif [ -f "${bootchanges}/${changes}" ]; then
+#
+#			else
+#				echo "Failed to mount ${usb} for changes"
+#			fi
+#		fi
+#	done
+#fi
 
 	if [ "x${changesfile}" != "x" ]; then
 		if [ -f "${BOOT_MOUNT}/${changes}" ]; then
