@@ -5,12 +5,11 @@ screenlets
 abiword
 gnumeric
 gimp
-kino
+#kino
 avidemux
-blender
+#blender
 gtk-recordmydesktop
 gtkpod
 virtualbox-ose
-kdelibs
-kdebase-runtime
-kdebase-workspace
+elisa-base
+elisa-plugins

@@ -1,3 +1,3 @@
-MODULES="archlive 001_xorg 002_lxde 003_awesome 004_icewm 005_fluxbox 006_xlibs 007_xfce 008_e17_svn 009_gnome 010_kde4 devel"
+MODULES="archlive 001_xorg 002_lib 003_apps 004_xfce 005_e17_svn 006_xlibs 007_xapps 008_gnome 009_kde4"
 PKGLIST=""
 DELDIR="usr/share/doc usr/share/devhelp usr/share/gtk-doc usr/share/wallpapers"

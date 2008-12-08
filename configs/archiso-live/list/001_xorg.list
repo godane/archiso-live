@@ -61,8 +61,8 @@ shared-mime-info
 startup-notification
 hicolor-icon-theme
 desktop-file-utils
--d slim
--d archlinux-themes-slim
+slim
+archlinux-themes-slim
 archlinux-menus
 archlinux-xdg-menu
 gtk-engines
@@ -78,19 +78,3 @@ openbox
 lxde
 obconf
 obmenu
-#apps
-firefox
-luser
-wicd
-leafpad
-flashplugin
-larchin
-shaman
-gparted
-isomaster
-epdfview
-hardinfo
-gpodder
-gftp
-urlgfe
-grsync

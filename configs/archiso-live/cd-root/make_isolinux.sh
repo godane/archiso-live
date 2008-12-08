@@ -26,6 +26,6 @@ fi
 
 mkisofs -o "$ISONAME" -v -J -R -D -publisher "http://arch-live.blogspot.com" -p "Christopher Rogers aka Godane" -A "$CDLABEL" -V "$CDLABEL" \
 -no-emul-boot -boot-info-table -boot-load-size 4 \
--b isolinux/isolinux.bin -c isolinux/isolinux.boot .
+-b boot/isolinux/isolinux.bin -c boot/isolinux/isolinux.boot .
 
 md5sum $1 > $1.md5
