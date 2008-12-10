@@ -46,9 +46,33 @@ if [ "${bootusb}" = "y" ]; then
         fi
         [ ${found} -eq 0 ] && umount ${bootmnt} >/dev/null 2>&1
     done
+elif [ "${boothd}" = "y" ]; then 
+    for hd in /dev/hd[a-z][0-9]; do
+        if mount -t vfat "${hd}" ${bootmnt} >/dev/null 2>&1 ||\
+            mount -t ext2 "${hd}" ${bootmnt} >/dev/null 2>&1; then
+	if [ "x${from}" != "x" ]; then
+            if [ -f "${bootmnt}/${from}/archlive.sqfs" ]; then
+                found=1
+                msg "${hd}"
+		/bin/mount -o bind "${bootmnt}/${from}" "${live}"
+                break
+            fi
+	else
+	     if [ -f "${bootmnt}/archlive.sqfs" ]; then
+                found=1
+                msg "${hd}"
+                break
+            fi
+	fi
+        else
+            echo "Failed to mount ${hd}"
+        fi
+        [ ${found} -eq 0 ] && umount ${bootmnt} >/dev/null 2>&1
+    done
 else
     /bin/modprobe -q isofs >/dev/null 2>&1
     for cdrom in /dev/sr[0-9]; do
+    #for cdrom in /dev/hd[c-z]; do
         if mount -r -t iso9660 "${cdrom}" ${bootmnt} >/dev/null 2>&1; then
 	    if [ -f "${bootmnt}/archlive.sqfs" ]; then
                 found=1

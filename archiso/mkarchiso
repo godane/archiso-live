@@ -120,6 +120,7 @@ CDROOT="$(pwd)/cd-root"
 _kversion ()
 {
     source ${INSTROOT}/etc/mkinitcpio.d/kernel26.kver
+    #source ${INSTROOT}/etc/mkinitcpio.d/kernel26slax.kver
     echo ${ALL_kver}
 }
 

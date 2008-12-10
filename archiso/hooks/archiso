@@ -143,7 +143,8 @@ run_hook ()
 
     msg ":: Mounting squashfs image"
     /bin/modprobe -q squashfs >/dev/null 2>&1
-
+    /bin/modprobe -q sqlzma >/dev/null 2>&1
+    /bin/modprobe -q unlzma >/dev/null 2>&1
     msg ":: Mounting root (real_root) filesystem"
     if [ "${aufs}" = "y" ]; then
     /bin/modprobe -q aufs brs=1 >/dev/null 2>&1
