@@ -276,7 +276,7 @@ find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
     # always make an addon out of DEF_CONFIG_DIR
     echo "Creating default-config addon..."
     if [ "${QUIET}" = "y" ]; then
-        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend >/dev/null
+        	/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend >/dev/null
     else
 		/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend
     fi
@@ -292,15 +292,15 @@ start=$(date +%s)
     fi
 
 for DIR in $MODULES; do
-	MOD="$(basename $DIR).sqfs"
+	MOD="$(basename $DIR).lzm"
 	echo "building $MOD"
 	/sbin/mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend > /dev/null
 	chmod 0444 ${moduleplace}/$MOD
 done
     minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
     echo "Modules creation done in $minutes minutes."
-    if [ -e ${moduleplace}/archlive.sqfs ]; then
-	mv ${moduleplace}/archlive.sqfs ${IMGROOT}/archlive.sqfs
+    if [ -e ${moduleplace}/archlive.lzm ]; then
+	mv ${moduleplace}/archlive.lzm ${IMGROOT}/archlive.sqfs
     fi
 }
 

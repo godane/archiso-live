@@ -88,7 +88,7 @@ merge()
 	done
 	
 	DESTINATION="$(pwd)/$(basename $1).sqfs"
-	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
+	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB -nolzma > mksquashfs.log
 	if [ $? -ne 0 ]; then 
 	echo "Error building module"
 	exit
@@ -126,7 +126,7 @@ changes()
 	else
 	DESTINATION="$(pwd)/$MODULE"
 	fi
-	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
+	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB -nolzma > mksquashfs.log
 	if [ $? -ne 0 ]; then 
 	echo "Error building module"
 	exit
@@ -154,7 +154,7 @@ mergelist()
 	MODULE=$(basename "$1" .sqfs).sqfs
 	
 	DESTINATION="$(pwd)/$MODULE"
-	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
+	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB -nolzma > mksquashfs.log
 	if [ $? -ne 0 ]; then 
 	echo "Error building module"
 	exit
@@ -207,7 +207,7 @@ removelist()
 	rm -R $UNION/var/lib/pacman/sync/*
 	
 	DESTINATION="$(pwd)/$MODULE"
-	/sbin/mksquashfs $UNION $DESTINATION -b 128kB > mksquashfs.log
+	/sbin/mksquashfs $UNION $DESTINATION -b 128kB -nolzma > mksquashfs.log
 	if [ $? -ne 0 ]; then 
 	echo "Error building module"
 	exit
@@ -267,7 +267,7 @@ addlist()
 	rm -R $UNION/var/lib/pacman/sync/*
 	
 	DESTINATION="$(pwd)/$MODULE"
-	/sbin/mksquashfs $UNION $DESTINATION -b 128kB > mksquashfs.log
+	/sbin/mksquashfs $UNION $DESTINATION -b 128kB -nolzma > mksquashfs.log
 	if [ $? -ne 0 ]; then 
 	echo "Error building module"
 	exit
@@ -296,7 +296,7 @@ pkg()
 	echo "Creating module ..."
 
 	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.gz).sqfs"
-	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
+	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB -nolzma > mksquashfs.log
 	
 	if [ $? -ne 0 ]; then 
 	echo "Error building module"
@@ -324,7 +324,7 @@ aur()
 	echo "Creating module ..."
 
 	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.gz).sqfs"
-	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
+	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB -nolzma > mksquashfs.log
 	
 	if [ $? -ne 0 ]; then 
 	echo "Error building module"
@@ -344,7 +344,7 @@ local()
 	echo "Creating module ..."
 
 	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.gz).sqfs"
-	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
+	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB -nolzma > mksquashfs.log
 
 	if [ $? -ne 0 ]; then 
 	echo "Error building module"
@@ -406,7 +406,7 @@ updateonly()
 
 	rm -Rf $CHANGES/var/lib/pacman/sync/*
 	find $CHANGES -type f -name ".wh.*" -delete
-	/sbin/mksquashfs $CHANGES $DESTINATION -b 128kB > mksquashfs.log
+	/sbin/mksquashfs $CHANGES $DESTINATION -b 128kB -nolzma > mksquashfs.log
 
 	if [ $? -ne 0 ]; then 
 	echo "Error building module"
@@ -464,7 +464,7 @@ update()
 
 	rm -Rf $UNION/var/lib/pacman/sync/*
 
-	/sbin/mksquashfs $UNION $MODULE -b 128kB > mksquashfs.log
+	/sbin/mksquashfs $UNION $MODULE -b 128kB -nolzma > mksquashfs.log
 
 	if [ $? -ne 0 ]; then 
 	echo "Error building module"
