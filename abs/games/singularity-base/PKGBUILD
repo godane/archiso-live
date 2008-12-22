@@ -1,0 +1,37 @@
+# Contributor: teddy_beer_maniac <teddy_beer_maniac@wp.pl>
+
+pkgname=singularity-base
+pkgver=0.28a
+pkgrel=2
+pkgdesc="game - simulation of true AI (base game)"
+arch=('i686')
+url="http://emhsoft.com/singularity/index.html"
+license=('custom')
+groups=()
+depends=('python' 'python-pygame' 'sdl_image' 'sdl_mixer')
+makedepends=()
+provides=('singularity')
+conflicts=()
+replaces=('singularity')
+backup=()
+options=()
+install=
+source=(http://endgame-singularity.googlecode.com/files/singularity-${pkgver}-src.tar.gz
+        singularity singularity.desktop)
+noextract=()
+md5sums=('7005cdde78b0bbbe4165967306412cad'
+         '0c4cb3e9599772638fb71d6e408612f5'
+	 '5f2c5ffafdbca913926246684883bc75')
+
+
+build() {
+    mkdir -p $startdir/pkg/usr/{bin,share/licenses/singularity,share/applications}
+    mkdir -p $startdir/pkg/usr/share/singularity/{code,data}
+    cd $startdir/src/
+    install -m 755 singularity $startdir/pkg/usr/bin/singularity
+    cp -R singularity-$pkgver/code $startdir/pkg/usr/share/singularity
+    cp -R singularity-$pkgver/data $startdir/pkg/usr/share/singularity
+    install -m 644 singularity-$pkgver/README.txt $startdir/pkg/usr/share/licenses/singularity/README.txt
+    install -m 644 singularity.desktop $startdir/pkg/usr/share/applications/singularity.desktop
+}
+

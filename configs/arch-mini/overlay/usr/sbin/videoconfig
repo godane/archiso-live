@@ -35,6 +35,8 @@
 # Version 4.0 - 02/10/2007
 #  * Synaptics and modeline improvements
 
+. /usr/lib/liblinuxlive
+
 # Take a look at "Xdialog" and use it instead of "dialog" in case X is running
 if [[ "$DISPLAY" && "$(which Xdialog 2>&1 | grep -v "which: no")" ]]; then
 	dialog="Xdialog --wrap --left"
@@ -52,6 +54,10 @@ export PATH="${PATH}:/usr/sbin:/sbin"
 export tmpdir="/tmp/videoconfig"
 mkdir -p $tmpdir
 
+xdepth=$(cmdline_value xdepth)
+if [ "$xdepth" = "" ]; then
+	xdepth=24
+fi
 
 # Create the xorg.conf file
 writexorg() {
@@ -259,7 +265,7 @@ Section "Screen"
     Device      "Videocard1"
     Monitor     "Monitor1"
 
-   DefaultDepth 24
+   DefaultDepth $xdepth
 
     Subsection "Display"
         Depth       8
@@ -416,7 +422,7 @@ function xkbconvert(){
 
 # Probing the keymap
 
-  key="$(grep "^[[:space:]]*\/usr\/bin\/loadkeys" /etc/rc.d/rc.keymap \
+  key="$(grep "^[[:space:]]*\/usr\/bin\/loadkeys" /etc/rc.d/keymap \
     | sed -e 's/^.*loadkeys *\([^\.]*\)\(\.map\)*$/\1/')"
 
 

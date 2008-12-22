@@ -1,0 +1,20 @@
+# Maintainer:  Nathan Jones <nathanj@insightbb.com>
+
+pkgname=twisted-web2
+pkgver=8.1.0
+pkgrel=1
+pkgdesc="The twisted.web2 package in Twisted."
+arch=('i686' 'x86_64')
+url="http://twistedmatrix.com/"
+license=('MIT')
+depends=('twisted')
+conflicts=('twisted-web')
+source=("http://tmrc.mit.edu/mirror/twisted/Web2/8.1/TwistedWeb2-8.1.0.tar.bz2")
+md5sums=('e34b48edf6fef075bd41ddbd215aed32')
+
+build() {
+    cd $startdir/src/TwistedWeb2-8.1.0/
+    python setup.py install --prefix=/usr --root=$startdir/pkg
+	install -D -m644 LICENSE $startdir/pkg/usr/share/licenses/twisted-web2/LICENSE
+}
+

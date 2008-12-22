@@ -352,7 +352,7 @@ is_supported_filesystem()
 {
    debug_log "is_supported_filesystem" "$*"
 
-   if [ -e /bin/ntfsmount -a "$1" = "ntfs-3g" ]; then
+   if [ -e /usr/bin/ntfsmount -a "$1" = "ntfs-3g" ]; then
       return 0
    fi
 
@@ -513,7 +513,8 @@ find_modules()
 {
    debug_log "find_modules" "$*"
    #find "$1/base" "$1/modules" "$1/optional" -name "*.lzm" 2>/dev/null | sort
-   find  "$1/modules" "$1/optional" -name "*.sqfs" 2>/dev/null | sort
+   find "$1/modules" "$1/optional" -name "*.sqfs" 2>/dev/null | sort
+   find "$1/modules" "$1/optional" -name "*.lzm" 2>/dev/null | sort
 }
 
 # List all modules in all directories (base, modules, optional)

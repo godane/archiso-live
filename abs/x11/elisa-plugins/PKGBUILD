@@ -1,0 +1,34 @@
+# $Id: PKGBUILD,v 1.21 2008/11/16 23:43:16 BaSh Exp $
+# Maintainer: Andrea Scarpino <bash.lnx@gmail.com>
+
+pkgname=elisa-plugins
+pkgver=0.5.22
+pkgrel=1
+pkgdesc="Plugins pack for elisa"
+arch=('i686' 'x86_64')
+url="http://elisa.fluendo.com/"
+license=('GPL')
+depends=("elisa-base=$pkgver")
+groups=('elisa')
+makedepends=('setuptools')
+source=(http://elisa.fluendo.com/static/download/elisa/$pkgname-good-$pkgver.tar.gz
+	http://elisa.fluendo.com/static/download/elisa/$pkgname-bad-$pkgver.tar.gz
+	http://elisa.fluendo.com/static/download/elisa/$pkgname-ugly-$pkgver.tar.gz)
+md5sums=('b93221f7b769faba039afdf624cb0cbf'
+         '975303ea70a1eee91b837ee10f39303c'
+         '92396e4c04e44b9f5e2cbccd3de9c9a4')
+
+build() {
+  #build elisa-plugins-good
+  cd "$srcdir/$pkgname-good-$pkgver"
+  export PYTHONPATH=$PWD/elisa-core:$PWD/elisa-plugins:$PYTHONPATH
+  python setup.py install --root="$pkgdir" || return 1
+
+  #build elisa-plugins-bad
+  cd "$srcdir/$pkgname-bad-$pkgver"
+  python setup.py install --root="$pkgdir" || return 1
+
+  #build elisa-plugins-ugly
+  cd "$srcdir/$pkgname-ugly-$pkgver"
+  python setup.py install --root="$pkgdir" || return 1
+}

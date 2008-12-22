@@ -1,0 +1,4 @@
+#!/bin/sh
+mkdir $HOME/.endgame
+cd /usr/share/singularity/code
+python singularity.py

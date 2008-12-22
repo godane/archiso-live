@@ -61,19 +61,20 @@ shared-mime-info
 startup-notification
 hicolor-icon-theme
 desktop-file-utils
--d slim
--d archlinux-themes-slim
+slim
+archlinux-themes-slim
 archlinux-menus
 archlinux-xdg-menu
 gtk-engines
 xdialog
 gksu
 menumaker
-obconf
-obmenu
 scrot
 #mini-desktops
 fluxbox
 awesome
 icewm
+openbox
 lxde
+obconf
+obmenu
