@@ -2,13 +2,13 @@
 
 pkgname=singularity-base
 pkgver=0.28a
-pkgrel=2
+pkgrel=3
 pkgdesc="game - simulation of true AI (base game)"
 arch=('i686')
 url="http://emhsoft.com/singularity/index.html"
 license=('custom')
 groups=()
-depends=('python' 'python-pygame' 'sdl_image' 'sdl_mixer')
+depends=('python-pygame' 'sdl_image' 'sdl_mixer')
 makedepends=()
 provides=('singularity')
 conflicts=()
@@ -20,9 +20,8 @@ source=(http://endgame-singularity.googlecode.com/files/singularity-${pkgver}-sr
         singularity singularity.desktop)
 noextract=()
 md5sums=('7005cdde78b0bbbe4165967306412cad'
-         '0c4cb3e9599772638fb71d6e408612f5'
-	 '5f2c5ffafdbca913926246684883bc75')
-
+         '4d57ed9f226b269b2230101994cbb153'
+         '5f2c5ffafdbca913926246684883bc75')
 
 build() {
     mkdir -p $startdir/pkg/usr/{bin,share/licenses/singularity,share/applications}
@@ -34,4 +33,3 @@ build() {
     install -m 644 singularity-$pkgver/README.txt $startdir/pkg/usr/share/licenses/singularity/README.txt
     install -m 644 singularity.desktop $startdir/pkg/usr/share/applications/singularity.desktop
 }
-

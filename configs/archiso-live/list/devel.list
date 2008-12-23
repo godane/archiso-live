@@ -3,6 +3,7 @@ abs
 git
 subversion
 cvs
+scons
 nasm
 yaourt
 pacbuilder-svn

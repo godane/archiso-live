@@ -52,6 +52,7 @@ twisted-web2
 pyopenssl
 python-cssutils
 python-pigment
+fftw
 #games-libs
 sdl_perl
 sdl_pango
