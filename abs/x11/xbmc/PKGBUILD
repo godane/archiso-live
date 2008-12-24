@@ -1,0 +1,61 @@
+# Contributor: [vEX] <niechift.dot.vex.at.gmail.dot.com>
+# Contributor: Zeqadious <zeqadious.at.gmail.dot.com>
+
+pkgname=xbmc
+pkgver=8.10
+pkgrel=6
+pkgdesc="XBMC Media Center"
+url="http://xbmc.org"
+arch=('i686' 'x86_64')
+license=('GPL' 'custom')
+depends=('alsa-lib' 'curl' 'enca' 'faac' 'freetype2' 'fribidi' 'gawk' 'glew' \
+         'hal' 'jasper' 'libcdio' 'libgl' 'libjpeg>=6b-5' 'libmad' 'libmysqlclient' \
+         'libpng>=1.2.32-1' 'libxinerama' 'libxrandr' 'lzo2' 'pmount' 'sdl_gfx' 'sdl_image' \
+         'sdl_mixer' 'smbclient'  'sqlite3' 'tre' 'unrar' 'unzip' 'x-server')
+makedepends=('autoconf' 'automake' 'boost' 'cmake' 'gcc' 'gperf' 'libtool' \
+             'make' 'nasm' 'patch' 'pkgconfig' 'zip')
+optdepends=('lirc: remote controller support')
+install=("${pkgname}.install")
+source=("http://downloads.sourceforge.net/${pkgname}/XBMC-${pkgver}.src.tar.gz")
+md5sums=('2d20d255a211223eaa47f1c6bcf4be8e')
+
+build() {
+    cd ${srcdir}/XBMC
+
+    # Fix permissions for the configure scripts
+    find -type f -name "configure"|xargs chmod a+x || return 1
+    # Fix other permissions
+    chmod a+x ${srcdir}/XBMC/xbmc/cores/dvdplayer/Codecs/ffmpeg/doc/texi2pod.pl \
+	      ${srcdir}/XBMC/xbmc/lib/libPython/Python/Doc/tools/html2texi.pl \
+	      ${srcdir}/XBMC/xbmc/lib/libPython/Python/Doc/tools/node2label.pl || return 1
+
+    # Build XBMC
+    ./configure --prefix=/usr \
+                --disable-debug || return 1
+    make || return 1
+    make prefix=${pkgdir}/usr install || return 1
+
+    # Fix the shell script
+    sed -i '4iexport SDL_AUDIODRIVER=alsa' ${pkgdir}/usr/bin/xbmc
+
+    # Xrandr
+    install -Dm755 ${srcdir}/XBMC/xbmc-xrandr \
+                   ${pkgdir}/usr/share/xbmc/xbmc-xrandr || return 1
+
+    # Menu item
+    install -Dm644 ${srcdir}/XBMC/tools/Linux/xbmc.desktop \
+                   ${pkgdir}/usr/share/applications/xbmc.desktop || return 1
+    install -Dm644 ${srcdir}/XBMC/tools/Linux/xbmc.png \
+                   ${pkgdir}/usr/share/pixmaps/xbmc.png || return 1
+
+    # XBMCTex
+    install -Dm755 ${srcdir}/XBMC/tools/XBMCTex/XBMCTex \
+                   ${pkgdir}/usr/share/xbmc/tools/xbmctex || return 1
+
+    # License(s)
+    install -dm755 ${pkgdir}/usr/share/licenses/${pkgname}
+    for licensef in LICENSE.GPL README.linux copying.txt; do
+        mv ${pkgdir}/usr/share/xbmc/${licensef} \
+           ${pkgdir}/usr/share/licenses/${pkgname} || return 1
+    done
+}
