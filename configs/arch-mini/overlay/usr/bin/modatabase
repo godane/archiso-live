@@ -5,6 +5,11 @@
 #		rm -f /bootmnt/empty 2>/dev/null
 #fi
 
+if [ ! -d $1 ]; then
+	echo "That folder doesn't exist."
+	exit 1
+fi
+
 find $1 -name "*.lzm" | sort > $1/db.mod
 
 sed -i "s|$1/||g" $1/db.mod
