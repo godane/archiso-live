@@ -1,0 +1,97 @@
+# Contributor: Jens Pranaitis <jens@jenux.homelinux.org>
+# Contributor: Christopher Rogers aka Godane <slaxemulator@gmail.com>
+pkgname=aufs-utils
+pkgver=20081225
+_realname=aufs
+pkgrel=1
+pkgdesc="Another Unionfs Implementation. For using with arch-live kernel26slax."
+arch=('i686' 'x86_64')
+url="http://aufs.sourceforge.net/"
+license=('GPL2')
+makedepends=('cvs')
+depends=('bash')
+source=()
+options=(!libtool !makeflags)
+md5sums=()
+_cvsroot=":pserver:anonymous:@$_realname.cvs.sourceforge.net:/cvsroot/aufs"
+_cvsmod="aufs"
+
+build() {
+  #source "${startdir}"/../kernel.env
+  _kernver="2.6.27-ARCH"
+  _kerndir="/usr/src/linux-$_kernver/"
+  cd "${srcdir}"
+  msg "Connecting to $_cvsmod.sourceforge.net CVS server...."
+  if [ -d $_cvsmod/CVS ]; then
+    cd $_cvsmod
+    cvs -z3 update -d
+  else
+    cvs -z3 -d $_cvsroot co -D $pkgver -f $_cvsmod
+    cd $_cvsmod
+  fi
+  msg "CVS checkout done or server timeout"
+  msg "Starting make..."
+  cp -r ../$_cvsmod ../$_cvsmod-build
+  cd ../$_cvsmod-build
+  sed 's|-le 26|-le 27|g' -i fs/aufs25/Makefile
+  sed -i 's|CONFIG_AUFS_SPLICE_PATCH =|CONFIG_AUFS_SPLICE_PATCH = y|' \
+    local.mk || return 1
+
+  # patch for spin_lock conflict with the new unionfs patch
+  #sed s'|#if.*KERNEL_VERSION(2, 6, 26).*|#if 0|' -i fs/aufs25/cpup.c \
+  #  || return 1
+
+  sed -i 's|.*CONFIG_AUFS_SHWH =.*|CONFIG_AUFS_SHWH = y|' \
+    local.mk || return 1
+
+  # configure for NFS by:
+  # 1) configure local.mk to use FILP and LHASH
+  sed -i 's|CONFIG_AUFS_PUT_FILP_PATCH =|CONFIG_AUFS_PUT_FILP_PATCH = y|' \
+    local.mk || return 1
+  sed -i 's|CONFIG_AUFS_LHASH_PATCH =|CONFIG_AUFS_LHASH_PATCH = y|' \
+    local.mk || return 1
+  # 2) configure local.mk NOT to use FAKE_DM
+  sed -i 's|CONFIG_AUFS_FAKE_DM = y|CONFIG_AUFS_FAKE_DM =  |' \
+    local.mk || return 1
+
+  sed -i 's|CONFIG_AUFS_BRANCH_MAX_127 = y|CONFIG_AUFS_BRANCH_MAX_127 =  |' \
+    local.mk || return 1
+
+  sed -i 's|CONFIG_AUFS_BRANCH_MAX_1023 =|CONFIG_AUFS_BRANCH_MAX_1023 = y|' \
+    local.mk || return 1
+
+  # use splice functions exported by unionfs kernel patch'
+  # - important for loopback fs mounts 
+  sed -i 's|CONFIG_AUFS_SPLICE_PATCH =|CONFIG_AUFS_SPLICE_PATCH = y|' \
+     local.mk || return 1
+
+  # this fixes the unionfs patch from hanging aufs
+  sed -i 's|CONFIG_AUFS_UNIONFS23_PATCH =|CONFIG_AUFS_UNIONFS23_PATCH = y|' \
+     local.mk || return 1
+
+  sed -i 's|CONFIG_AUFS_WORKAROUND_FUSE =|CONFIG_AUFS_WORKAROUND_FUSE = y|' \
+    local.mk || return 1
+  
+  sed -i 's|export CONFIG_AUFS_SYSAUFS = y|export CONFIG_AUFS_SYSAUFS =|' \
+    local.mk || return 1
+
+  sed -i 's|export CONFIG_AUFS_STAT =|export CONFIG_AUFS_STAT = y|' \
+    local.mk || return 1
+
+  #sed -i 's|CONFIG_AUFS_FSYNC_SUPER_PATCH =|CONFIG_AUFS_FSYNC_SUPER_PATCH = y|' \
+  #  local.mk || return 1
+  # don't build static binaries
+  sed -i 's|aulchown: LDFLAGS += -s|aulchown:|g' util/Makefile ||return 1
+  # build
+  make KDIR=$_kerndir -f local.mk build_util|| return 1
+
+  # install
+  cd util ||return 1
+  mkdir -p "${pkgdir}"/sbin
+  mkdir -p "${pkgdir}"/etc/default
+  for x in {aufind.sh,mount.aufs,umount.aufs,auplink,aulchown,auchk}; do install -m 755 -p $x "${pkgdir}"/sbin/;done ||return 1
+  install -m 500 -p etc_default_aufs "${pkgdir}"/etc/default/aufs ||return 1
+  echo FLUSH=ALL > "${pkgdir}"/etc/default/auplink || return 1
+}
+
+# vim:set ts=2 sw=2 et:
