@@ -70,6 +70,7 @@ pkgconfig
 #live-tools
 syslinux
 aufs
+aufs-utils
 #aufs-slax
 sqlzma
 sqlzma-tools

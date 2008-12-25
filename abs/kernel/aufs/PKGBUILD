@@ -10,6 +10,7 @@ license=('GPL2')
 makedepends=('cvs')
 install=$pkgname.install
 source=()
+deps=(aufs-utils=$pkgver)
 options=(!libtool !makeflags)
 md5sums=()
 _cvsroot=":pserver:anonymous:@$pkgname.cvs.sourceforge.net:/cvsroot/aufs"
