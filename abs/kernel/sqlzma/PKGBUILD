@@ -6,22 +6,27 @@ pkgname=sqlzma
 _realname=squashfs
 pkgver=3.4
 lzmaver=457
-kver=2.6.27-ARCH
+kver=2.6.28-ARCH
 kdir="${pkgdir}"/lib/modules/${kver}/kernel/fs/${_realname}
-pkgrel=2
+pkgrel=3
 url="http://www.squashfs-lzma.org"
 pkgdesc="A highly compressed read-only filesystem for Linux."
+#depends=('kernel26>=2.6.28' 'kernel26<2.6.29' 'zlib')
 depends=('zlib')
 license=('GPL')
 arch=('i686' 'x86_64')
-source=(http://frugalware.org/~janny/source_pkgs/lzma${lzmaver}.tar.bz2 \
-	http://frugalware.org/~janny/source_pkgs/${_realname}${pkgver}.tar.gz \
-	http://frugalware.org/~janny/source_pkgs/sqlzma${pkgver}-${lzmaver}.tar.bz2
-	squashfs-lzma.tar.bz2)
+source=(#http://frugalware.org/~janny/source_pkgs/lzma${lzmaver}.tar.bz2 \
+	#http://frugalware.org/~janny/source_pkgs/${_realname}${pkgver}.tar.gz \
+	#http://frugalware.org/~janny/source_pkgs/sqlzma${pkgver}-${lzmaver}.tar.bz2
+	lzma${lzmaver}.tar.bz2
+	${_realname}${pkgver}.tar.gz
+	sqlzma${pkgver}-${lzmaver}.tar.bz2
+	squashfs-lzma.tar.gz)
 md5sums=('fc7a12a396ade1772e959604d6eb31e1'
          '2a4d2995ad5aa6840c95a95ffa6b1da6'
          'bcf26bd5a39e89ab1d9bbdbbea953281'
-	 'a70af8c0671db5afbe8a50206bddc4b7')
+         'd7c53db305d77701cd2298e2845adb13')
+
 build()
 {
 	cd "${srcdir}"
