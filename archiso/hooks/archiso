@@ -93,6 +93,12 @@ run_hook ()
     if [ -f "${BOOT_MOUNT}/initrd" ]; then
     	_mnt_ext2_file "${BOOT_MOUNT}/initrd" "/tmpfs"
     fi
+	
+	if [ "${break}" = "y" ]; then
+        echo ":: Break requested, type 'exit' to resume operation"
+        echo "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+        PS1="ramfs$ " /bin/sh -i
+    fi
 
 #if [ "x${changes}" != "x" ]; then
 #	for usb in /dev/sd[a-z][0-9]; do
@@ -118,14 +124,14 @@ run_hook ()
 	fi
 
     if [ "${changes}" = "y" ]; then
-	if [ "${bootusb}" = "y" ]; then
-		if [ -d "${BOOT_MOUNT}/changes" ]; then
-			msg -n ":: Mounting changes. "
-			/bin/mount -o bind "${BOOT_MOUNT}/changes" "/tmpfs"			
+		if [ "${bootusb}" = "y" ]; then
+			if [ -d "${BOOT_MOUNT}/changes" ]; then
+				msg -n ":: Mounting changes. "
+				/bin/mount -o bind "${BOOT_MOUNT}/changes" "/tmpfs"			
+			fi
 		fi
-	fi
     else
-	mount_tmpfs
+		mount_tmpfs
     fi
     
     if [ "x${BOOT_MOUNT}" = "x" ]; then
