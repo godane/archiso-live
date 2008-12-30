@@ -8,7 +8,6 @@ cpio
 device-mapper
 grub
 ca-certificates
-cpio
 libgpg-error
 texinfo
 libgcrypt
@@ -53,7 +52,6 @@ rp-ppoe
 sdparm
 syslog-ng
 sysvinit
-tar
 tcp_wrappers
 usbutils
 vi
@@ -70,6 +68,7 @@ pkgconfig
 #live-tools
 syslinux
 aufs
+aufs-utils
 #aufs-slax
 sqlzma
 sqlzma-tools
