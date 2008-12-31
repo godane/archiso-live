@@ -77,7 +77,7 @@ _mnt_squashfs()
     if [ "${aufs}" = "y" ]; then 
     /bin/mount -t aufs -o remount,add:1:/tmpfs/mnt/loop${LOOP_NUM}=rr aufs "/real_root"
     else
-    /bin/mount -t real_rootfs -o remount,add=:/tmpfs/mnt/loop${LOOP_NUM}=ro none "/real_root"
+    /bin/mount -t unionfs -o remount,add=:/tmpfs/mnt/loop${LOOP_NUM}=ro none "/real_root"
     fi
     export LOOP_NUM=$(( $LOOP_NUM + 1 ))
 }
