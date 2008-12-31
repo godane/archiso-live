@@ -60,6 +60,9 @@ which
 wpa_supplicant
 xfsprogs
 netcfg
+openssl
+openssh
+openvpn
 #chakra-hardware-detection
 #chakra-initscripts
 #chakra-sysvinit
