@@ -1,4 +1,4 @@
-# args: source, mountpoint
+ [# args: source, mountpoint
 _mnt_bind()
 {
     msg "::: Binding ${1} to ${2}"
@@ -153,17 +153,17 @@ run_hook ()
     /bin/modprobe -q unlzma >/dev/null 2>&1
     msg ":: Mounting root (real_root) filesystem"
     if [ "${aufs}" = "y" ]; then
-    /bin/modprobe -q aufs brs=1 >/dev/null 2>&1
-    /bin/mount -t aufs -o nowarn_perm,br:/tmpfs=rw aufs /real_root
+		/bin/modprobe -q aufs brs=1 >/dev/null 2>&1
+		/bin/mount -t aufs -o nowarn_perm,br:/tmpfs=rw aufs /real_root
     else
-    /bin/modprobe -q unionfs >/dev/null 2>&1
-    /bin/mount -t unionfs -o dirs=/tmpfs=rw none /real_root
+		/bin/modprobe -q unionfs >/dev/null 2>&1
+		/bin/mount -t unionfs -o dirs=/tmpfs=rw none /real_root
     fi
     
     addon_dir="${BOOT_MOUNT}/addons"
 
     # always layer default configuration
-    if [ "${aufs}" = "y" ]; then
+if [ "${aufs}" = "y" ]; then
     _mnt_squashfs ${base_img}
     
     if [ -e "${addon_dir}/config" ]; then
@@ -179,9 +179,11 @@ run_hook ()
             fi
         done < ${addon_dir}/config
     fi
-    	_mnt_squashfs "${addon_dir}/overlay.sqfs"
+		if [ -f "${addon_dir}/overlay.sqfs" ]; then
+			_mnt_squashfs "${addon_dir}/overlay.sqfs"
+		fi
 
-    else
+else
 
     # always layer default configuration
     _mnt_squashfs "${addon_dir}/overlay.sqfs"
@@ -214,22 +216,22 @@ fi
     mkdir -p /real_root/${CHANGES}
 
     if [ -f "${BOOT_MOUNT}/initrd" ]; then
-	/bin/mount -o move /tmpfs /real_root/${CHANGES}
+		/bin/mount -o move /tmpfs /real_root/${CHANGES}
     else
-	/bin/mount -o bind /tmpfs /real_root/${CHANGES}
+		/bin/mount -o bind /tmpfs /real_root/${CHANGES}
     fi
 
     if [ "${bootusb}" = "y" ]; then
-	if [ "x${from}" != "x" ]; then
+		if [ "x${from}" != "x" ]; then
     		mkdir -p /real_root/device
-		mount -w -o move "/bootmnt" "/real_root/device"
-	fi
+			mount -w -o move "/bootmnt" "/real_root/device"
+		fi
     fi
 	
     if [ "${norootcopy}" = "y" ]; then
     	msg ":: no copying of rootcopy"
     else
-	cp -af ${BOOT_MOUNT}/rootcopy/* /real_root 2>/dev/null # may be empty
+		cp -af ${BOOT_MOUNT}/rootcopy/* /real_root 2>/dev/null # may be empty
     fi
 
     mkdir -p /real_root/bootmnt
