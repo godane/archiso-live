@@ -2,3 +2,5 @@ src/
 pkg/
 *.pkg.*
 .working/
+*.iso
+*.md5

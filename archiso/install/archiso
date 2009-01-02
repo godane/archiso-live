@@ -1,7 +1,7 @@
 install ()
 {
-    MODULES="cdrom ide-cd_mod ide-core ide-generic aufs unionfs squashfs isofs loop ext2 xfs $(all_modules '/kernel/fs' | grep -v "nls") "
-    BINARIES="cp ls find touch rm test chmod chown"
+    MODULES="cdrom ide-cd_mod ide-core ide-generic aufs unionfs squashfs isofs loop xfs $(all_modules '/kernel/fs' | grep -v "nls") "
+    BINARIES="cp ls find touch rm test chmod chown grep"
     #FILES="/usr/lib/liblinuxlive"
     FiLES=""
     add_dir /real_root
