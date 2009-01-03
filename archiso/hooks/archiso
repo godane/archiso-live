@@ -1,4 +1,4 @@
- [# args: source, mountpoint
+#args: source, mountpoint
 _mnt_bind()
 {
     msg "::: Binding ${1} to ${2}"
@@ -137,6 +137,7 @@ run_hook ()
 					fi 
 			fi
 		fi
+	fi
 
     if [ "${changes}" = "y" ]; then
 		if [ "${bootusb}" = "y" ]; then
