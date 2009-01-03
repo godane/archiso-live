@@ -90,6 +90,15 @@ run_hook ()
 	BOOT_MOUNT="/live"
     fi
     
+	if [ ! $(ls /dev/loop*) ]; then
+		echo "Creating loop device nodes."
+		mknod /dev/loop0 b 7 0
+		mknod /dev/loop1 b 7 1
+		mknod /dev/loop2 b 7 2
+		mknod /dev/loop3 b 7 3
+		mknod /dev/loop4 b 7 4
+	fi
+	
     if [ -f "${BOOT_MOUNT}/initrd" ]; then
     	_mnt_ext2_file "${BOOT_MOUNT}/initrd" "/tmpfs"
     fi
