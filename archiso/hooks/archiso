@@ -125,12 +125,18 @@ run_hook ()
 #	done
 #fi
 
-	if [ "x${changesfile}" != "x" ]; then
-		if [ -f "${BOOT_MOUNT}/${changes}" ]; then
-			msg -n ":: Mounting xfs file changes. "
-			_mnt_xfs_file "${BOOT_MOUNT}/${changes}" "/tmpfs"
+	if [ "${changes}" = "n" ]; then
+		if [ "x${changesfile}" != "x" ]; then
+			if [ -f "${BOOT_MOUNT}/${changes}" ]; then
+				msg -n ":: Mounting xfs file changes. "
+				_mnt_xfs_file "${BOOT_MOUNT}/${changes}" "/tmpfs"
+					if [ ! $(touch /tmpfs/keep) ]; then
+						msg -n ":: changesfile not working"
+						msg -n ":: using tmpfs"
+						mount_tmpfs
+					fi 
+			fi
 		fi
-	fi
 
     if [ "${changes}" = "y" ]; then
 		if [ "${bootusb}" = "y" ]; then
@@ -140,6 +146,8 @@ run_hook ()
 			fi
 		fi
     else
+		msg -n ":: changesfile not working"
+		msg -n ":: using tmpfs"
 		mount_tmpfs
     fi
     
