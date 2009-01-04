@@ -147,7 +147,6 @@ run_hook ()
 			fi
 		fi
     else
-		msg -n ":: changesfile not working"
 		msg -n ":: using tmpfs"
 		mount_tmpfs
     fi
