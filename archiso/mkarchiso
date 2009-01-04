@@ -273,10 +273,12 @@ find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
     # always make an addon out of DEF_CONFIG_DIR
     echo "Creating default-config addon..."
     if [ "${QUIET}" = "y" ]; then
-        	/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend >/dev/null
+        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend >/dev/null
     else
 		/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend
     fi
+	
+	chmod 0444 "${IMGROOT}/addons/overlay.sqfs"
 }
 
 # Squash is the next step.
