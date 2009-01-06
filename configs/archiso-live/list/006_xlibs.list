@@ -54,6 +54,7 @@ python-cssutils
 python-pigment
 fftw
 #games-libs
+freealut
 sdl_perl
 sdl_pango
 perl-locale-gettext

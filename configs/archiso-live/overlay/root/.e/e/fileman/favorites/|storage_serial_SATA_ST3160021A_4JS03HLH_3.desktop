@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Link
+X-Enlightenment-Type=Removable
+X-Enlightenment-Removable-State=Full
+Name=ATA ST3160021A - 61 GiB
+Icon=drive-harddisk
+Comment=Removable Device
+URL=file://org/freedesktop/Hal/devices/volume_uuid_e4059ff6_bc7a_429c_9122_f6fa64caefd0
