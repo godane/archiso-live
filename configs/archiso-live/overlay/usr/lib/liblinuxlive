@@ -340,7 +340,7 @@ device_filesystem()
    debug_log "device_filesystem" "$*"
    local NTFS
 
-   if [ -e /bin/ntfsmount ]; then NTFS="ntfs-3g"; else NTFS="ntfs"; fi
+   if [ -e /usr/bin/ntfsmount ]; then NTFS="ntfs-3g"; else NTFS="ntfs"; fi
    blkid -s TYPE "$1" -o value | sed "s/msdos/vfat/" | sed "s/ntfs/$NTFS/"
 }
 
