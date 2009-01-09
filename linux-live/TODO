@@ -1,0 +1,13 @@
+Linux Live Scripts TODO list
+============================
+
+- bootinst.sh/.bat, bootlilo - make the 'Slax' string customizable, and modify
+  it the same way like liblinuxlive
+
+- copy2ram together with changes=slax .. can confuse people and/or make
+  troubles if user unplugs the flash key after copy2ram. Perhaps
+  ignore 'changes=...' if copy2ram is used?
+
+- when busybox is called to list its applets, it should link to correct libraries
+  (from linux live scripts, not from current distro).
+  

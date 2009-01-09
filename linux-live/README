@@ -1,0 +1,28 @@
+
+ Linux Live scripts
+
+   These scripts are used to create Slax Live CD. It may be used to make
+   a bootable CD from your real Linux distribution as well. Just install
+   your distro somewhere, unpack these scripts somewhere in $DISTRO/tmp,
+   login as root, make changes to .config file and finally run ./build
+
+   You'll be asked for the name of your LiveCD during the build process.
+
+
+ Documentation and changelog:
+
+   cat ./DOC/requirements.txt
+   cat ./DOC/changelog.txt
+   cat ./DOC/international.txt
+   cat ./DOC/bootparams.txt
+   vi ./.config
+
+ Author:
+
+   Tomas M. <http://www.linux-live.org>
+
+ Sources:
+
+ Source code of all binaries available in linux-live scripts are not included,
+ because of the size. Nevertheless you may download all sources needed to build
+ these binaries from ftp.slax.org/source and ftp.slackware.com

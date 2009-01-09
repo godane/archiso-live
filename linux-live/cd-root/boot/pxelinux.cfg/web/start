@@ -1,0 +1,39 @@
+#!/bin/bash
+# This script will start a webserver for live data, using monkey http daemon.
+# Live data dir is guessed from /mnt/live/mnt/* and then (if not found yet)
+# from /mnt/*
+# Specify the data dir as a parameter if you wish to overide the guessed one
+# It searches for a .lzm file in /base /modules or /optional subdirectory
+#
+cd $(dirname $(readlink -f $0))
+CONF=/tmp/monkey-web-conf-pxe-$$
+
+# Actually it is not always known where are the live data mounted.
+# This function will verify if the path provided as argument is valid
+# data dir. More arguments are supported.
+verify_datadir()
+{
+   while [ "$1" != "" ]; do
+      VALID=$(find $1/*/base $1/*/modules $1/*/optional -name "*.lzm" 2>/dev/null)
+      if [ "$VALID" != "" ]; then
+         echo "$1"
+         return
+      fi
+      shift
+   done
+}
+
+ROOT=$(verify_datadir $1 /mnt/live/mnt/* /mnt/*)
+if [ "$ROOT" = "" ]; then
+   echo "Can't find root directory with live data," >&2
+   echo "try to specify a directory with ./base in it" >&2
+   echo "with at least one .lzm module." >&2
+   exit 1
+fi
+
+cp -R conf $CONF
+sed -i -r "s:Server_root /var/www:Server_root $ROOT:" $CONF/monkey.conf
+
+killall monkey 2>/dev/null
+./monkey -c $CONF -D >/dev/null
+rm -Rf $CONF

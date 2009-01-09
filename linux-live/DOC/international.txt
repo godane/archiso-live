@@ -1,0 +1,29 @@
+People with international Windows won't be able to see correct file names
+on disk out of the box, because FAT and NTFS partitions require different
+encoding.
+
+In order to support international NTFS and FAT filesystems, simply configure
+Linux Live scripts to include your desired locale (see .config), and use 
+a boot parameter like locale=czech (for example) during live system startup.
+
+If you specify only one locale in .config file, for example "czech", then
+there is no need for any boot parameters. But if you use "czech,polish" for
+example, then linux live scripts can't know which one to use as default, so
+the boot parameter locale= is required.
+
+You may use 'locale=' or 'lang=' or 'language=' boot parameters,
+all do the same. Sorry for this confusion, but it's better to remember.
+
+For example, if you use locale=czech boot parameter to force Czech locales
+for FAT and NTFS partitions, Linux Live scripts will use: cs_CZ.ISO-8859-2
+
+If you're creating a live distribution which will be mostly used on 
+computers with international Windows systems, you may need to add the locale=
+boot parameter permanently. In this case, edit:
+
+ - boot/syslinux/syslinux.cfg
+ - boot/isolinux/isolinux.cfg
+ - boot/dos/config
+
+and add 'locale=your_language' to the append section,
+or 'lang=your_language' or 'language=your_language', all means the same.

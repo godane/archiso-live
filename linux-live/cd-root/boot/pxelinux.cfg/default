@@ -1,0 +1,11 @@
+PROMPT 0
+
+LABEL linux
+MENU LABEL Run linux over PXE
+KERNEL /vmlinuz
+IPAPPEND 1
+APPEND vga=769 initrd=/initrd.gz ramdisk_size=6666 root=/dev/ram0 rw autoexec=xconf;startx
+
+LABEL memtest86
+MENU LABEL Run Memtest utility
+KERNEL /mt86p

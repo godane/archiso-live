@@ -1,0 +1,46 @@
+Linux Live scripts Requirements         by Tomas M.   http://www.linux-live.org
+
+  To say it short and fast:
+  -------------------------
+  
+  To be able to create a Linux Live CD, your kernel must meet some
+  requirements. Easiest way is to visit www.linux-live.org and download
+  precompiled Linux kernel with everything included. Install it and run
+  ./build from linux-live scripts. It should work :)
+
+  Long info (if you need own kernel):
+  -----------------------------------
+
+  Sample kernel config file can be found if you boot Slax and see /proc/config.gz
+
+  * Your distro must use kernel 2.6.24 or higher (in order to use sqlzma patch)
+
+  * all the following things must be compiled directly into kernel:
+     (these options are usually compiled so you shouldn't have problems)
+     - ext2 (CONFIG_EXT2_FS=y)
+     - tmpfs (CONFIG_TMPFS=y)
+     - ramdisk (CONFIG_BLK_DEV_RAM=y)
+     - initrd (CONFIG_BLK_DEV_INITRD=y)
+     - a cdrom driver, if you boot from CD-ROM
+
+  * all the following things must be compiled in the kernel or must be
+     available at least as a kernel modules (.ko):
+     - loop (else mount -o loop won't work)
+     - isofs (if you will boot your live distro from CDROM)
+     - ehci-hcd, ohci-hcd, uhci-hcd, usb-storage (if you will boot your live distro from USB)
+
+  * all these modules must be available:
+     - aufs.ko
+     - squashfs.ko (plus sqlzma.ko and unlzma.ko)
+
+     Make sure that your modules don't contain debug info, so it can fit
+     a 6MB initrd image. If you need debugging, change .config file
+     in linux live scripts and set it to to create bigger initrd.
+
+  * Your distro must have /usr/bin/chroot or /usr/sbin/chroot
+  * Your distro must have /bin/init or /sbin/init
+
+  * if you compiled squashfs tools manually, you should replace
+    ./tools/mksquashfs and ./tools/unsquashfs by your own binaries
+
+  These requirements could change with new kernel or aufs versions.
