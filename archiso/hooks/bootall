@@ -28,14 +28,14 @@ if [ "${bootusb}" = "y" ]; then
         if mount -t vfat "${usb}" ${bootmnt} >/dev/null 2>&1 ||\
             mount -t ext2 "${usb}" ${bootmnt} >/dev/null 2>&1; then
 	if [ "x${from}" != "x" ]; then
-            if [ -f "${bootmnt}/${from}/archlive.sqfs" ]; then
+            if [ -f "${bootmnt}/${from}/livecd.sgn" ]; then
                 found=1
                 msg "${usb}"
 				/bin/mount -o bind "${bootmnt}/${from}" "${live}"
                 break
             fi
 	else
-	     if [ -f "${bootmnt}/archlive.sqfs" ]; then
+	     if [ -f "${bootmnt}/livecd.sgn" ]; then
                 found=1
                 msg "${usb}"
                 break
@@ -51,14 +51,14 @@ elif [ "${boothd}" = "y" ]; then
         if mount -t vfat "${hd}" ${bootmnt} >/dev/null 2>&1 ||\
             mount -t ext2 "${hd}" ${bootmnt} >/dev/null 2>&1; then
 	if [ "x${from}" != "x" ]; then
-            if [ -f "${bootmnt}/${from}/archlive.sqfs" ]; then
+            if [ -f "${bootmnt}/${from}/livecd.sgn" ]; then
                 found=1
                 msg "${hd}"
 				/bin/mount -o bind "${bootmnt}/${from}" "${live}"
                 break
             fi
 	else
-	     if [ -f "${bootmnt}/archlive.sqfs" ]; then
+	     if [ -f "${bootmnt}/livecd.sgn" ]; then
                 found=1
                 msg "${hd}"
                 break
@@ -74,7 +74,7 @@ else
     for cdrom in /dev/sr[0-9]; do
     #for cdrom in /dev/hd[c-z]; do
         if mount -r -t iso9660 "${cdrom}" ${bootmnt} >/dev/null 2>&1; then
-	    if [ -f "${bootmnt}/archlive.sqfs" ]; then
+	    if [ -f "${bootmnt}/livecd.sgn" ]; then
                 found=1
                 msg "${cdrom}"
                 break
