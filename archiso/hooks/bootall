@@ -32,14 +32,12 @@ if [ "${bootusb}" = "y" ]; then
                 found=1
                 msg "${usb}"
 				/bin/mount -o bind "${bootmnt}/${from}" "${live}"
-				export "${usb}"
                 break
             fi
 	else
 	     if [ -f "${bootmnt}/archlive.sqfs" ]; then
                 found=1
                 msg "${usb}"
-				export "${usb}"
                 break
             fi
 	fi
@@ -57,7 +55,6 @@ elif [ "${boothd}" = "y" ]; then
                 found=1
                 msg "${hd}"
 				/bin/mount -o bind "${bootmnt}/${from}" "${live}"
-				export ${hd}
                 break
             fi
 	else
