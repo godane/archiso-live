@@ -31,13 +31,15 @@ if [ "${bootusb}" = "y" ]; then
             if [ -f "${bootmnt}/${from}/archlive.sqfs" ]; then
                 found=1
                 msg "${usb}"
-		/bin/mount -o bind "${bootmnt}/${from}" "${live}"
+				/bin/mount -o bind "${bootmnt}/${from}" "${live}"
+				export "${usb}"
                 break
             fi
 	else
 	     if [ -f "${bootmnt}/archlive.sqfs" ]; then
                 found=1
                 msg "${usb}"
+				export "${usb}"
                 break
             fi
 	fi
@@ -54,7 +56,8 @@ elif [ "${boothd}" = "y" ]; then
             if [ -f "${bootmnt}/${from}/archlive.sqfs" ]; then
                 found=1
                 msg "${hd}"
-		/bin/mount -o bind "${bootmnt}/${from}" "${live}"
+				/bin/mount -o bind "${bootmnt}/${from}" "${live}"
+				export ${hd}
                 break
             fi
 	else
@@ -87,11 +90,13 @@ else
 fi
 
     if [ ${found} -eq 0 ]; then
-	if [ "${bootusb}" = "y" ]; then
-		echo "ERROR: cannot find booted usb device, cannot continue..."
-	else
+	
+		if [ "${bootusb}" = "y" ]; then
+			echo "ERROR: cannot find booted usb device, cannot continue..."
+		else
         	echo "ERROR: cannot find booted cdrom device, cannot continue..."
-	fi
+		fi
+		
         exit 1
     else
         export BOOT_MOUNT="${bootmnt}"

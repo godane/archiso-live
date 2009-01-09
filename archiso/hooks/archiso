@@ -61,6 +61,16 @@ mount_tmpfs ()
     msg "done."
 }
 
+test_mount_fs ()
+{
+	mkdir /test
+	if [ $(mount -t $1 ${usb} /test) ]; then
+		umount /test
+		export ${usb}
+		rm -f /test
+	fi
+}
+
 # args: image file
 _mnt_squashfs()
 {
@@ -145,7 +155,9 @@ run_hook ()
 		if [ "${bootusb}" = "y" ]; then
 			if [ -d "${BOOT_MOUNT}/changes" ]; then
 				msg -n ":: Mounting changes. "
-				/bin/mount -o bind "${BOOT_MOUNT}/changes" "/tmpfs"			
+				if [ test_mount_fs ext2 ]; then
+					/bin/mount -o bind "${BOOT_MOUNT}/changes" "/tmpfs"
+				fi	
 			fi
 		fi
     else
