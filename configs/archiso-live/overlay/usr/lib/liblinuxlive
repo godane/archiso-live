@@ -326,7 +326,7 @@ fs_options()
       fi
    fi
 
-   if [ "$1" = "ntfs-3g" ]; then
+   if [ "$1" = "ntfs.fuse" -o "$1" = "ntfs-3g" ]; then
       echo ",locale=$(locale_id)"
    fi
 }
@@ -340,7 +340,13 @@ device_filesystem()
    debug_log "device_filesystem" "$*"
    local NTFS
 
-   if [ -e /usr/bin/ntfsmount ]; then NTFS="ntfs-3g"; else NTFS="ntfs"; fi
+   if [ -e /bin/ntfs-3g ]; then
+   NTFS="ntfs-3g"
+   elif [ -e /usr/bin/ntfsmount ]; then
+   NTFS="ntfs.fuse"
+   else
+   NTFS="ntfs"
+   fi
    blkid -s TYPE "$1" -o value | sed "s/msdos/vfat/" | sed "s/ntfs/$NTFS/"
 }
 
@@ -351,8 +357,10 @@ device_filesystem()
 is_supported_filesystem()
 {
    debug_log "is_supported_filesystem" "$*"
-
-   if [ -e /usr/bin/ntfsmount -a "$1" = "ntfs-3g" ]; then
+	
+   if [ -e /bin/ntfs-3g -a "$1" = "ntfs-3g" ]; then
+	  return 0
+   elif [ -e /usr/bin/ntfsmount -a "$1" = "ntfs.fuse" ]; then
       return 0
    fi
 
@@ -386,7 +394,7 @@ mount_device()
    if [ "$3" ]; then OPTIONS="$OPTIONS,$3"; fi
    OPTIONS=$(echo "$OPTIONS" | sed -r "s/^,+//")
 
-   if [ "$FS" = "-t ntfs-3g" ]; then
+   if [ "$FS" = "-t ntfs.fuse" ]; then
       ntfsmount "$DEV" "$2" -o $OPTIONS >/dev/null 2>&1
       ERR=$?
    else
@@ -872,7 +880,7 @@ modprobe_essential_modules()
    modprobe_module vfat
    echolog "starting windows filesystem support"
    modprobe_module vfat
-   modprobe_module fuse # for ntfs-3g
+   modprobe_module fuse # for ntfs-3g/ntfs.fuse
    modprobe_module ntfs # for ro driver
 }
 
