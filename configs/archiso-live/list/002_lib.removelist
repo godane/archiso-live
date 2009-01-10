@@ -32,11 +32,11 @@ gtk-recordmydesktop
 #xfce
 #xfce4
 #kdemod-arts
-exo
-gtk-xfce-engine
-libxfce4mcs
-libxfce4util
-libxfcegui4
+#exo
+#gtk-xfce-engine
+#libxfce4mcs
+#libxfce4util
+#libxfcegui4
 mousepad
 terminal
 thunar

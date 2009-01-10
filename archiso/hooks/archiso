@@ -53,9 +53,9 @@ _mnt_xfs_file()
 
 mount_tmpfs () 
 {
-    if [ "x${ramdisk_size}" = "x" ]; then
-        ramdisk_size="75%"
-    fi
+    #if [ "x${ramdisk_size}" = "x" ]; then
+        ramdisk_size="2M"
+    #fi
     msg -n ":: Mounting tmpfs, size=${ramdisk_size}..."
     mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
     msg "done."
@@ -99,17 +99,17 @@ run_hook ()
 		mknod /dev/loop4 b 7 4
 	fi
 	
-    if [ -f "${BOOT_MOUNT}/initrd" ]; then
+    if [ -f "${BOOT_MOUNT}/initrd.lzm" ]; then
 		mount_tmpfs
 		mkdir -p "/tmpfs/initrd"
-    	_mnt_ext2_file "${BOOT_MOUNT}/initrd" "/tmpfs/initrd"
+    	#_mnt_ext2_file "${BOOT_MOUNT}/initrd" "/tmpfs/initrd"
 		/bin/modprobe -q squashfs >/dev/null 2>&1
 		/bin/modprobe -q sqlzma >/dev/null 2>&1
 		/bin/modprobe -q unlzma >/dev/null 2>&1
 		/bin/modprobe -q aufs brs=1 >/dev/null 2>&1
 		/bin/mount -t aufs -o nowarn_perm,br:/tmpfs=rw aufs /real_root
-		/bin/mount -t aufs -o remount,add:1:/tmpfs/initrd=ro aufs /real_root
-		cp -Raf /lib/modules /real_root/lib/modules
+		_mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
+		#/bin/mount -t aufs -o remount,add:1:/tmpfs/initrd=ro aufs /real_root
 		
 		udevpid=$(/bin/minips -C udevd -o pid=)
 		[ "x${udevpid}" != "x" ] && /bin/kill -9 $udevpid 2>&1 >/dev/null

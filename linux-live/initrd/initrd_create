@@ -204,44 +204,47 @@ mksquashfs $INITRD_TREE/$LMK/kernel/drivers $INITRD_TREE/drivers.lzm >/dev/null 
 chmod ago-x $INITRD_TREE/drivers.lzm
 rm -Rf $INITRD_TREE/$LMK/kernel/drivers/*
 
-debug "creating empty image file for initrd"
-dd if=/dev/zero of=$INITRDIMG bs=1024 count=$RAM0SIZE >>$DEBUG 2>&1
+#debug "creating empty image file for initrd"
+#dd if=/dev/zero of=$INITRDIMG bs=1024 count=$RAM0SIZE >>$DEBUG 2>&1
 
-debug "making filesystem"
-mkfs -t ext2 -F -m 0 -b 1024 -i 1024 $INITRDIMG >>$DEBUG 2>&1
-tune2fs -i 120m $INITRDIMG >>$DEBUG 2>&1
+#debug "making filesystem"
+#mkfs -t ext2 -F -m 0 -b 1024 -i 1024 $INITRDIMG >>$DEBUG 2>&1
+#tune2fs -i 120m $INITRDIMG >>$DEBUG 2>&1
 
-debug "creating empty directory $MOUNTDIR"
-rm -Rf $MOUNTDIR
-mkdir $MOUNTDIR
+#debug "creating empty directory $MOUNTDIR"
+#rm -Rf $MOUNTDIR
+#mkdir $MOUNTDIR
 
-debug "mounting $INITRDIMG to it"
-modprobe loop 2>>$DEBUG
-mount -o loop -t ext2 $INITRDIMG $MOUNTDIR
-if [ "$?" -ne 0 ]; then
-   echo "Error mounting initrd! Not enough free loop devices?"
-   exit 1
-fi
+#debug "mounting $INITRDIMG to it"
+#modprobe loop 2>>$DEBUG
+#mount -o loop -t ext2 $INITRDIMG $MOUNTDIR
+#if [ "$?" -ne 0 ]; then
+#   echo "Error mounting initrd! Not enough free loop devices?"
+#   exit 1
+#fi
 
-debug "copying content of $INITRD_TREE to $MOUNTDIR"
-rmdir $MOUNTDIR/lost+found
-cp -R --preserve $INITRD_TREE/* $MOUNTDIR 2>/dev/null
-if [ $? -ne 0 ]; then
-   debug "error copying data to mounted initrd. Increase RAM0SIZE"
-   echo "Not enough free space in initrd. Edit .config and increase RAM0SIZE !"
-   umount $MOUNTDIR
-   rm $INITRDIMG
-   exit 1
-fi
+#debug "copying content of $INITRD_TREE to $MOUNTDIR"
+#rmdir $MOUNTDIR/lost+found
+#cp -R --preserve $INITRD_TREE/* $MOUNTDIR 2>/dev/null
+#if [ $? -ne 0 ]; then
+#   debug "error copying data to mounted initrd. Increase RAM0SIZE"
+#   echo "Not enough free space in initrd. Edit .config and increase RAM0SIZE !"
+#   umount $MOUNTDIR
+#   rm $INITRDIMG
+#   exit 1
+#fi
 
-debug "unmounting $MOUNTDIR"
-umount $MOUNTDIR
+#debug "unmounting $MOUNTDIR"
+#umount $MOUNTDIR
 
-debug "gzipping $INITRDIMG"
-gzip --best $INITRDIMG
+mksquashfs $INITRD_TREE $INITRDIMG.lzm >/dev/null 2>&1
+chmod ago-x $INITRDIMG.lzm
+#debug "gzipping $INITRDIMG"
+#gzip --best $INITRDIMG
 
-debug "deleting directory $MOUNTDIR"
-rmdir $MOUNTDIR
+#debug "deleting directory $MOUNTDIR"
+#rmdir $MOUNTDIR
+
 
 debug "deleting directory $INITRD_TREE"
 rm -Rf $INITRD_TREE
