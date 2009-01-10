@@ -10,7 +10,7 @@ install ()
     fi
 	add_dir /tmpfs
 	
-    BINARIES="touch rm sed"
+    BINARIES="touch rm sed basename tr"
     FILES=""
     SCRIPT="bootall"
 }

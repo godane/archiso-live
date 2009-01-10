@@ -8,6 +8,11 @@ mount_tmpfs ()
     msg "done."
 }
 
+device_mountdir()
+{
+   echo "/tmpfs/mnt/$(/usr/bin/basename "$1")" # | tr -s /
+}
+
 run_hook ()
 {
     # external drives may need to settle
@@ -40,25 +45,18 @@ run_hook ()
 
 if [ "${bootusb}" = "y" ]; then 
     for usb in /dev/sd[a-z][0-9]; do
-		bootusbmnt="$(echo ${usb} | /bin/sed 's|/dev/|/tmpfs/mnt/|g')"
+		bootusbmnt="$(device_mountdir ${usb})"
 		/bin/mkdir -p ${bootusbmnt}
         if mount -r -t vfat "${usb}" ${bootusbmnt} >/dev/null 2>&1 ||\
             mount -r -t ext2 "${usb}" ${bootusbmnt} >/dev/null 2>&1; then
 	if [ "x${from}" != "x" ]; then
-		if [ $(echo ${from} | /bin/grep /dev/sd) ]; then
-			from=$(echo "${from}" | /bin/sed 's|/dev/|/tmpfs/mnt/|g')
-				if [ -f ${from}/initrd.lzm" ]; then
+			from=$(/usr/bin/basename ${from})			
+				if [ -f "${bootusbmnt}/${from}/initrd.lzm" ]; then
 					found=1
 					msg "${usb}"
 					/bin/mount -o bind "${bootusbmnt}/${from}" "${live}"
 					break
-				elif [ -f ${bootusbmnt}/${from}/initrd.lzm" ]; then
-					found=1
-					msg "${usb}"
-					/bin/mount -o bind "${bootusbmnt}/${from}" "${live}"
-					break
-				fi
-		fi		
+				fi		
 	else
 	     if [ -f "${bootusbmnt}/initrd.lzm" ]; then
                 found=1
@@ -74,7 +72,7 @@ if [ "${bootusb}" = "y" ]; then
 else
     /bin/modprobe -q isofs >/dev/null 2>&1
     for cdrom in /dev/sr[0-9]; do
-		bootcdmnt="$(echo ${cdrom} | /bin/sed 's|/dev/|/tmpfs/mnt/|g')"
+		bootcdmnt="$(device_mountdir ${cdrom})"
 		mkdir -p "${bootcdmnt}"
         if mount -r -t iso9660 "${cdrom}" ${bootcdmnt} >/dev/null 2>&1; then
 	    if [ -f "${bootcdmnt}/initrd.lzm" ]; then
