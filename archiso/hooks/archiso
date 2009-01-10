@@ -6,61 +6,6 @@ _mnt_bind()
     /bin/mount -o bind ${addon_dir}/${1} /real_root${2}
 }
 
-_mnt_cdimage()
-{
-msg "::: Adding new real_root branch: ${1}"
-    /bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
-    mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
-    if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${1} > /dev/null 2>&1; then
-        echo "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
-        echo "       Couldn't mount all addons"
-        break
-    fi
-    /bin/mount -r -t iso9660  "/dev/loop${LOOP_NUM}" "/tmpfs/mnt/loop${LOOP_NUM}"
-    /bin/mount -o bind "/tmpfs/mnt/loop${LOOP_NUM}" "/live"
-    export LOOP_NUM=$(( $LOOP_NUM + 1 ))
-}
-
-# args: ext2 file image
-_mnt_ext2_file()
-{
-    msg "::: Adding new real_root branch: ${1}"
-    /bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
-    mkdir -p ${2}
-    if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${1} > /dev/null 2>&1; then
-        echo "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
-        echo "       Couldn't mount all addons"
-        break
-    fi
-    /bin/mount -t ext2 "/dev/loop${LOOP_NUM}" ${2}
-    export LOOP_NUM=$(( $LOOP_NUM + 1 ))
-}
-
-_mnt_xfs_file()
-{
-    msg "::: Adding new real_root branch: ${1}"
-    /bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
-    /bin/modprobe -q xfs >/dev/null 2>&1
-    mkdir -p ${2}
-    if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${1} > /dev/null 2>&1; then
-        echo "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
-        echo "       Couldn't mount all addons"
-        break
-    fi
-    /bin/mount -t xfs "/dev/loop${LOOP_NUM}" ${2}
-    export LOOP_NUM=$(( $LOOP_NUM + 1 ))
-}
-
-mount_tmpfs () 
-{
-    #if [ "x${ramdisk_size}" = "x" ]; then
-        ramdisk_size="2M"
-    #fi
-    msg -n ":: Mounting tmpfs, size=${ramdisk_size}..."
-    mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
-    msg "done."
-}
-
 # args: image file
 _mnt_squashfs()
 {
@@ -74,11 +19,7 @@ _mnt_squashfs()
     fi
     /bin/mount -r -t squashfs "/dev/loop${LOOP_NUM}" "/tmpfs/mnt/loop${LOOP_NUM}"
 
-    if [ "${aufs}" = "y" ]; then 
     /bin/mount -t aufs -o remount,add:1:/tmpfs/mnt/loop${LOOP_NUM}=rr aufs "/real_root"
-    else
-    /bin/mount -t unionfs -o remount,add=:/tmpfs/mnt/loop${LOOP_NUM}=ro none "/real_root"
-    fi
     export LOOP_NUM=$(( $LOOP_NUM + 1 ))
 }
 
@@ -100,16 +41,20 @@ run_hook ()
 	fi
 	
     if [ -f "${BOOT_MOUNT}/initrd.lzm" ]; then
-		mount_tmpfs
+		#mount_tmpfs
 		mkdir -p "/tmpfs/initrd"
-    	#_mnt_ext2_file "${BOOT_MOUNT}/initrd" "/tmpfs/initrd"
 		/bin/modprobe -q squashfs >/dev/null 2>&1
 		/bin/modprobe -q sqlzma >/dev/null 2>&1
 		/bin/modprobe -q unlzma >/dev/null 2>&1
 		/bin/modprobe -q aufs brs=1 >/dev/null 2>&1
 		/bin/mount -t aufs -o nowarn_perm,br:/tmpfs=rw aufs /real_root
 		_mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
-		#/bin/mount -t aufs -o remount,add:1:/tmpfs/initrd=ro aufs /real_root
+		
+		if [ "${break}" = "y" ]; then
+			echo ":: Break requested, type 'exit' to resume operation"
+			echo "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+			PS1="ramfs$ " /bin/sh -i
+		fi
 		
 		udevpid=$(/bin/minips -C udevd -o pid=)
 		[ "x${udevpid}" != "x" ] && /bin/kill -9 $udevpid 2>&1 >/dev/null
@@ -119,183 +64,7 @@ run_hook ()
 		/bin/umount /proc
 		exec /bin/run-init -c /dev/console /real_root /sbin/init
     fi
-	
-	if [ "${break}" = "y" ]; then
-        echo ":: Break requested, type 'exit' to resume operation"
-        echo "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
-        PS1="ramfs$ " /bin/sh -i
-    fi
 
-#if [ "x${changes}" != "x" ]; then
-#	for usb in /dev/sd[a-z][0-9]; do
-#        	if mount -t ext2 "${usb}" "${BOOT_MOUNT}/changes" >/dev/null 2>&1; then
-#			if [ -d "${bootchanges}/${changes}" ]; then
-#				found=1
-#				msg "${usb} for changes"
-#				break
-#			elif [ -f "${bootchanges}/${changes}" ]; then
-#
-#			else
-#				echo "Failed to mount ${usb} for changes"
-#			fi
-#		fi
-#	done
-#fi
-
-	if [ "${changes}" = "n" ]; then
-		if [ "x${changesfile}" != "x" ]; then
-			if [ "${bootusb}" = "y" ]; then
-				if [ -f "${BOOT_MOUNT}/${changes}" ]; then
-					msg -n ":: Mounting xfs file changes. "
-					_mnt_xfs_file "${BOOT_MOUNT}/${changes}" "/tmpfs"
-						if [ ! $(touch /tmpfs/keep) ]; then
-							msg -n ":: changesfile not working"
-							msg -n ":: using tmpfs"
-							mount_tmpfs
-						fi 
-				fi
-			fi
-		fi
-	fi
-
-    if [ "${changes}" = "y" ]; then
-		if [ "${bootusb}" = "y" ]; then
-			if [ -d "${BOOT_MOUNT}/changes" ]; then
-				msg -n ":: Mounting changes. "
-				/bin/mount -o bind "${BOOT_MOUNT}/changes" "/tmpfs"
-			fi
-		fi
-    else
-		msg -n ":: using tmpfs"
-		mount_tmpfs
-    fi
-    
-    if [ "x${BOOT_MOUNT}" = "x" ]; then
-        echo "ERROR: BOOT_MOUNT is not set. The bootall hook MUST"
-        echo "       be run before this one.  This image was improperly built"
-        exit 1
-    fi
-
-    base_img="${BOOT_MOUNT}/archlive.sqfs"
-    if [ "${copytoram}" = "y" ]; then
-        msg ":: Copying squashfs image to RAM"
-        /bin/cat ${base_img} > /tmpfs/archlive.sqfs
-        base_img="/tmpfs/archlive.sqfs"
-    fi
-
-    msg ":: Mounting squashfs image"
-    /bin/modprobe -q squashfs >/dev/null 2>&1
-    /bin/modprobe -q sqlzma >/dev/null 2>&1
-    /bin/modprobe -q unlzma >/dev/null 2>&1
-    msg ":: Mounting root (real_root) filesystem"
-    if [ "${aufs}" = "y" ]; then
-		/bin/modprobe -q aufs brs=1 >/dev/null 2>&1
-		/bin/mount -t aufs -o nowarn_perm,br:/tmpfs=rw aufs /real_root
-    else
-		/bin/modprobe -q unionfs >/dev/null 2>&1
-		/bin/mount -t unionfs -o dirs=/tmpfs=rw none /real_root
-    fi
-    
-    addon_dir="${BOOT_MOUNT}/addons"
-
-    # always layer default configuration
-if [ "${aufs}" = "y" ]; then
-    _mnt_squashfs ${base_img}
-    
-    if [ -e "${addon_dir}/config" ]; then
-        msg ":: Mounting addons"
-        while read img mountpoint type; do
-            # check if this line is a comment (starts with #)
-            [ "${img#"#"}" != "${img}" ] && continue
-
-            if [ "${type}" = "bind" ]; then
-                _mnt_bind ${img} ${mountpoint}
-            elif [ "${type}" = "squashfs" ]; then
-                _mnt_squashfs "${addon_dir}/${img}"
-            fi
-        done < ${addon_dir}/config
-    fi
-		if [ -f "${addon_dir}/overlay.sqfs" ]; then
-			_mnt_squashfs "${addon_dir}/overlay.sqfs"
-		fi
-
-else
-
-    # always layer default configuration
-    _mnt_squashfs "${addon_dir}/overlay.sqfs"
-
-    if [ -e "${addon_dir}/config" ]; then
-        msg ":: Mounting addons"
-        while read img mountpoint type; do
-            # check if this line is a comment (starts with #)
-            [ "${img#"#"}" != "${img}" ] && continue
-
-            if [ "${type}" = "bind" ]; then
-                _mnt_bind ${img} ${mountpoint}
-            elif [ "${type}" = "squashfs" ]; then
-                _mnt_squashfs "${addon_dir}/${img}"
-            fi
-        done < ${addon_dir}/config
-    fi
-
-    # layer the "pristine" base system image last
-    _mnt_squashfs ${base_img}
-fi
-
-    if [ -d /proc/sys/dev/cdrom ]; then
-        echo 0 > /proc/sys/dev/cdrom/lock
-        echo 0 > /proc/sys/dev/cdrom/autoeject
-    fi
-
-    MEMORY=/mnt/live/memory
-    CHANGES=${MEMORY}/changes
-    mkdir -p /real_root/${CHANGES}
-
-    if [ -f "${BOOT_MOUNT}/initrd" ]; then
-		/bin/mount -o move /tmpfs /real_root/${CHANGES}
-    else
-		/bin/mount -o bind /tmpfs /real_root/${CHANGES}
-    fi
-
-    if [ "${bootusb}" = "y" ]; then
-		if [ "x${from}" != "x" ]; then
-    		mkdir -p /real_root/device
-			mount -w -o move "/bootmnt" "/real_root/device"
-		fi
-    fi
-	
-    if [ "${norootcopy}" = "y" ]; then
-    	msg ":: no copying of rootcopy"
-    else
-		cp -af ${BOOT_MOUNT}/rootcopy/* /real_root 2>/dev/null # may be empty
-    fi
-
-    mkdir -p /real_root/bootmnt
-    /bin/mount -o move ${BOOT_MOUNT} /real_root/bootmnt
-
-    if [ "${break}" = "y" ]; then
-        echo ":: Break requested, type 'exit' to resume operation"
-        echo "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
-        PS1="ramfs$ " /bin/sh -i
-    fi
-
-    udevpid=$(/bin/minips -C udevd -o pid=)
-    [ "x${udevpid}" != "x" ] && /bin/kill -9 $udevpid 2>&1 >/dev/null
-    #Yep, we're bailing out here.  We don't need kinit.
-    msg ":: Passing control to Archlinux Initscripts...Please Wait"
-    /bin/umount /sys
-    /bin/umount /proc
-	#/bin/mount -o bind /sys /real_root/sys
-    #/bin/mount -o bind /proc /real_root/proc
-    
-    ROOT=/real_root
-
-    /bin/mkdir -p $ROOT/dev 2>&1 >/dev/null
-    /bin/mknod $ROOT/dev/console c 5 1 2>&1 >/dev/null
-    /bin/mknod $ROOT/dev/null c 1 3 2>&1 >/dev/null
-    /bin/mknod $ROOT/dev/zero c 1 5 2>&1 >/dev/null
-
-    exec /bin/run-init -c /dev/console /real_root /sbin/init ${CMDLINE}
 }
 
 # vim:ft=sh:ts=4:sw=4:et:

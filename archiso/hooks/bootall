@@ -1,3 +1,13 @@
+mount_tmpfs () 
+{
+    #if [ "x${ramdisk_size}" = "x" ]; then
+        ramdisk_size="2M"
+    #fi
+    msg -n ":: Mounting tmpfs, size=${ramdisk_size}..."
+    mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
+    msg "done."
+}
+
 run_hook ()
 {
     # external drives may need to settle
@@ -12,69 +22,62 @@ run_hook ()
     /bin/mkdir -p /live
     #/bin/mkdir -p /bootchanges
     live="/live"
-    bootmnt="/bootmnt"
+    #bootmnt="/bootmnt"
+	#bootusbmnt="$(echo ${usb} | /bin/sed 's|/dev/|/mnt/|g')"
+	#bootcdmnt="$(echo ${cdrom} | /bin/sed 's|/dev/|/mnt/|g')"
     #bootchanges="/bootchanges"
     found=0
-    
+    mount_tmpfs
     if [ "${break}" = "y" ]; then
         echo ":: Break requested, type 'exit' to resume operation"
         echo "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
         PS1="ramfs$ " /bin/sh -i
     fi
 
+#if [ "x${from}" != "x" ]; then
+#	from=$(echo "${from}" | grep dev | sed 's|/dev/|/mnt/|g')
+#fi
 
 if [ "${bootusb}" = "y" ]; then 
     for usb in /dev/sd[a-z][0-9]; do
-        if mount -t vfat "${usb}" ${bootmnt} >/dev/null 2>&1 ||\
-            mount -t ext2 "${usb}" ${bootmnt} >/dev/null 2>&1; then
+		bootusbmnt="$(echo ${usb} | /bin/sed 's|/dev/|/tmpfs/mnt/|g')"
+		/bin/mkdir -p ${bootusbmnt}
+        if mount -r -t vfat "${usb}" ${bootusbmnt} >/dev/null 2>&1 ||\
+            mount -r -t ext2 "${usb}" ${bootusbmnt} >/dev/null 2>&1; then
 	if [ "x${from}" != "x" ]; then
-            if [ -f "${bootmnt}/${from}/initrd.lzm" ]; then
-                found=1
-                msg "${usb}"
-				/bin/mount -o bind "${bootmnt}/${from}" "${live}"
-                break
-            fi
+		if [ $(echo ${from} | /bin/grep /dev/sd) ]; then
+			from=$(echo "${from}" | /bin/sed 's|/dev/|/tmpfs/mnt/|g')
+				if [ -f ${from}/initrd.lzm" ]; then
+					found=1
+					msg "${usb}"
+					/bin/mount -o bind "${bootusbmnt}/${from}" "${live}"
+					break
+				elif [ -f ${bootusbmnt}/${from}/initrd.lzm" ]; then
+					found=1
+					msg "${usb}"
+					/bin/mount -o bind "${bootusbmnt}/${from}" "${live}"
+					break
+				fi
+		fi		
 	else
-	     if [ -f "${bootmnt}/initrd.lzm" ]; then
+	     if [ -f "${bootusbmnt}/initrd.lzm" ]; then
                 found=1
                 msg "${usb}"
                 break
-            fi
+         fi
 	fi
         else
             echo "Failed to mount ${usb}"
         fi
-        [ ${found} -eq 0 ] && umount ${bootmnt} >/dev/null 2>&1
-    done
-elif [ "${boothd}" = "y" ]; then 
-    for hd in /dev/hd[a-z][0-9]; do
-        if mount -t vfat "${hd}" ${bootmnt} >/dev/null 2>&1 ||\
-            mount -t ext2 "${hd}" ${bootmnt} >/dev/null 2>&1; then
-	if [ "x${from}" != "x" ]; then
-            if [ -f "${bootmnt}/${from}/initrd.lzm" ]; then
-                found=1
-                msg "${hd}"
-				/bin/mount -o bind "${bootmnt}/${from}" "${live}"
-                break
-            fi
-	else
-	     if [ -f "${bootmnt}/initrd.lzm" ]; then
-                found=1
-                msg "${hd}"
-                break
-            fi
-	fi
-        else
-            echo "Failed to mount ${hd}"
-        fi
-        [ ${found} -eq 0 ] && umount ${bootmnt} >/dev/null 2>&1
+        [ ${found} -eq 0 ] && /bin/umount ${bootusbmnt} >/dev/null 2>&1
     done
 else
     /bin/modprobe -q isofs >/dev/null 2>&1
     for cdrom in /dev/sr[0-9]; do
-    #for cdrom in /dev/hd[c-z]; do
-        if mount -r -t iso9660 "${cdrom}" ${bootmnt} >/dev/null 2>&1; then
-	    if [ -f "${bootmnt}/initrd.lzm" ]; then
+		bootcdmnt="$(echo ${cdrom} | /bin/sed 's|/dev/|/tmpfs/mnt/|g')"
+		mkdir -p "${bootcdmnt}"
+        if mount -r -t iso9660 "${cdrom}" ${bootcdmnt} >/dev/null 2>&1; then
+	    if [ -f "${bootcdmnt}/initrd.lzm" ]; then
                 found=1
                 msg "${cdrom}"
                 break
@@ -82,7 +85,7 @@ else
         else
             echo "Failed to mount ${cdrom}"
         fi
-        [ ${found} -eq 0 ] && umount ${bootmnt} >/dev/null 2>&1
+        [ ${found} -eq 0 ] && /bin/umount ${bootcdmnt} >/dev/null 2>&1
     done
 fi
 
@@ -96,7 +99,11 @@ fi
 		
         exit 1
     else
-        export BOOT_MOUNT="${bootmnt}"
+		if [ "${bootusb}" = "y" ]; then
+			export BOOT_MOUNT="${bootusbmnt}"
+		else
+			export BOOT_MOUNT="${bootcdmnt}"
+		fi
     fi
 
 }

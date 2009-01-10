@@ -24,7 +24,7 @@ INITRAMDISK=$MOUNTDIR/live
 LOOPMOUNT=$MOUNTDIR/tmp
 
 # this will be replaced by build script, so never change the following line!
-LIVECDNAME="mylinux"
+LIVECDNAME="archiso-live"
 
 # =================================================================
 # debug and output functions

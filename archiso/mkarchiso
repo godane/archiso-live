@@ -273,12 +273,12 @@ find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
     # always make an addon out of DEF_CONFIG_DIR
     echo "Creating default-config addon..."
     if [ "${QUIET}" = "y" ]; then
-        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.sqfs" -noappend >/dev/null
+        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.lzm" -noappend >/dev/null
     else
-		/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.sqfs" -noappend
+		/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.lzm" -noappend
     fi
 	
-	chmod 0444 "${IMGROOT}/archiso-live/optional/overlay.sqfs"
+	chmod 0444 "${IMGROOT}/archiso-live/optional/overlay.lzm"
 }
 
 # Squash is the next step.
