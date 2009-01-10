@@ -42,17 +42,6 @@ hwdetect_graphics() {
 						# add a file in /tmp, so that tribe and postinstall know which driver has been installed
 						touch /tmp/nvidia-96xx
 				
-					elif [ $(grep -i "$CARD_NVIDIA" ${HW_DB_PATH}/${NV71XX_DB}) ]
-					then
-				
-						printhl "NVIDIA hardware detected"
-						printhl "Installing driver: nvidia-71xx"
-				
-						pacman -Udf ${HW_DRIVER_PATH}/nvidia-71xx* &>/dev/null
-				
-						# add a file in /tmp, so that tribe and postinstall know which driver has been installed
-						touch /tmp/nvidia-71xx
-				
 					else 
 				
 						printhl "NVIDIA hardware detected"

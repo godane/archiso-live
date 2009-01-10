@@ -17,7 +17,6 @@ depends=('glibc' 'bash' 'awk' 'grep' 'coreutils' 'sed' 'udev>=118' 'net-tools' '
 install=initscripts.install
 source=(ftp://ftp.archlinux.org/other/initscripts/${_origname}-${pkgver%l}-${pkgrel}.tar.gz)
 provides=('initscripts=2008.09')
-conflicts=('initscripts=2008.09')
 
 build() {
 	cd ${startdir}/src/${_origname}-${pkgver%l}-${pkgrel}/
