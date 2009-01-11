@@ -7,11 +7,11 @@ install: all
 	# testiso can be used by anyone
 	install -D -m 755 testiso $(DESTDIR)/usr/bin
 	# hooks/install are needed by mkinitcpio
-	install -D -m 644 hooks/{archiso,bootall} $(DESTDIR)/lib/initcpio/hooks/
-	install -D -m 644 install/{archiso,bootall} $(DESTDIR)/lib/initcpio/install/
+	install -D -m 644 hooks/archiso $(DESTDIR)/lib/initcpio/hooks/
+	install -D -m 644 install/archiso $(DESTDIR)/lib/initcpio/install/
 
 uninstall:
 	rm -f $(DESTDIR)/usr/sbin/mkarchiso
 	rm -f $(DESTDIR)/usr/bin/testiso
-	rm -f $(DESTDIR)/lib/initcpio/hooks/{archiso,bootall}
-	rm -f $(DESTDIR)/lib/initcpio/install/{archiso,bootall}
+	rm -f $(DESTDIR)/lib/initcpio/hooks/archiso
+	rm -f $(DESTDIR)/lib/initcpio/install/archiso

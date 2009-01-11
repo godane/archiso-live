@@ -28,6 +28,9 @@ gcalctool
 streamripper
 streamtuner
 gtk-recordmydesktop
+#libs
+liboil
+gstreamer0.10-base
 libisoburn
 #xfce
 #xfce4

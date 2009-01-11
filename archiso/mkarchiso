@@ -110,7 +110,7 @@ echo "               image type:   ${IMG_TYPE}"
 IMGROOT="${work_dir}/img"
 union="${work_dir}/union"
 lastbr="${work_dir}/empty"
-moduleplace="${IMGROOT}/modules"
+moduleplace="${IMGROOT}/archiso-live/base"
 moduledir="${work_dir}/modules"
 INSTROOT="${moduledir}/archlive"
 CDROOT="$(pwd)/cd-root"
@@ -264,21 +264,21 @@ find ${moduledir} -type f -name ".wh.*" -exec rm {} \;
 find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
 
     # TODO: this might belong somewhere else
-    mkdir -p "${IMGROOT}/addons"
-    if [ -d "${ADDON_DIR}" ]; then
-        echo "Copying addons from ${ADDON_DIR}..."
-        cp -r ${ADDON_DIR}/* "${IMGROOT}/addons"
-    fi
+    #mkdir -p "${IMGROOT}/addons"
+    #if [ -d "${ADDON_DIR}" ]; then
+    #    echo "Copying addons from ${ADDON_DIR}..."
+    #    cp -r ${ADDON_DIR}/* "${IMGROOT}/addons"
+    #fi
 
     # always make an addon out of DEF_CONFIG_DIR
     echo "Creating default-config addon..."
     if [ "${QUIET}" = "y" ]; then
-        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend >/dev/null
+        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.lzm" -noappend >/dev/null
     else
-		/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/addons/overlay.sqfs" -noappend
+		/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.lzm" -noappend
     fi
 	
-	chmod 0444 "${IMGROOT}/addons/overlay.sqfs"
+	chmod 0444 "${IMGROOT}/archiso-live/optional/overlay.lzm"
 }
 
 # Squash is the next step.
@@ -287,7 +287,7 @@ command_squash () {
 echo "Creating modules procede..."
 start=$(date +%s)
     if [ -d "${MODULESCOPY}" ]; then
-	cp -r ${MODULESCOPY}/* "${IMGROOT}/modules"
+		cp -r ${MODULESCOPY}/* "${IMGROOT}/archiso-live/modules"
     fi
 
 for DIR in $MODULES; do
@@ -299,7 +299,8 @@ done
     minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
     echo "Modules creation done in $minutes minutes."
     if [ -e ${moduleplace}/archlive.lzm ]; then
-	mv ${moduleplace}/archlive.lzm ${IMGROOT}/archlive.sqfs
+	mv ${moduleplace}/archlive.lzm ${moduleplace}/000_archlive.lzm
+	mv ${moduleplace}/devel.lzm ${moduleplace}/000_devel.lzm
     fi
 }
 
