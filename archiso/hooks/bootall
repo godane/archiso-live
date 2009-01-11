@@ -47,8 +47,8 @@ if [ "${bootusb}" = "y" ]; then
     for usb in /dev/sd[a-z][0-9]; do
 		bootusbmnt="$(device_mountdir ${usb})"
 		/bin/mkdir -p ${bootusbmnt}
-        if mount -r -t vfat "${usb}" ${bootusbmnt} >/dev/null 2>&1 ||\
-            mount -r -t ext2 "${usb}" ${bootusbmnt} >/dev/null 2>&1; then
+        if mount -t vfat "${usb}" ${bootusbmnt} >/dev/null 2>&1 ||\
+            mount -t ext2 "${usb}" ${bootusbmnt} >/dev/null 2>&1; then
 	if [ "x${from}" != "x" ]; then
 			from=$(/usr/bin/basename ${from})			
 				if [ -f "${bootusbmnt}/${from}/initrd.lzm" ]; then

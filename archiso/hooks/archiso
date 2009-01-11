@@ -50,6 +50,12 @@ run_hook ()
 		/bin/mount -t aufs -o nowarn_perm,br:/tmpfs=rw aufs /real_root
 		_mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
 		
+		if [ "x${from}" != "x" ]; then
+			mkdir -p /real_root/mnt/tmp
+			/bin/mount -o move ${BOOT_MOUNT} /real_root/mnt/tmp
+		else
+			/bin/mount -o move ${BOOT_MOUNT} /real_root/mnt/$(/usr/bin/basename ${BOOT_MOUNT})
+		fi
 		if [ "${break}" = "y" ]; then
 			echo ":: Break requested, type 'exit' to resume operation"
 			echo "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
