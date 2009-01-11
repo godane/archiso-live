@@ -3,7 +3,7 @@ _mnt_bind()
 {
     msg "::: Binding ${1} to ${2}"
     mkdir -p /real_root${2}
-    /bin/mount -o bind ${addon_dir}/${1} /real_root${2}
+    /bin/mount -o bind ${1} /real_root${2}
 }
 
 # args: image file
@@ -12,15 +12,32 @@ _mnt_squashfs()
     msg "::: Adding new real_root branch: ${1}"
     /bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
     mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
+    while [ ! -e "/dev/loop${LOOP_NUM}" ]; do
+	sleep 1
+    done
     if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${1} > /dev/null 2>&1; then
         echo "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
-        echo "       Couldn't mount all addons"
         break
     fi
     /bin/mount -r -t squashfs "/dev/loop${LOOP_NUM}" "/tmpfs/mnt/loop${LOOP_NUM}"
 
     /bin/mount -t aufs -o remount,add:1:/tmpfs/mnt/loop${LOOP_NUM}=rr aufs "/real_root"
     export LOOP_NUM=$(( $LOOP_NUM + 1 ))
+}
+
+mount_tmpfs () 
+{
+    #if [ "x${ramdisk_size}" = "x" ]; then
+        ramdisk_size="2M"
+    #fi
+    msg -n ":: Mounting tmpfs, size=${ramdisk_size}..."
+    mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
+    msg "done."
+}
+
+device_mountdir()
+{
+   echo "/tmpfs/mnt/$(/usr/bin/basename "$1")" # | tr -s /
 }
 
 run_hook ()
@@ -30,47 +47,108 @@ run_hook ()
     if [ "x${from}" != "x" ]; then
 	BOOT_MOUNT="/live"
     fi
+
+    mount_tmpfs
+
+    # external drives may need to settle
+    msg ":: Waiting for usb devices to settle..."
+    /sbin/udevadm trigger --subsystem-match=usb
+    /sbin/udevadm settle
     
-	if [ ! $(ls /dev/loop*) ]; then
-		echo "Creating loop device nodes."
-		mknod /dev/loop0 b 7 0
-		mknod /dev/loop1 b 7 1
-		mknod /dev/loop2 b 7 2
-		mknod /dev/loop3 b 7 3
-		mknod /dev/loop4 b 7 4
+    found=0
+    /bin/modprolbe -q isofs >/dev/null 2>&1
+    msg ":: Scanning cd drives..."
+    for cdrom in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sg[0-9]*; do
+    	[ ! -e "${cdrom}" ] && continue
+	bootcdmnt="$(device_mountdir ${cdrom})"
+	/bin/mkdir -p "${bootcdmnt}"
+    	if mount -r -t iso9660 "${cdrom}" "${bootcdmnt}" >/dev/null 2>&1; then
+		if [ -f "${bootcdmnt}/initrd.lzm" ]; then
+			found=1
+			msg "${cdrom}"
+			BOOT_MOUNT="${bootcdmnt}"
+			break
+		fi
+	else
+	    echo "Failed to mount ${cdrom}"
 	fi
-	
-    if [ -f "${BOOT_MOUNT}/initrd.lzm" ]; then
-		#mount_tmpfs
-		mkdir -p "/tmpfs/initrd"
-		/bin/modprobe -q squashfs >/dev/null 2>&1
-		/bin/modprobe -q sqlzma >/dev/null 2>&1
-		/bin/modprobe -q unlzma >/dev/null 2>&1
-		/bin/modprobe -q aufs brs=1 >/dev/null 2>&1
-		/bin/mount -t aufs -o nowarn_perm,br:/tmpfs=rw aufs /real_root
-		_mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
-		
+	[ ${found} -eq 0 ] && umount "${bootcdmnt}" >/dev/null 2>&1
+    done
+
+    if [ ${found} -eq 0 ]; then
+	msg ":: Scanning usb drivers..."
+	for usb in /dev/sd[a-z][0-9]; do
+	    [ ! -e "${usb}" ] && continue
+		bootusbmnt="$(device_mountdir ${usb})"
+		/bin/mkdir -p "${bootusbmnt}"
+	    if mount -t vfat "${usb}" "${bootusbmnt}" >/dev/null 2>&1 ||\
+		mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
 		if [ "x${from}" != "x" ]; then
-			mkdir -p /real_root/mnt/tmp
-			/bin/mount -o move ${BOOT_MOUNT} /real_root/mnt/tmp
+			from=$(/usr/bin/basename ${from})
+			if [ -f "${bootusbmnt}/${from}/initrd.lzm" ]; then
+			    found=1
+			    msg "${usb}"
+			    BOOT_MOUNT="${bootusbmnt}"
+			    break
+			fi
 		else
-			/bin/mount -o move ${BOOT_MOUNT} /real_root/mnt/$(/usr/bin/basename ${BOOT_MOUNT})
+			if [ -f "${bootusbmnt}/initrd.lzm" ]; then
+		    	    found=1
+		    	    msg "${usb}"
+		    	    BOOT_MOUNT="${bootusbmnt}"
+		   	    break
+			fi
 		fi
-		if [ "${break}" = "y" ]; then
-			echo ":: Break requested, type 'exit' to resume operation"
-			echo "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
-			PS1="ramfs$ " /bin/sh -i
-		fi
-		
-		udevpid=$(/bin/minips -C udevd -o pid=)
-		[ "x${udevpid}" != "x" ] && /bin/kill -9 $udevpid 2>&1 >/dev/null
-		#Yep, we're bailing out here.  We don't need kinit.
-		msg ":: Passing control to Archlinux Initscripts...Please Wait"
-		/bin/umount /sys
-		/bin/umount /proc
-		exec /bin/run-init -c /dev/console /real_root /sbin/init
+	    else
+		echo "Failed to mount ${usb}"
+	    fi
+	    [ ${found} -eq 0 ] && umount "${bootusbmnt}" >/dev/null 2>&1
+	done
     fi
 
+    if [ ${found} -eq 0 ]; then
+	echo "ERROR: cannot find boot device, cannot continue..."
+	echo "   Falling back to interactive prompt"
+	PS1="ramfs$ " /bin/sh -i
+	exit 1
+    fi
+
+    /bin/modprobe -q squashfs >/dev/null 2>&1
+    /bin/modprobe -q sqlzma >/dev/null 2>&1
+    /bin/modprobe -q unlzma >/dev/null 2>&1
+    /bin/modprobe -q aufs brs=1 >/dev/null 2>&1
+    XINO=xino
+    MEMORY=memory
+    if [ "$XINO" != "$MEMORY" ]; then
+    	/bin/mkdir -p $XINO
+    	/bin/mount -n -t tmpfs tmpfs $XINO
+    fi
+    
+
+    /bin/mount -t aufs -o nowarn_perm,xino=$XINO/.aufs.xino,br:/tmpfs=rw aufs /real_root
+
+    if [ "x${from}" != "x" ]; then
+	_mnt_squashfs "${BOOT_MOUNT}/${from}/initrd.lzm"
+    else
+    	_mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
+    fi
+
+    echo "aufs / aufs defaults 0 0" > /real_root/etc/fstab
+    /bin/mount -o move ${BOOT_MOUNT} /real_root/mnt/$(/usr/bin/basename ${BOOT_MOUNT})
+
+    if [ "${break}" = "y" ]; then
+	echo ":: Break requested, type 'exit' to resume operation"
+	echo "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+	PS1="ramfs$ " /bin/sh -i
+    fi
+		
+    udevpid=$(/bin/minips -C udevd -o pid=)
+    [ "x${udevpid}" != "x" ] && /bin/kill -9 $udevpid 2>&1 >/dev/null
+    #Yep, we're bailing out here.  We don't need kinit.
+    msg ":: Passing control to Archlinux Initscripts...Please Wait"
+    /bin/umount /sys
+    /bin/umount /proc
+    exec /bin/run-init -c /dev/console /real_root /sbin/init
 }
 
 # vim:ft=sh:ts=4:sw=4:et:
