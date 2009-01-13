@@ -54,9 +54,10 @@ run_hook ()
     msg ":: Waiting for usb devices to settle..."
     /sbin/udevadm trigger --subsystem-match=usb
     /sbin/udevadm settle
-    
+    sleep 5
     found=0
-    /bin/modprolbe -q isofs >/dev/null 2>&1
+    
+    /bin/modprobe -q isofs >/dev/null 2>&1
     msg ":: Scanning cd drives..."
     for cdrom in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sg[0-9]*; do
     	[ ! -e "${cdrom}" ] && continue
@@ -75,14 +76,17 @@ run_hook ()
 	[ ${found} -eq 0 ] && umount "${bootcdmnt}" >/dev/null 2>&1
     done
 
+
+
+    /bin/modprobe -q vfat >/dev/null 2>&1
+    /bin/modprobe -q ext2 >/dev/null 2>&1
     if [ ${found} -eq 0 ]; then
 	msg ":: Scanning usb drivers..."
-	for usb in /dev/sd[a-z][0-9]; do
+    for usb in /dev/sd[a-z][0-9]; do
 	    [ ! -e "${usb}" ] && continue
 		bootusbmnt="$(device_mountdir ${usb})"
 		/bin/mkdir -p "${bootusbmnt}"
-	    if mount -t vfat "${usb}" "${bootusbmnt}" >/dev/null 2>&1 ||\
-		mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
+	    if mount -t vfat "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
 		if [ "x${from}" != "x" ]; then
 			from=$(/usr/bin/basename ${from})
 			if [ -f "${bootusbmnt}/${from}/initrd.lzm" ]; then
@@ -103,7 +107,39 @@ run_hook ()
 		echo "Failed to mount ${usb}"
 	    fi
 	    [ ${found} -eq 0 ] && umount "${bootusbmnt}" >/dev/null 2>&1
-	done
+        done
+    fi
+
+    /bin/modprobe -q vfat >/dev/null 2>&1
+    /bin/modprobe -q ext2 >/dev/null 2>&1
+    if [ ${found} -eq 0 ]; then
+	msg ":: Scanning usb drivers..."
+    for usb in /dev/sd[a-z][0-9]; do
+	    [ ! -e "${usb}" ] && continue
+		bootusbmnt="$(device_mountdir ${usb})"
+		/bin/mkdir -p "${bootusbmnt}"
+	    if mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
+		if [ "x${from}" != "x" ]; then
+			from=$(/usr/bin/basename ${from})
+			if [ -f "${bootusbmnt}/${from}/initrd.lzm" ]; then
+			    found=1
+			    msg "${usb}"
+			    BOOT_MOUNT="${bootusbmnt}"
+			    break
+			fi
+		else
+			if [ -f "${bootusbmnt}/initrd.lzm" ]; then
+		    	    found=1
+		    	    msg "${usb}"
+		    	    BOOT_MOUNT="${bootusbmnt}"
+		   	    break
+			fi
+		fi
+	    else
+		echo "Failed to mount ${usb}"
+	    fi
+	    [ ${found} -eq 0 ] && umount "${bootusbmnt}" >/dev/null 2>&1
+        done
     fi
 
     if [ ${found} -eq 0 ]; then
@@ -134,7 +170,7 @@ run_hook ()
     fi
 
     echo "aufs / aufs defaults 0 0" > /real_root/etc/fstab
-    /bin/mount -o move ${BOOT_MOUNT} /real_root/mnt/$(/usr/bin/basename ${BOOT_MOUNT})
+    /bin/mount -o bind ${BOOT_MOUNT} /real_root/mnt/$(/usr/bin/basename ${BOOT_MOUNT})
 
     if [ "${break}" = "y" ]; then
 	echo ":: Break requested, type 'exit' to resume operation"
