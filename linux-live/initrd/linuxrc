@@ -219,7 +219,7 @@ fstab_update $UNION
 
 # everything is ready now, so we may unload unused kernel modules
 # and do some cleanup, unmount few things which are no longer needed.
-rmmod_unused_modules
+#rmmod_unused_modules
 fumount /usr
 fumount /sys
 
