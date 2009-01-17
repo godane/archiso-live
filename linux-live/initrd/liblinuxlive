@@ -1084,3 +1084,24 @@ fstab_update()
 
    mv -f $FSTABTMP $FSTAB
 }
+
+# create correct fstab file in $1/etc/fstab only with aufs,proc,sysfs and devpts
+# No partition will be mounted and mount point created
+# HAL is going to manage mount points and medias
+fstab_clean()
+{
+   debug_log "fstab_update" "$*"
+   local FSTAB FSTABTMP
+
+   FSTAB="$1/etc/fstab"
+   FSTABTMP=$FSTAB$$
+   mkdir -p $1/etc $1/mnt
+   cat $FSTAB 2>/dev/null | grep -v "$FSTABLLFLAG" >$FSTABTMP
+
+   fstab_add_line $FSTABTMP aufs / aufs defaults
+   fstab_add_line $FSTABTMP proc /proc proc defaults
+   fstab_add_line $FSTABTMP sysfs /sys sysfs defaults
+   fstab_add_line $FSTABTMP devpts /dev/pts devpts gid=5,mode=620
+   fstab_add_line $FSTABTMP tmpfs /dev/shm tmpfs defaults
+   mv -f $FSTABTMP $FSTAB
+}

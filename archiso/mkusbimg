@@ -33,8 +33,8 @@ fi
 
 DISKIMG="${2}"
 IMGROOT="${1}"
-TMPDIR=$(mktemp -d)
-FSIMG=$(mktemp)
+TMPDIR="$(mktemp -d)"
+FSIMG="$(mktemp)"
 
 # ext2 overhead's upper bound is 6%
 # empirically tested up to 1GB
@@ -48,6 +48,7 @@ dd if=/dev/zero of="$FSIMG" bs=512 count="$IMGSZ"
 mke2fs -m 0 -F "$FSIMG"
 
 # mount the filesystem and copy data
+modprobe loop
 mount -o loop "$FSIMG" "$TMPDIR"
 cp -a "$IMGROOT"/* "$TMPDIR"
 

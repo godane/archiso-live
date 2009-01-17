@@ -43,10 +43,6 @@ device_mountdir()
 run_hook ()
 {
 	export LOOP_NUM="0"
-    
-    if [ "x${from}" != "x" ]; then
-	BOOT_MOUNT="/live"
-    fi
 
     mount_tmpfs
 

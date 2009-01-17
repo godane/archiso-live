@@ -169,7 +169,7 @@ mergelist()
 removelist()
 {
 	MODULE=$(basename "$1" .lzm).lzm
-	TMPDIR=/tmp/tmp$$
+	TMPDIR=/mnt/live/memory/tmp$$
 	IMAGES=/mnt/live/memory/images
 	UNION=$TMPDIR/union
 	CHANGES=$TMPDIR/changes
@@ -226,7 +226,7 @@ removelist()
 addlist()
 {
 	MODULE=$(basename "$1" .lzm).lzm
-	TMPDIR=/tmp/tmp$$
+	TMPDIR=/mnt/live/memory/tmp$$
 	IMAGES=/mnt/live/memory/images
 	UNION=$TMPDIR/union
 	CHANGES=$TMPDIR/changes
@@ -422,7 +422,7 @@ update()
 {
 	MODULE=$(basename "$1" .lzm).lzm
 	IMAGES=/mnt/live/memory/images
-	TMPDIR=/tmp/updatemod
+	TMPDIR=/mnt/live/memory/updatemod
 	CHANGES=$TMPDIR/changes
 	UNION=$TMPDIR/union
 	

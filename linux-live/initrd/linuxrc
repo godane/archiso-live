@@ -216,6 +216,7 @@ echolog "recreating /etc/fstab and /mnt directories"
 touch $UNION/etc/fstab
 rmdir $UNION/mnt/* 2>/dev/null
 fstab_update $UNION
+#fstab_clean $UNION
 
 # everything is ready now, so we may unload unused kernel modules
 # and do some cleanup, unmount few things which are no longer needed.
