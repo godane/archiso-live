@@ -164,7 +164,7 @@ run_hook ()
     fi
 
     echo "aufs / aufs defaults 0 0" > /real_root/etc/fstab
-    /bin/mount -o move ${BOOT_MOUNT} /real_root/mnt/$(/usr/bin/basename ${BOOT_MOUNT})
+    /bin/mount -o bind ${BOOT_MOUNT} /real_root/mnt/$(/usr/bin/basename ${BOOT_MOUNT})
 
     if [ "${break}" = "y" ]; then
 	echo ":: Break requested, type 'exit' to resume operation"
