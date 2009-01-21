@@ -57,12 +57,16 @@ pkg()
 	fi
 }
 
+if [ -f /var/lib/pacman/db.lck ]; then
+	rm -f /var/lib/pacman/db.lck
+fi
+
 pacman -Sy
 
-cat "$1/db.mod" | while read pkgname; do
+cd $1
+cat "db.mod" | while read pkgname; do
 if [ $pkgname != "" ]; then
 	if [ ! $(find /var/lib/pacman/sync -name $pkgname) ]; then
-	cd $1
 	mkdir -p old
 	mv $pkgname* old
 	pkgname=$(echo $pkgname | sed "s|-[0-9].*||g")

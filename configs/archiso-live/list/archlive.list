@@ -63,6 +63,8 @@ netcfg
 openssl
 openssh
 openvpn
+inetutils
+crda
 #chakra-hardware-detection
 #chakra-initscripts
 #chakra-sysvinit

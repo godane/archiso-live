@@ -12,7 +12,7 @@ if [ "$1" = "--help" -o "$1" = "-h" ]; then
   exit
 fi
 
-CDLABEL="Arch-Mini"
+CDLABEL="Archiso-Live"
 ISONAME="$1"
 
 cd $(dirname $0)
@@ -24,7 +24,7 @@ if [ "$ISONAME" = "" ]; then
    if [ "$ISONAME" = "" ]; then ISONAME="$SUGGEST"; fi
 fi
 
-mkisofs -o "$ISONAME" -v -J -R -D -publisher "http://arch-live.blogspot.com" -p "Christopher Rogers aka Godane" -A "$CDLABEL" -V "$CDLABEL" \
+mkisofs -o "$ISONAME" -v -J -R -D -publisher "http://godane.wordpress.com/" -p "Christopher Rogers aka Godane" -A "$CDLABEL" -V "$CDLABEL" \
 -no-emul-boot -boot-info-table -boot-load-size 4 \
 -b boot/isolinux/isolinux.bin -c boot/isolinux/isolinux.boot .
 

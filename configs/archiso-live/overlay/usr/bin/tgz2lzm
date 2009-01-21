@@ -17,12 +17,10 @@ PATH=.:$(dirname $0):/usr/lib:$PATH
 
 TMPDIR=/tmp/tgz2lzm$$
 
-installpkg -root $TMPDIR $1 
+installpkg -root $TMPDIR $1
 if [ $? != 0 ]; then echo "error installing package"; exit; fi
 
-mksquashfs $TMPDIR "$2" -b 256K
+create_module $TMPDIR "$2"
 if [ $? != 0 ]; then echo "error building compressed image"; exit; fi
-
-chmod 0444 "$2"
 
 rm -Rf $TMPDIR

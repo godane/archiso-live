@@ -5,18 +5,20 @@
 #
 # Author: Tomas M. <http://www.linux-live.org>
 
-#if [ "$1" = "-k" ]; then
-#   CALLED_BY_KDE_HELPER=1
-#   shift
-#fi
+if [ "$1" = "-k" ]; then
+   CALLED_BY_KDE_HELPER=1
+   shift
+fi
 
-#if [ "$DISPLAY" -a ! "$CALLED_BY_KDE_HELPER" -a "$(whereis kactivate)" ]; then
-#   exec kdeactivate "$@" 2>/dev/null
-#fi
+if [ -e /usr/bin/kdeactivate -a "$DISPLAY" -a ! "$CALLED_BY_KDE_HELPER" ]; then
+   exec /usr/bin/kdeactivate "$@" 2>/dev/null
+fi
 
+PATH=.:$(dirname $0):/usr/lib:$PATH
+. liblinuxlive || exit 5
 
-#MODULE=$(basename "$1" .lzm).lzm
-MODULE="$1"
+allow_only_root
+MODULE=$(basename "$1" .lzm).lzm
 IMAGES=/mnt/live/memory/images
 IPREV=empty
 
@@ -35,7 +37,7 @@ fi
 
 try_remount()
 {
-   mount -t aufs -o remount,verbose,del:"$IMAGES/$MODULE" aufs / 2>/dev/null
+   mount -t aufs -o remount,verbose,del:$IMAGES/$MODULE aufs / 2>/dev/null
 }
 
 # Try to simply remove the dir first. If succeeds, finish
@@ -43,16 +45,7 @@ rmdir "$IMAGES/$MODULE" 2>/dev/null && exit 0
 # OK the previous trick didn't work. So we have a real module here.
 
 # First, try to stop all daemons which may be started by this module
-if [ -d $IMAGES/$MODULE/etc/rc.d ]; then
-   ( find $IMAGES/$MODULE/etc/rc.d -type f -maxdepth 1 ; \
-     find $IMAGES/$MODULE/etc/rc.d -type f -maxdepth 2 -mindepth 2 | egrep '/S[^/]+$' \
-   ) | while read SCRIPT; do
-      if [ "$SCRIPT" != "" -a -x "$SCRIPT" -a ! -d "$SCRIPT" ]; then
-         # call the script by real path, not from the images directory
-         ${SCRIPT##$IMAGES/$MODULE} stop deactivate 
-      fi
-   done
-fi
+find_n_run_scripts $IMAGES/$MODULE stop deactivate
 
 # detach it from aufs union. This may take a long time, remounting the
 # root directory is an expensive operation.
@@ -77,7 +70,7 @@ fi
 # if we are here, the module has been successfuly removed from aufs union
 # so now we have to umount the lzm file and then free the loop device
 LOOP=$(cat /proc/mounts | grep "$IMAGES/$MODULE " | cut -d " " -f 1)
-umount -l -n "$IMAGES/$MODULE" 2>/dev/null
+umount -n "$IMAGES/$MODULE" 2>/dev/null
 if [ $? -ne 0 ]; then
    exit 4
 fi
