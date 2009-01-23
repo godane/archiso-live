@@ -1,0 +1,18 @@
+# Maintainer: Fernando Henrique <arch at liquuid dot net> 
+pkgname=backintime
+pkgver=0.9.2
+pkgrel=1
+pkgdesc="Back In Time is a simple backup system for GNOME desktop inspired from \“flyback project\” and \“TimeVault\”"
+arch=('i686' 'x86_64')
+url="http://www.le-web.org/back-in-time"
+license="GPL"
+depends=('python' 'pygtk' 'rsync')
+source=(http://www.le-web.org/download/backintime/$pkgname-${pkgver}_src.tar.gz)
+md5sums=('b06e768613f61eb54e1e6511b155182c')
+build() {
+	cd $startdir/src/$pkgname-$pkgver || return 1;
+	./install-common.sh $startdir/pkg/  || return 1;
+	./install-gnome.sh $startdir/pkg/  || return 1;
+        	
+
+}
