@@ -101,6 +101,8 @@ ipw2200-fw
 tiacx
 zd1211-firmware
 #command-line-apps
+lshwd
+hwd
 htop
 mc
 links
