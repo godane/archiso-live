@@ -34,7 +34,7 @@ usage ()
     echo "    -i CPIO_CONFIG   Use CONFIG file for mkinitcpio. default: ${CPIOCONFIG}"
     #echo "    -P PKGFILE       File with list of packages to install. default: ${PKGFILE}"
     #echo "    -p PACKAGE       Additional package to install, can be used multiple times"
-    echo "    -c NOLZMA        Use plain squashfs instead of squashfs+lzma."
+    echo "    -n NOLZMA        Use plain squashfs instead of squashfs+lzma."
     echo "    -b BOOT		Boot option (syslinux,grub,grub-gfx)"
     echo "    -M MODULES       Modules for livecd. default: ${MODULES}"
     echo "    -m MODULESCOPY   Copy modules from a folder to modules place in IMGROOT. default: none"
@@ -51,7 +51,7 @@ usage ()
 }
 
 #while getopts 'i:P:p:a:t:fvh' arg; do
-while getopts 'i:P:b:M:m:a:t:cfvh' arg; do
+while getopts 'i:P:b:M:m:a:t:nfvh' arg; do
     case "${arg}" in
         i) CPIOCONFIG="${OPTARG}" ;;
         #P) PKGFILE="${OPTARG}" ;;
@@ -61,7 +61,7 @@ while getopts 'i:P:b:M:m:a:t:cfvh' arg; do
 	m) MODULESCOPY="${OPTARG}" ;;
         a) ADDON_DIR="${OPTARG}" ;;
         t) IMG_TYPE="${OPTARG}" ;;
-	c) NOLZMA="n" ;;
+	n) NOLZMA="n" ;;
         f) FORCE="y" ;;
         v) QUIET="n" ;;
         h|?) usage 0 ;;
