@@ -13,6 +13,7 @@ virtualbox-ose
 gnome-commander
 kdelibs
 kdebase-runtime
+kdepimlibs
 kdebase-workspace
 libstdc++5
 #gstreamer

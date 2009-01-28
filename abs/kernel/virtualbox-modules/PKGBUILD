@@ -8,7 +8,7 @@
 pkgname=virtualbox-modules
 _kernver=2.6.28-ARCH
 pkgver=2.1.2
-pkgrel=1
+pkgrel=2
 pkgdesc="Kernel modules for VirtualBox (vboxdrv)"
 arch=('i686')
 url="http://www.virtualbox.org"

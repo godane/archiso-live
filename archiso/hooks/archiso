@@ -50,7 +50,11 @@ run_hook ()
     msg ":: Waiting for usb devices to settle..."
     /sbin/udevadm trigger --subsystem-match=usb
     /sbin/udevadm settle
-    sleep 5
+    if [ "${rootdelay}" != "0" ]; then
+        /bin/sleep "${rootdelay}"
+        export rootdelay=0
+    fi
+
     found=0
     
     /bin/modprobe -q isofs >/dev/null 2>&1
@@ -71,7 +75,6 @@ run_hook ()
 	fi
 	[ ${found} -eq 0 ] && umount "${bootcdmnt}" >/dev/null 2>&1
     done
-
 
 
     /bin/modprobe -q vfat >/dev/null 2>&1
@@ -141,6 +144,12 @@ run_hook ()
 	echo "   Falling back to interactive prompt"
 	PS1="ramfs$ " /bin/sh -i
 	exit 1
+    fi
+
+    if [ "${break}" = "y" ]; then
+	echo ":: Break requested, type 'exit' to resume operation"
+	echo "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+	PS1="ramfs$ " /bin/sh -i
     fi
 
     /bin/modprobe -q squashfs >/dev/null 2>&1
