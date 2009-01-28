@@ -34,7 +34,8 @@ usage ()
     echo "    -i CPIO_CONFIG   Use CONFIG file for mkinitcpio. default: ${CPIOCONFIG}"
     #echo "    -P PKGFILE       File with list of packages to install. default: ${PKGFILE}"
     #echo "    -p PACKAGE       Additional package to install, can be used multiple times"
-	echo "	  -b BOOT		   Boot option (syslinux,grub,grub-gfx)"
+    echo "    -c NOLZMA        Use plain squashfs instead of squashfs+lzma."
+    echo "    -b BOOT		Boot option (syslinux,grub,grub-gfx)"
     echo "    -M MODULES       Modules for livecd. default: ${MODULES}"
     echo "    -m MODULESCOPY   Copy modules from a folder to modules place in IMGROOT. default: none"
     echo "    -a ADDON_DIR     Use addons from DIR. default: none"
@@ -50,7 +51,7 @@ usage ()
 }
 
 #while getopts 'i:P:p:a:t:fvh' arg; do
-while getopts 'i:P:b:M:m:a:t:fvh' arg; do
+while getopts 'i:P:b:M:m:a:t:cfvh' arg; do
     case "${arg}" in
         i) CPIOCONFIG="${OPTARG}" ;;
         #P) PKGFILE="${OPTARG}" ;;
@@ -60,6 +61,7 @@ while getopts 'i:P:b:M:m:a:t:fvh' arg; do
 	m) MODULESCOPY="${OPTARG}" ;;
         a) ADDON_DIR="${OPTARG}" ;;
         t) IMG_TYPE="${OPTARG}" ;;
+	c) NOLZMA="n" ;;
         f) FORCE="y" ;;
         v) QUIET="n" ;;
         h|?) usage 0 ;;
@@ -98,6 +100,14 @@ if [ "x${BOOT}" = "x" ]; then BOOT="syslinux"; fi
 [ "x${imgname}" = "x" ] && (echo "Bootable image name must be specified" && usage 1)
 [ "x${work_dir}" = "x" ] && (echo "please specify a working directory" && usage 1)
 
+if [ "${NOLZMA}" = "n" ]; then
+	EXT="sqfs"
+	OPTION="-nolzma"
+else
+	EXT="lzm"
+	OPTION=""
+fi
+
 echo "${APPNAME} : Configuration Settings"
 echo "   mkinitcpio config file:   ${CPIOCONFIG}"
 #echo "   mount description file:   ${MOUNTFILE}"
@@ -106,6 +116,7 @@ echo "                boot menu:   ${BOOT}"
 echo "        working directory:   ${work_dir}"
 echo "               image name:   ${imgname}"
 echo "               image type:   ${IMG_TYPE}"
+echo "		  squashfs type:   ${EXT}"
 
 IMGROOT="${work_dir}/img"
 union="${work_dir}/union"
@@ -273,12 +284,12 @@ find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
     # always make an addon out of DEF_CONFIG_DIR
     echo "Creating default-config addon..."
     if [ "${QUIET}" = "y" ]; then
-        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.lzm" -noappend >/dev/null
+        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.${EXT}" -noappend ${OPTION} >/dev/null
     else
-		/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.lzm" -noappend
+	/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.${EXT}" -noappend ${OPTION}
     fi
 	
-	chmod 0444 "${IMGROOT}/archiso-live/optional/overlay.lzm"
+	chmod 0444 "${IMGROOT}/archiso-live/optional/overlay.${EXT}"
 }
 
 # Squash is the next step.
@@ -291,16 +302,16 @@ start=$(date +%s)
     fi
 
 for DIR in $MODULES; do
-	MOD="$(basename $DIR).lzm"
+	MOD="$(basename $DIR).${EXT}"
 	echo "building $MOD"
-	/sbin/mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend > /dev/null
+	/sbin/mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${OPTION} > /dev/null
 	chmod 0444 ${moduleplace}/$MOD
 done
     minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
     echo "Modules creation done in $minutes minutes."
-    if [ -e ${moduleplace}/archlive.lzm ]; then
-	mv ${moduleplace}/archlive.lzm ${moduleplace}/000_archlive.lzm
-	mv ${moduleplace}/devel.lzm ${moduleplace}/000_devel.lzm
+    if [ -e ${moduleplace}/archlive.${EXT} ]; then
+	mv ${moduleplace}/archlive.${EXT} ${moduleplace}/000_archlive.${EXT}
+	mv ${moduleplace}/devel.${EXT} ${moduleplace}/000_devel.${EXT}
     fi
 }
 
