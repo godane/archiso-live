@@ -508,6 +508,7 @@ union_insert_dir()
 find_modules()
 {
    debug_log "find_modules" "$*"
+   find "$1/base" "$1/modules" "$1/optional" -name "*.sqfs" 2>/dev/null | sort
    find "$1/base" "$1/modules" "$1/optional" -name "*.lzm" 2>/dev/null | sort
 }
 

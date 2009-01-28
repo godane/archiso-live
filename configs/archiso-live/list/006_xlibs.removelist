@@ -13,4 +13,5 @@ virtualbox-ose
 gnome-commander
 kdelibs
 kdebase-runtime
+kdepimlibs
 kdebase-workspace
