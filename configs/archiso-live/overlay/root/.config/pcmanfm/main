@@ -1,4 +1,6 @@
 [General]
+show_hidden_files=1
+terminal=xterm
 
 [Window]
 width=640
