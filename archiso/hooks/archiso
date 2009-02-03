@@ -9,13 +9,26 @@ _mnt_bind()
 # args: image file
 _mnt_squashfs()
 {
-    msg "::: Adding new real_root branch: ${1}"
+    img="${1}"
+    base_img="/tmp/$(/usr/bin/basename ${img})";
+    #mnt="${2}"
+
+    msg "::: Adding new real_root branch: ${base_img}"
     /bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
+
+    if [ "${copy2ram}" = "y" ]; then
+	msg ":: Copying squashfs image to RAM"
+	mkdir -p /tmp
+	mount -t tmpfs -o "size=6M" tmpfs /tmp
+	/bin/cat ${img} > "${base_img}"
+	img="${base_img}"
+    fi
+
     mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
     while [ ! -e "/dev/loop${LOOP_NUM}" ]; do
 	sleep 1
     done
-    if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${1} > /dev/null 2>&1; then
+    if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${img} > /dev/null 2>&1; then
         echo "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
         break
     fi
