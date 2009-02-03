@@ -1,0 +1,10 @@
+[Desktop Entry]
+Categories=Application;System
+Encoding=UTF-8
+Exec=gksu -l /opt/larchin/run/larchin.py
+Icon=larchin
+StartupNotify=true
+Terminal=true
+Type=Application
+Name=Install Arch Linux
+Comment=
