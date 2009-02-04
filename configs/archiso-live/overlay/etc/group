@@ -29,5 +29,6 @@ dbus:x:81:arch
 hal:x:82:arch
 avahi:x:84:
 gdm:x:101:
-policykit:x:111:
+policykit:x:101:
 vboxusers:x:108:arch
+cherokee:x:106:
