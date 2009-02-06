@@ -6,6 +6,7 @@ openvpn
 inetutils
 crda
 aif
+archlinux-installer
 #chakra-hardware-detection
 #chakra-initscripts
 #chakra-sysvinit
@@ -42,11 +43,15 @@ ipw2200-fw
 tiacx
 zd1211-firmware
 #command-line-apps
+dmraid
+dnsutils
+gnu-netcat
+speedtouch
 lshwd
 hwd
 htop
 mc
-links
+elinks
 irrsi
 aspell-en
 screen

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=LiveInstall
+Comment=Install your ZenLive environment
+Exec=gksu liveinstall
+Icon=liveinstall
+Terminal=false
+Type=Application
+Categories=Application;System;Settings
+StartupNotify=true
+Encoding=UTF-8

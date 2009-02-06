@@ -67,6 +67,7 @@ archlinux-menus
 archlinux-xdg-menu
 gtk-engines
 xdialog
+gtkdialog
 gksu
 menumaker
 scrot
