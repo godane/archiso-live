@@ -1,0 +1,322 @@
+#! /bin/bash
+
+# Copyright Alex <blackcat.myako@gmail.com>. 
+#
+#      This program is free software; you can redistribute it and/or modify
+#      it under the terms of the GNU General Public License as published by
+#      the Free Software Foundation; either version 2 of the License, or
+#      (at your option) any later version.
+#
+#      This program is distributed in the hope that it will be useful,
+#      but WITHOUT ANY WARRANTY; without even the implied warranty of
+#      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#      GNU General Public License for more details.
+#
+#      You should have received a copy of the GNU General Public License
+#      along with this program; if not, write to the Free Software
+#      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+########################## LiveInstall functions ##########################
+
+Rgetleftlist(){
+    	cat $buffer/list_install
+}
+
+Rgetrightlist(){
+	cat $buffer/list_remove
+}
+
+Rmoveright(){
+	( cat $buffer/list_remove ; echo -n "$RLEFT" ) | sort -u -b -o $buffer/list_remove
+	rm $buffer/buffer
+	cat $buffer/list_install > $buffer/buffer
+	grep -v "$RLEFT" $buffer/buffer > $buffer/list_install
+}
+
+Rmoveleft(){
+	( cat $buffer/list_install ; echo -n "$RRIGHT" ) | sort -u -b -o $buffer/list_install
+	rm $buffer/buffer
+	cat $buffer/list_remove > $buffer/buffer
+	grep -v "$RRIGHT" $buffer/buffer > $buffer/list_remove
+}
+
+getdescription_left(){
+	
+	softname=${RLEFT%.*} 
+	softname=$(basename $softname)
+	softname=${softname%-*}
+	softname="$softname.desc"
+	if [ -e /mnt/live/mnt/*/zenlive/descriptions/$softname ]; then
+		cat /mnt/live/mnt/*/zenlive/descriptions/$softname
+	else
+		echo "No description available"
+	fi
+	
+}
+getdescription_right(){
+	
+	softname=${RRIGHT%.*} 
+	softname=$(basename $softname)
+	softname=${softname%-*}
+	softname="$softname.desc"
+	if [ -e /mnt/live/mnt/*/zenlive/descriptions/$softname ]; then
+		cat /mnt/live/mnt/*/zenlive/descriptions/$softname
+	else
+		echo "No description available"
+	fi
+}
+
+# Lilo setup partitions list 
+lilolist() {
+	
+	fdisk -l | grep dev | grep -v Swap | grep -v swap | grep -v Platte | grep -v Ext | grep -v Ext\'d| grep -v Disk |cut -f1 -d " " > $buffer/temppart
+	cat $buffer/genlilo.conf | grep \/dev\/sd | grep -w 'sd.[1-9]' | grep \/dev\/hd | grep -w 'hd.[1-9]' | cut -f3 -d " " | sort > $buffer/tempgenlist
+	diff -n $buffer/tempgenlist $buffer/temppart | grep \/dev\/sd
+
+}
+
+install() {
+
+export mntpoint="/mnt/${SELSYS#/dev/}"
+installsituation="OK"
+config="FAILED"
+percent=0
+
+	# check config
+	if [ "$ZENCORE_INSTALL" = "true" ]; then
+		config="OK"
+	fi
+	if [ "$ZENBASE_INSTALL" = "true" ]; then
+		config="OK"
+	fi
+	if [ "$ZENWALK_INSTALL" = "true" ]; then
+		config="OK"
+	fi
+	if [ "$ZENALL_INSTALL" = "true" ]; then
+		config="OK"
+	fi
+
+if [ $config = "FAILED" ]; then
+	printf "%s\n" "- No install config given." >> /var/log/liveinstall.log
+	gtkdialog --program ERROR 
+	installsituation="FAILED"
+fi
+
+if [ $installsituation = "OK" ]; then
+	if [ "$SELSYS" = "" ]; then
+		printf "%s\n" "- No target partition for installation." >> /var/log/liveinstall.log
+		gtkdialog --program ERROR 
+		installsituation="FAILED"
+	fi
+fi
+if [ $installsituation = "OK" ]; then
+
+	# if presetup given , use it
+	if [ "$ZENCORE_INSTALL" = "true" ] ; then
+		cd $zenlive_folder
+		find base/core -name "*.lzm" 2>/dev/null | sort > $buffer/list_install
+		cat $buffer/list_install > $buffer/buffer
+		grep -v "zenlite-base.lzm" $buffer/buffer > $buffer/list_install
+		rm $buffer/buffer
+		cat $buffer/list_install > $buffer/buffer
+		grep -v "zenlite-desktop.lzm" $buffer/buffer > $buffer/list_install
+		rm $buffer/buffer
+		touch $buffer/list_remove
+	fi
+	
+	if [ "$ZENBASE_INSTALL" = "true" ] ; then
+		cd $zenlive_folder
+		find base -name "*.lzm" 2>/dev/null | sort > $buffer/list_install
+		cat $buffer/list_install > $buffer/buffer
+		grep -v "zenlite-base.lzm" $buffer/buffer > $buffer/list_install
+		rm $buffer/buffer
+		cat $buffer/list_install > $buffer/buffer
+		grep -v "zenlite-desktop.lzm" $buffer/buffer > $buffer/list_install
+		rm $buffer/buffer
+		touch $buffer/list_remove
+	fi
+	
+	if [ "$ZENWALK_INSTALL" = "true" ] ; then
+		cd $zenlive_folder
+		find base modules -name "*.lzm" 2>/dev/null | sort > $buffer/list_install
+		cat $buffer/list_install > $buffer/buffer
+		grep -v "zenlite-base.lzm" $buffer/buffer > $buffer/list_install
+		rm $buffer/buffer
+		cat $buffer/list_install > $buffer/buffer
+		grep -v "zenlite-desktop.lzm" $buffer/buffer > $buffer/list_install
+		rm $buffer/buffer
+		touch $buffer/list_remove
+	fi
+fi
+if [ $installsituation = "OK" ]; then
+	if [ ! -z "$( echo $USRNAME | grep "^[0-9]" )" ]; then
+		printf "%s\n" "- User names cannot begin with a number; please choose another" >> /var/log/liveinstall.log
+		gtkdialog --program ERROR 
+		installsituation="FAILED"
+	fi
+fi
+if [ $installsituation = "OK" ]; then
+	if [ ! "$USRNAME" = "`echo $USRNAME | tr A-Z a-z`" ]; then
+		printf "%s\n" "- User '$USRNAME' contains illegal characters (uppercase); please choose another" >> /var/log/liveinstall.log
+		gtkdialog --program ERROR 
+		installsituation="FAILED"
+	fi
+fi
+if [ $installsituation = "OK" ]; then
+	if [ ! -z "$( echo $USRNAME | grep '\.' )" ]; then
+		printf "%s\n" "- User '$USRNAME' contains illegal characters (period/dot); please choose another" >> /var/log/liveinstall.log
+		gtkdialog --program ERROR 
+		installsituation="FAILED"
+	fi
+fi
+
+if [ $installsituation = "OK" ]; then
+	# format target partition
+	umount $SELSYS
+	mkfs.ext2 $SELSYS -L ZenWalk
+	mount $SELSYS $mntpoint
+	
+	if [ $? -eq 0 ]; then
+		printf "%s\n" "- Formatted $SELSYS with EXT2 successful." >> /var/log/liveinstall.log
+		else
+		printf "%s\n" "- Formating failed." >> /var/log/liveinstall.log
+		gtkdialog --program ERROR 
+		installsituation="FAILED"
+	fi
+fi
+
+if [ $installsituation = "OK" ]; then
+	LIST=$(cat $buffer/list_install)
+	for module in $LIST ; do
+		echo "Copy $module"
+		lzm2dir $module $mntpoint
+	done
+	
+	if [ $? -eq 0 ]; then
+		printf "%s\n" "- Modules copied to $mntpoint." >> /var/log/liveinstall.log
+		else
+		printf "%s\n" "- Copying failed." >> /var/log/liveinstall.log
+		gtkdialog --program ERROR 
+		installsituation="FAILED"
+	fi
+fi
+
+if [ $installsituation = "OK" ]; then
+	echo "Copy configs"
+	cp /etc/X11/xorg.conf $mntpoint/etc/X11/xorg.conf
+	cp /etc/modprobe.conf $mntpoint/etc/modprobe.conf
+	
+	# locale
+	cp /etc/profile.d/lang.sh $mntpoint/etc/profile.d/lang.sh
+	chroot $mntpoint /etc/profile.d/lang.sh
+	
+	# fstab
+	cp /etc/fstab $mntpoint/etc/fstab
+	sed -i "s_aufs / aufs defaults 0 0 # AutoUpdate__g" $mntpoint/etc/fstab
+	sed -i "s_"$mntpoint"_/_g" $mntpoint/etc/fstab
+	sed -i "s_auto,noatime,users,suid,dev,exec_auto,defaults_g" $mntpoint/etc/fstab
+	
+	# create mountpoints
+	for mountdir in /mnt/s* ; do
+		if [ ! "$mntpoint" = "$mountdir" ]; then
+			mkdir $mntpoint/$mountdir
+		fi
+	done
+
+	for mountdir in /mnt/d* ; do
+		if [ ! "$mntpoint" = "$mountdir" ]; then
+			mkdir $mntpoint/$mountdir
+		fi
+	done
+
+	# new user
+	cp -pr /mnt/live/memory/images/zenlite-base*/home/one $mntpoint/home/$USRNAME
+	rm $mntpoint/etc/shadow
+	cp -r /mnt/live/memory/images/zenlite-base*/etc/shadow $mntpoint/etc/shadow
+	sed -i "s_one_"$USRNAME"_g" $mntpoint/etc/shadow
+	rm $mntpoint/etc/passwd
+	cp -r /mnt/live/memory/images/zenlite-base*/etc/passwd $mntpoint/etc/passwd
+	sed -i "s_one_"$USRNAME"_g" $mntpoint/etc/passwd
+	rm $mntpoint/etc/group
+	cp -r /mnt/live/memory/images/zenlite-base*/etc/group $mntpoint/etc/group
+	sed -i "s_one_"$USRNAME"_g" $mntpoint/etc/group
+
+	if [ "$AUTOLOGGDM" = "true" ]; then
+		cp -r /mnt/live/memory/images/zenlite-base*/etc/X11/gdm/custom.conf $mntpoint/etc/X11/gdm/custom.conf
+		sed -i "s_one_"$USRNAME"_g" $mntpoint/etc/X11/gdm/custom.conf
+	fi
+	if [ "$ZENLITEDESK" = "true" ]; then
+		cp -pr /mnt/live/memory/images/zenlite-desktop*/home/one $mntpoint/home/$USRNAME
+	fi
+
+	if [ $? -eq 0 ]; then
+		printf "%s\n" "- Copied last config files." >> /var/log/liveinstall.log
+		else
+		printf "%s\n" "- Last step failed ?!?" >> /var/log/liveinstall.log
+		gtkdialog --program ERROR 
+		installsituation="FAILED"
+	fi
+fi
+
+if [ $installsituation = "OK" ]; then
+	LIST=$(cat $buffer/temppart)
+	for partition in $LIST ; do
+	
+		lilsel=`echo -n $partition | sed 's/\/dev\///'`
+		if [ -e /mnt/$lilsel/boot/vmlinuz ]; then
+			mkdir -p $buffer/boot/$lilsel
+			cp -a /mnt/$lilsel/boot/* $buffer/boot/$lilsel
+			autlilmnt=`echo -n "$partition" | sed 's/dev/mnt/'`	
+			if [ -e /mnt/$lilsel/etc/zenwalk-version ]; then 
+				linuxname=$(cat "$autlilmnt"/etc/zenwalk-version* | sed 's/ /_/'	)
+			else
+				linuxname=$(cat "$autlilmnt"/etc/*version* | sed 's/ /_/'	)
+			fi
+			printf "%s\n" "#" >> $buffer/genlilo.conf
+			printf "%s\n" "# Other Linux bootable partition config begins" >> $buffer/genlilo.conf
+			printf "%s\n" "image = /boot/$lilsel/vmlinuz" >> $buffer/genlilo.conf
+			printf "%s\n" "root = /dev/$lilsel" >> $buffer/genlilo.conf
+			printf "%s\n" "label = $linuxname" >> $buffer/genlilo.conf
+			printf "%s\n" "initrd = /boot/$lilsel/initrd.splash" >> $buffer/genlilo.conf
+			printf "%s\n" "read-write" >> $buffer/genlilo.conf
+			printf "%s\n" "# Other Linux bootable partition config ends" >> $buffer/genlilo.conf
+		fi
+		if [ -e /mnt/$lilsel/boot.ini ]; then
+			printf "%s\n" "#" >> $buffer/genlilo.conf
+			printf "%s\n" "# Other Windows bootable partition config begins" >> $buffer/genlilo.conf
+			printf "%s\n" "other = /dev/$lilsel" >> $buffer/genlilo.conf
+			printf "%s\n" "label = Windows" >> $buffer/genlilo.conf
+			printf "%s\n" "table = /dev/$(echo $lilsel | cut -b -3)" >> $buffer/genlilo.conf
+			printf "%s\n" "# Other Windows bootable partition config ends" >> $buffer/genlilo.conf
+		fi
+		
+	done
+	
+	if [ $? -eq 0 ]; then
+		printf "%s\n" "- Lilo-Configuration completed." >> /var/log/liveinstall.log
+		else
+		printf "%s\n" "- Lilo-Configuration failed." >> /var/log/liveinstall.log
+		gtkdialog --program ERROR 
+		installsituation="FAILED"
+	fi
+fi
+
+if [ $installsituation = "OK" ]; then
+	cat $buffer/genlilo.conf | grep root -m 1 | cut -f3 -d " " | sed 's/dev/mnt/' > $buffer/chdirfile
+		
+	cp -f $mntpoint/etc/lilo.conf $mntpoint/etc/lilofix.backup	
+	cp -f $buffer/genlilo.conf $mntpoint/etc/lilo.conf	
+	cp -fR $buffer/boot $mntpoint
+	
+	chroot $mntpoint /sbin/lilo -v
+	
+	if [ $? -eq 0 ]; then
+		printf "%s\n" "- Lilo-Setup completed." >> /var/log/liveinstall.log
+		gtkdialog --program DONE
+		else
+		printf "%s\n" "- Lilo-Setup failed." >> /var/log/liveinstall.log
+		gtkdialog --program ERROR 
+	fi
+fi
+exit
+}
