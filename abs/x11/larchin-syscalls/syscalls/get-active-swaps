@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# get-active-swaps
-
-# Get all swap partitions currently in use - also the size, in KiB
-
-grep 'partition' /proc/swaps | while read p x s y; do echo "${p} ${s}"; done

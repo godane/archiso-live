@@ -49,7 +49,7 @@ class installClass:
         self.MOUNTFLAGS = "ADm"
 
         # Available file-systems for formatting
-        self.filesystems = ['ext3', 'ext4', 'reiserfs', 'ext2', 'jfs', 'xfs']
+        self.filesystems = ['ext3', 'reiserfs', 'ext2', 'jfs', 'xfs']
         # List of mount-point suggestions
         self.mountpoints = ['---', '/', '/home', '/boot', '/var',
                 '/opt', '/usr']

@@ -1,9 +1,0 @@
-#!/bin/sh
-
-# setpw
-
-# Set the password (encrypted $2) for the given user (argument $1)
-
-if chroot /tmp/install /usr/sbin/usermod -p $2 $1; then
-    echo -n '^OK^'
-fi

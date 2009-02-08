@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# readmenulst - Get the contents of the file $2 on device $1.
-
-mkdir -p /tmp/mnt
-mount $1 /tmp/mnt
-cat /tmp/mnt$2
-umount /tmp/mnt

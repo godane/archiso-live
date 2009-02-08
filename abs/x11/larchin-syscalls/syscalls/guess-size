@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# guess-size
-
-# Guess the size of given directory, in MiB
-
-du -s -m $1 | cut -f1

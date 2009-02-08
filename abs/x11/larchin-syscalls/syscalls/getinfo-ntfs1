@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# getinfo-ntfs1
-
-# Get info on the 1st partition on the given (argument $1) device using
-# parted, but only if it of type ntfs. The unit is bytes.
-
-parted -sm $1 unit B print | grep '^1:.*:ntfs:.*;'

@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# ntfs-growfit
-
-# Expand the given (argument $1) NTFS filesystem to fit in its partition.
-
-if ntfsresize -f -f -P $1; then echo -n '^OK^'; fi

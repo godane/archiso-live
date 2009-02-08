@@ -1,4 +1,0 @@
-#! /bin/sh
-# lsdir  - Get a list of the contents of this directory ($1)
-
-ls -A $1

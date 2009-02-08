@@ -1,8 +1,0 @@
-#!/bin/sh
-
-# mount1
-
-# Mount a partition (argument $1) at mount point /tmp/mnt
-
-mkdir -p /tmp/mnt
-mount $1 /tmp/mnt
