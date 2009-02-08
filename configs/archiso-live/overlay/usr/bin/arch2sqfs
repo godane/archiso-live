@@ -284,14 +284,9 @@ pkg()
 	mkdir -p $TMPDIR/var/lib/pacman/local
 	sync
 	
-	#if [ $(whereis yaourt) ]; then
 	pacman -Sw "$1" --noconfirm
-	PKG=$(ls /var/cache/pacman/pkg/$1-[0-9]*.pkg.tar.gz)
+	PKG=$(ls /var/cache/pacman/pkg/$1-[0-9]*.pkg.tar.gz | tail -1)
 	pacman -U -d -r $TMPDIR $PKG
-	#else
-	#pacman -Sw "$1" --noconfirm
-	#pacman -U -d -r $TMPDIR $PKG
-	#fi
 	
 	echo "Creating module ..."
 
