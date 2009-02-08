@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# get-partsize
+
+# Return the size of partition $1 in a user-friendly form
+
+LANG=C parted $1 print | grep Disk | sed "s|.*: *||"

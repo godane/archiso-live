@@ -1,0 +1,38 @@
+#!/bin/sh
+
+# get-usableparts
+
+# Get a list of partitions which could, potentially be mounted.
+# Return the device basename, a tag: '+' for removable or '-' for not,
+# and the detected file-system type (in ""), space separated.
+
+# Use sfdisk, because it's easier to get the ids out, but check the
+# partitions against fdisk because sfdisk shows primary partitions
+# even if they aren't allocated.
+fdisk -l > /tmp/fdiskl
+blkid -c /dev/null -s TYPE | sed -r s'|:.*=| |' > /tmp/blkidt
+
+sfdisk -d | grep "^/dev/" | sed "s|\(.*\):.*Id=\(..\).*|\1 \2|" | \
+    while read dev id; do
+        # Ignore if id is "Extended" or "LVM", these are not usable partitions
+        if [ "${id}" = "5" -o "${id}" = "8e" -o "${id}" = "82" ]; then
+            continue
+        fi
+        if ! grep "^${dev} " /tmp/fdiskl &>/dev/null; then
+            continue
+        fi
+        removable=""
+        part=$( basename ${dev} )
+        echo -n "${part}"
+        if [ $( cat /sys/block/${part:0:3}/removable 2>/dev/null ) -ne 0 ]; then
+            echo -n " + "
+        else
+            echo -n " - "
+        fi
+        xx=$( grep "/dev/sda1" /tmp/blkidt | cut -d' ' -f2 )
+        if [ -n "${xx}" ]; then
+            echo "${xx}"
+        else
+            echo '""'
+        fi
+    done

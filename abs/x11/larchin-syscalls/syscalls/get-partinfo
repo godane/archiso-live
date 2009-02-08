@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# get-partinfo
+
+# Get info on the partitions on the given (argument $1) device using parted.
+# Set unit to sectors, include free space.
+
+parted -sm $1 unit s print free | grep -E "^[0-9]+:"

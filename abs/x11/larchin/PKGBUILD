@@ -2,8 +2,7 @@
 # 2008.12.17
 pkgname=larchin
 pkgver=6.0.2
-pkgrel=2
-
+pkgrel=3
 pkgdesc="Arch hard disk installer with gui for larch live media"
 url="http://larch.berlios.de"
 depends=('pygtk' 'larchin-syscalls')

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# newpart2
+
+# Create a new primary-swap/primary-linux/extended partition on the given
+# device (argument $1)
+# $2 - partition number (1-4)
+# $3 - start position (cylinders)
+# $4 - end position (cylinders)
+# $5 - 82/83/05
+
+if echo "$3,$(( $4 - $3 )),$5" | sfdisk -D /dev/sda -N$2; then
+    echo -n '^OK^'
+else
+    echo -n "Couldn't create partition on $1$2 from cylinder $3 to cylinder $4"
+fi

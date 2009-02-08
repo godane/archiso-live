@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# get-ntfsinfo
+
+# Get info on the given (argument $1) NTS partition using ntfsresize.
+
+ntfsresize -f -i $1 | grep bytes
