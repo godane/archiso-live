@@ -29,6 +29,8 @@ streamripper
 streamtuner
 gtk-recordmydesktop
 #libs
+xplc
+wvstreams
 liboil
 gstreamer0.10-base
 libisoburn
