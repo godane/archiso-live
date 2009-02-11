@@ -235,7 +235,7 @@ chmod 1777 $UNION/tmp
 
 # Boot will contain whatever was in ./boot directory in the bootable media
 # Error output goes to null, as nothing is mounted with copy2ram
-mount -n -o rbind $(dirname $DATA)/boot $UNION/boot 2>/dev/null
+#mount -n -o rbind $(dirname $DATA)/boot $UNION/boot 2>/dev/null
 
 debug_shell
 

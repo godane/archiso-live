@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# ulogin  - A script for autologin of a selected user (and more)
+#-----------------------------------------------------------------
+# 2008.04.06
+
+user=$( cat /tmp/newuser 2>/dev/null )
+
+rm -f /tmp/newuser
+rm -f /tmp/xlogout
+
+if [ -n "${user}" ]; then
+    login -f ${user}
+else
+    # offer choice of user
+    ulist="$( cat /etc/passwd | grep ':/home/.*sh$' )"
+    echo -e "\nLogin a user or quit:"
+    echo "   0 : root"
+    echo "   1 : REBOOT"
+    echo "   2 : HALT"
+
+    i=2
+    for entry in ${ulist}; do
+        i=$(( ${i} + 1 ))
+        user="$( echo ${entry} | cut -d':' -f1 )"
+        users[${i}]=${user}
+        printf "%4d : %s\n" ${i} ${user}
+    done
+    while true; do
+        read -p "Enter a number from 0 to ${i} : " n
+        if [ "${n}" = 0 ]; then
+            login -f root
+        elif [ "${n}" = 1 ]; then
+            exec reboot
+        elif [ "${n}" = 2 ]; then
+            exec halt
+        elif [ -n "$( echo "${n}" | grep "^[0-9]\+$" )" ] && \
+                [ -n "${users[${n}]}" ]; then
+            login -f ${users[${n}]}
+        else
+            echo "  *** Invalid choice ..."
+            continue
+        fi
+        break
+    done
+fi
+
+if grep "r" /tmp/xlogout &>/dev/null; then
+    reboot
+elif grep "h" /tmp/xlogout &>/dev/null; then
+    halt
+fi
+
+# This file is only needed for shutting down
+rm -f /tmp/checkse

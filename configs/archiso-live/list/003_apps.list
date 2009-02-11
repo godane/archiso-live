@@ -4,7 +4,7 @@ luser
 wicd
 leafpad
 flashplugin
-#larchin
+larchin
 gparted
 isomaster
 epdfview
@@ -29,3 +29,4 @@ xarchiver
 #streamripper
 streamtuner
 gtk-recordmydesktop
+wvdial

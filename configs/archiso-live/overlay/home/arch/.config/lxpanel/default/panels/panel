@@ -8,14 +8,14 @@ Global {
     widthtype=percent
     width=100
     height=26
-    transparent=1
+    transparent=0
     tintcolor=#000000
     alpha=0
     setdocktype=1
     setpartialstrut=1
     usefontcolor=1
     fontcolor=#ffffff
-    background=0
+    background=1
     backgroundfile=/usr/share/lxpanel/images/background.png
 }
 
@@ -53,10 +53,10 @@ Plugin {
             id=pcmanfm.desktop
         }
         Button {
-            id=firefox.desktop
+            id=lxterminal.desktop
         }
         Button {
-            id=lxterminal.desktop
+            id=firefox.desktop
         }
     }
 }
