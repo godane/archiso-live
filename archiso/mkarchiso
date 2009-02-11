@@ -261,6 +261,8 @@ command_install () {
    		cp -r "$(pwd)/isolinux" "${IMGROOT}"
    fi
 
+pacman -Q -r ${union} > ${PKGLIST}
+
 # Unmount union
 echo "Unmounting union."
 umount -l ${union}
