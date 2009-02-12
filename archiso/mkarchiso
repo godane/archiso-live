@@ -402,6 +402,7 @@ command_img () {
             -publisher "Arch Linux <archlinux.org>" \
             -A "Arch Linux Live/Rescue CD" \
             -o "${imgname}" "${IMGROOT}"
+       isohybrid "${imgname}"
        md5sum "${imgname}" > "${imgname}".md5
     else
 		echo "Invalid image type '$IMG_TYPE' specified"

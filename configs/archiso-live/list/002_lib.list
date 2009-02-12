@@ -31,6 +31,8 @@ gtk-recordmydesktop
 #libs
 xplc
 wvstreams
+qt
+xalan-c
 liboil
 gstreamer0.10-base
 libisoburn

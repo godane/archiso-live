@@ -8,6 +8,11 @@ makeiso()
 	mkarchiso -f all "${WORKDIR}" "${ISONAME}"
 }
 
+makeimg()
+{
+	mkarchiso -f img "${WORKDIR}" "${ISONAME}"
+}
+
 clean()
 {
 	rm -rf "${WORKDIR}" "${ISONAME}"
@@ -15,6 +20,10 @@ clean()
 
 if [ "${1}" = "makeiso" ]; then
 	makeiso
+fi
+
+if [ "${1}" = "makeimg" ]; then
+	makeimg
 fi
 
 if [ "${1}" = "clean" ]; then
