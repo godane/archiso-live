@@ -11,7 +11,7 @@ FORCE="n"
 IMG_TYPE="iso"
 DELDIR=""
 BOOT=""
-
+KERNEL="/etc/mkinitcpio.d/kernel26.kver"
 
 if [ -f $(pwd)/config ]; then
 . $(pwd)/config
@@ -128,7 +128,7 @@ CDROOT="$(pwd)/cd-root"
 
 _kversion ()
 {
-    source ${INSTROOT}/etc/mkinitcpio.d/kernel26.kver
+    source ${INSTROOT}${KERNEL}
     #source ${INSTROOT}/etc/mkinitcpio.d/kernel26slax.kver
     echo ${ALL_kver}
 }
@@ -261,7 +261,7 @@ command_install () {
    		cp -r "$(pwd)/isolinux" "${IMGROOT}"
    fi
 
-pacman -Q -r ${union} > ${PKGLIST}
+pacman -Q -r ${union} > ${PKGFILE}
 
 # Unmount union
 echo "Unmounting union."
