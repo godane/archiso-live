@@ -10,7 +10,7 @@ avidemux
 blender
 gtkpod
 gnome-commander
-kdelibs
-kdebase-runtime
-kdepimlibs
-kdebase-workspace
+#kdelibs
+#kdebase-runtime
+#kdepimlibs
+#kdebase-workspace

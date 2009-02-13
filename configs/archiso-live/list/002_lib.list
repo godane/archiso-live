@@ -29,6 +29,9 @@ streamripper
 streamtuner
 gtk-recordmydesktop
 #libs
+gtkglext
+libxslt
+tcl
 xplc
 wvstreams
 qt
