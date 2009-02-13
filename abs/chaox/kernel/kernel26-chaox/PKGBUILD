@@ -1,0 +1,179 @@
+# Contributor: Jens Pranaitis <jens@jenux.homelinux.org>
+# Based on the work of godane <slaxemulator@gmail.com>
+pkgname=kernel26-chaox
+_basekernel=2.6.28
+pkgver=2.6.28.4
+pkgrel=2
+pkgdesc="Linux kernel based on slax config. Used in chaox-ng"
+arch=("i686")
+license=('GPL2')
+groups=('base')
+url="http://www.kernel.org"
+depends=('coreutils' 'module-init-tools' 'mkinitcpio>=0.5.18')
+replaces=('kernel24' 'kernel24-scsi' 'kernel26-scsi'
+          'alsa-driver' 'ieee80211' 'hostap-driver26'
+          'pwc' 'nforce' 'squashfs' 'ivtv'
+	  'zd1211' 'kvm-modules' 'iwlwifi' 'rt2x00-cvs' 'kernel26' 'kernel26slax')
+provides=('kernel26')
+install=$pkgname.install
+source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
+	http://kernel.org/pub/linux/kernel/v2.6/patch-$pkgver.bz2
+        config
+	aufs-patches.patch
+	http://patches.aircrack-ng.org/mac80211_2.6.28-rc4-wl_frag+ack_v3.patch
+	http://patches.aircrack-ng.org/ath5k-injection-2.6.27-rc2.patch
+	http://patches.aircrack-ng.org/ieee80211_inject-2.6.22.patch
+	http://patches.aircrack-ng.org/rtl8187-mac80211-injection-speed-2.6.28-rc6.patch
+	http://www.kernel.org/pub/linux/kernel/people/edward/reiser4/reiser4-for-2.6/reiser4-for-2.6.28.patch.bz2
+	fix-reiser4-for-2.6.28.1.patch
+	openlog.patch
+	http://downloads.sourceforge.net/squashfs/squashfs3.4.tar.gz
+	sqlzma2k-3.4.patch
+	squashfs-kernel26-2.6.28.patch
+	http://patches.aircrack-ng.org/zd1211rw_inject_2.6.26.patch
+	$pkgname.preset
+)
+md5sums=('d351e44709c9810b85e29b877f50968a'
+         '65afbbf63a73ee7be7227531622049fe'
+         '2f3c87ef189f4ef774b45308a5d0b653'
+         'e1cc3c48b5f52bb19b2b011bd488e065'
+         'ca85d39144f07b0500c663779dda9259'
+         '69c34c83c6f64570efa3bc65c39304c5'
+         '2c3adc6510c5bd47f0a04ace4aa2ea1d'
+         '04abcf6b17f5bfa8823617b428b3a3c6'
+         '9d6c0bf55a906a773ea74ac7a3938cb6'
+         'e4ac854309dbf941c834b3597d2cd954'
+         'a49390dd08e4f7702b8f4b550f1ad84e'
+         '2a4d2995ad5aa6840c95a95ffa6b1da6'
+         '0b024ec3aefd98c68b30334d3ab682df'
+         'a9eda3969e6bdfd45048529260a4eea3'
+         'a162a23b5db02738309e54b6ca9fcbc9'
+         '4a311eaee7f632cf2dcb8a96f5942701')
+build() {
+  KARCH=x86
+
+  cd "${srcdir}"/linux-$_basekernel
+  if [ "$_basekernel" != "$pkgver" ]; then
+  # add latest kernel stable patch
+         patch -Np1 < "${srcdir}"/patch-$pkgver ||return 1
+  fi
+  # add squashfs and aufs
+  patch -Np1 -i "${srcdir}"/aufs-patches.patch || return 1
+  patch -Np1 -i "${srcdir}"/squashfs3.4/kernel-patches/linux-2.6.27-rc4/squashfs3.4-patch || return 1
+  patch -Np0 -i "${srcdir}"/squashfs-kernel26-2.6.28.patch || return 1
+  patch -Np1 -i "${srcdir}"/sqlzma2k-3.4.patch || return 1
+  # add injection support
+  patch -Np0 -i "${srcdir}"/zd1211rw_inject_2.6.26.patch || return 1
+  patch -Np1 -i "${srcdir}"/mac80211_2.6.28-rc4-wl_frag+ack_v3.patch || return 1
+  patch -Np1 -i "${srcdir}"/ath5k-injection-2.6.27-rc2.patch || return 1
+  patch -Np1 -i "${srcdir}"/ieee80211_inject-2.6.22.patch || return 1
+  patch -Np1 -i "${srcdir}"/rtl8187-mac80211-injection-speed-2.6.28-rc6.patch || return 1
+  # add openlog patch
+  patch -Np0 -i "${srcdir}"/openlog.patch || return 1
+  # add reiser4 patch
+  patch -Np1 -i "${srcdir}"/reiser4-for-2.6.28.patch || return 1
+  patch -Np1 -i "${srcdir}"/fix-reiser4-for-2.6.28.1.patch || return 1
+  cp ../config ./.config
+  # build the full kernel version to use in pathnames
+  . ./.config
+  ### next line is only needed for rc kernels
+  _kernver="$pkgver"${CONFIG_LOCALVERSION}""
+  # load configuration
+  make menuconfig
+  make bzImage modules || return 1
+  mkdir -p "${pkgdir}"/{lib/modules,boot}
+  make INSTALL_MOD_PATH="${pkgdir}" modules_install || return 1
+  cp System.map "${pkgdir}"/boot/System.map26
+  cp arch/$KARCH/boot/bzImage "${pkgdir}"/boot/vmlinuz26
+  install -D -m644 Makefile \
+    ${pkgdir}/usr/src/linux-${_kernver}/Makefile
+  install -D -m644 kernel/Makefile \
+    ${pkgdir}/usr/src/linux-${_kernver}/kernel/Makefile
+  install -D -m644 .config \
+    ${pkgdir}/usr/src/linux-${_kernver}/.config
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/include
+
+  for i in acpi asm-{generic,x86} config linux math-emu media net pcmcia scsi sound video; do
+    cp -a include/$i ${pkgdir}/usr/src/linux-${_kernver}/include/
+  done
+
+  # copy arch includes for external modules
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/arch/x86
+  cp -a arch/x86/include ${pkgdir}/usr/src/linux-${_kernver}/arch/x86/
+
+  # copy files necessary for later builds, like nvidia and vmware
+  cp Module.symvers ${pkgdir}/usr/src/linux-${_kernver}
+  cp -a scripts ${pkgdir}/usr/src/linux-${_kernver}
+  # fix permissions on scripts dir
+  chmod og-w -R ${pkgdir}/usr/src/linux-${_kernver}/scripts
+  #mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/.tmp_versions
+
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/arch/$KARCH/kernel
+
+  cp arch/$KARCH/Makefile ${pkgdir}/usr/src/linux-${_kernver}/arch/$KARCH/
+  if [ "$CARCH" = "i686" ]; then
+    cp arch/$KARCH/Makefile_32.cpu ${pkgdir}/usr/src/linux-${_kernver}/arch/$KARCH/
+  fi
+  cp arch/$KARCH/kernel/asm-offsets.s ${pkgdir}/usr/src/linux-${_kernver}/arch/$KARCH/kernel/
+
+  # add headers for lirc package
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video
+  cp drivers/media/video/*.h  ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/
+  for i in bt8xx cpia2 cx25840 cx88 em28xx et61x251 pwc saa7134 sn9c102 usbvideo zc0301; do
+   mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/$i
+   cp -a drivers/media/video/$i/*.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/video/$i
+  done
+  # add dm headers
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/md
+  cp drivers/md/*.h  ${pkgdir}/usr/src/linux-${_kernver}/drivers/md
+  # add inotify.h
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/include/linux
+  cp include/linux/inotify.h ${pkgdir}/usr/src/linux-${_kernver}/include/linux/
+  # add CLUSTERIP file for iptables
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/net/ipv4/netfilter/
+  # add wireless headers
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/net/mac80211/
+  cp net/mac80211/*.h ${pkgdir}/usr/src/linux-${_kernver}/net/mac80211/
+  # add dvb headers for external modules
+  # in reference to:
+  # http://bugs.archlinux.org/task/9912
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-core
+  cp drivers/media/dvb/dvb-core/*.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/dvb-core/
+  # add dvb headers for external modules
+  # in reference to:
+  # http://bugs.archlinux.org/task/11194
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/include/config/dvb/
+  cp include/config/dvb/*.h ${pkgdir}/usr/src/linux-${_kernver}/include/config/dvb/
+  # add dvb headers for http://mcentral.de/hg/~mrec/em28xx-new
+  # in reference to:
+  # http://bugs.archlinux.org/task/13146
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/
+  cp drivers/media/dvb/frontends/lgdt330x.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/
+  cp drivers/media/video/msp3400-driver.h ${pkgdir}/usr/src/linux-${_kernver}/drivers/media/dvb/frontends/
+  # add xfs and shmem for aufs building
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/fs/xfs
+  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/mm
+  cp fs/xfs/xfs_sb.h ${pkgdir}/usr/src/linux-${_kernver}/fs/xfs/xfs_sb.h
+  # add vmlinux
+  cp vmlinux ${pkgdir}/usr/src/linux-${_kernver}
+  # copy in Kconfig files
+  for i in `find . -name "Kconfig*"`; do 
+    mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/`echo $i | sed 's|/Kconfig.*||'`
+    cp $i ${pkgdir}/usr/src/linux-${_kernver}/$i
+  done
+
+  cd ${pkgdir}/usr/src/linux-${_kernver}/include && ln -s asm-$KARCH asm
+
+  chown -R root.root ${pkgdir}/usr/src/linux-${_kernver}
+  find ${pkgdir}/usr/src/linux-${_kernver} -type d -exec chmod 755 {} \;
+  cd ${pkgdir}/lib/modules/${_kernver} && \
+    (rm -f source build; ln -sf ../../../usr/src/linux-${_kernver} build)
+  # install fallback mkinitcpio.conf file and preset file for kernel
+  install -m644 -D ${srcdir}/${pkgname}.preset ${pkgdir}/etc/mkinitcpio.d/${pkgname}.preset || return 1
+  # set correct depmod command for install
+  sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/g" "${startdir}"/$pkgname.install
+  mkdir -p "${pkgdir}"/etc/mkinitcpio.d/
+  echo -e "# DO NOT EDIT THIS FILE\nALL_kver='${_kernver}'" > "${pkgdir}"/etc/mkinitcpio.d/${pkgname}.kver
+  # remove unneeded architectures
+  rm -rf ${pkgdir}/usr/src/linux-${_kernver}/arch/{alpha,arm,arm26,avr32,blackfin,cris,frv,h8300,ia64,m32r,m68k,m68knommu,mips,mn10300,parisc,powerpc,ppc,s390,sh,sh64,sparc,sparc64,um,v850,xtensa}
+}
