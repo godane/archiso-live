@@ -80,8 +80,6 @@ mysql-clients
 mysql-python
 postgresql-libs
 nmap
-apache
-cherokee
 lzma-utils
 xdelta
 lftp
@@ -93,3 +91,4 @@ neon
 perl-error
 mpfr
 nasm
+libxml2
