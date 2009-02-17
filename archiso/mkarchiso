@@ -12,6 +12,8 @@ IMG_TYPE="iso"
 DELDIR=""
 BOOT=""
 KERNEL="/etc/mkinitcpio.d/kernel26.kver"
+ROOT_MOD="$(ls -1 $(pwd)/list | head -1)"
+#MODULES=$(ls -1 $(pwd)/list)
 
 if [ -f $(pwd)/config ]; then
 . $(pwd)/config
@@ -123,7 +125,7 @@ union="${work_dir}/union"
 lastbr="${work_dir}/empty"
 moduleplace="${IMGROOT}/archiso-live/base"
 moduledir="${work_dir}/modules"
-INSTROOT="${moduledir}/archlive"
+INSTROOT="${moduledir}/$(basename ${ROOT_MOD} .list)"
 CDROOT="$(pwd)/cd-root"
 
 _kversion ()
@@ -311,10 +313,6 @@ for DIR in $MODULES; do
 done
     minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
     echo "Modules creation done in $minutes minutes."
-    if [ -e ${moduleplace}/archlive.${EXT} ]; then
-	mv ${moduleplace}/archlive.${EXT} ${moduleplace}/000_archlive.${EXT}
-	mv ${moduleplace}/devel.${EXT} ${moduleplace}/000_devel.${EXT}
-    fi
 }
 
 # Finally, make the image.

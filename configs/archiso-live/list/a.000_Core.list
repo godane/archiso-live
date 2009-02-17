@@ -92,3 +92,5 @@ perl-error
 mpfr
 nasm
 libxml2
+apr-util
+ed

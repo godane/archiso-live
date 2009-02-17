@@ -69,6 +69,11 @@ else
     #[ -w /etc/X11/gdm/Init/Default ] && sed -i 's/.*\(\[ -x \/usr\/bin\/numlockx \].*\)/#\1/' /etc/X11/gdm/Init/Default
 fi
 
+
+if [ "`cmdline_parameter server`" ]; then
+	[[ -x /opt/lampp/lampp ]] && /opt/lampp/lampp start
+fi
+
 session="`cmdline_value session`"
 if [ "$session" != "" ]; then
 	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/X11/xinit/xinitrc
