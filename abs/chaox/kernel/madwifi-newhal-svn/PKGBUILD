@@ -1,0 +1,38 @@
+# Contributor: Jens Pranaitis <jens@jenux.homelinux.org>
+# Contributor: Nils Christopher Brause <mastercpp@gmx.net>
+pkgname=madwifi-newhal-svn
+pkgver=3942
+pkgrel=1
+pkgdesc="Madwifi drivers for Atheros wireless chipsets. HAL 0.10.5.6 branch."
+arch=(i686 x86_64)
+url="http://madwifi-project.org/"
+license=('GPL')
+makedepends=('subversion' 'make' 'gcc')
+provides=("madwifi")
+conflicts=("madwifi")
+source=(http://patches.aircrack-ng.org/madwifi-ng-r3925.patch)
+md5sums=('08b969d5786fe19a1381263e18348919')
+install=$pkgname.install
+
+_svntrunk=http://svn.madwifi-project.org/madwifi/branches/madwifi-hal-0.10.5.6
+_svnmod=madwifi
+
+build()
+{
+  source "${startdir}"/../kernel.env
+  cd "${srcdir}"
+  if [ -d $_svnmod/.svn ]; then
+    msg "svn update.."
+    cd $_svnmod
+    svn up -r $pkgver || return 1
+  else
+    msg "svn checkout.."
+    svn co $_svntrunk --config-dir ./ -r $pkgver $_svnmod || return 1
+    cd $_svnmod
+  fi
+
+  msg "make install-modules.."
+  patch -Np0 -i "${srcdir}"/madwifi-ng-r3925.patch || return 1
+  KERNELPATH="${_kerndir}" KERNELRELEASE=$_kernver DESTDIR="${pkgdir}" make install-modules || return 1
+  sed -i -e "s/_kernver='.*'/_kernver='${_kernver}'/" $startdir/*.install
+}

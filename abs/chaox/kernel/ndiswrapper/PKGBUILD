@@ -1,0 +1,28 @@
+# Contributor: Jens Pranaitis <jens@jenux.homelinux.org>
+# Contributor: Tobias Powalowski <tpowa@archlinux.org>
+pkgname=ndiswrapper
+pkgver=1.54
+pkgrel=3
+pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For stock arch 2.6 kernel."
+license=('GPL')
+arch=(i686 x86_64)
+url="http://ndiswrapper.sourceforge.net"
+install="ndiswrapper.install"
+depends=("ndiswrapper-utils=$pkgver")
+source=(http://downloads.sourceforge.net/sourceforge/ndiswrapper/ndiswrapper-$pkgver.tar.gz)
+
+build()
+{
+  source "${startdir}"/../kernel.env
+  cd "${srcdir}"/$pkgname-$pkgver/driver
+  make KVERS=$_kernver KBUILD=$_kernpath
+  make DESTDIR="${pkgdir}" KVERS=$_kernver KBUILD=$_kerndir install || return 1
+  rm "${pkgdir}"/lib/modules/$_kernver/modules.* #wtf?
+  # move it to correct kernel directory
+  mkdir -p "${pkgdir}"/lib/modules/$_kernver/kernel/drivers/net/wireless/ndiswrapper
+  mv "${pkgdir}"/lib/modules/$_kernver/misc/* "${pkgdir}"/lib/modules/$_kernver/kernel/drivers/net/wireless/ndiswrapper/
+  rm -r "${pkgdir}"/lib/modules/$_kernver/misc/
+  sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" $startdir/*.install
+}
+md5sums=('fc9ebd3985967727da494ec298ad4487')
+

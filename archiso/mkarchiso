@@ -11,7 +11,9 @@ FORCE="n"
 IMG_TYPE="iso"
 DELDIR=""
 BOOT=""
-
+KERNEL="/etc/mkinitcpio.d/kernel26.kver"
+ROOT_MOD="$(ls -1 $(pwd)/list | head -1)"
+#MODULES=$(ls -1 $(pwd)/list)
 
 if [ -f $(pwd)/config ]; then
 . $(pwd)/config
@@ -123,12 +125,12 @@ union="${work_dir}/union"
 lastbr="${work_dir}/empty"
 moduleplace="${IMGROOT}/archiso-live/base"
 moduledir="${work_dir}/modules"
-INSTROOT="${moduledir}/archlive"
+INSTROOT="${moduledir}/$(basename ${ROOT_MOD} .list)"
 CDROOT="$(pwd)/cd-root"
 
 _kversion ()
 {
-    source ${INSTROOT}/etc/mkinitcpio.d/kernel26.kver
+    source ${INSTROOT}${KERNEL}
     #source ${INSTROOT}/etc/mkinitcpio.d/kernel26slax.kver
     echo ${ALL_kver}
 }
@@ -261,6 +263,8 @@ command_install () {
    		cp -r "$(pwd)/isolinux" "${IMGROOT}"
    fi
 
+pacman -Q -r ${union} > ${PKGFILE}
+
 # Unmount union
 echo "Unmounting union."
 umount -l ${union}
@@ -309,10 +313,6 @@ for DIR in $MODULES; do
 done
     minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
     echo "Modules creation done in $minutes minutes."
-    if [ -e ${moduleplace}/archlive.${EXT} ]; then
-	mv ${moduleplace}/archlive.${EXT} ${moduleplace}/000_archlive.${EXT}
-	mv ${moduleplace}/devel.${EXT} ${moduleplace}/000_devel.${EXT}
-    fi
 }
 
 # Finally, make the image.
@@ -400,6 +400,7 @@ command_img () {
             -publisher "Arch Linux <archlinux.org>" \
             -A "Arch Linux Live/Rescue CD" \
             -o "${imgname}" "${IMGROOT}"
+       isohybrid "${imgname}"
        md5sum "${imgname}" > "${imgname}".md5
     else
 		echo "Invalid image type '$IMG_TYPE' specified"

@@ -7,8 +7,8 @@
  
 pkgname=virtualbox-modules
 _kernver=2.6.28-ARCH
-pkgver=2.1.2
-pkgrel=2
+pkgver=2.1.4
+pkgrel=1
 pkgdesc="Kernel modules for VirtualBox (vboxdrv)"
 arch=('i686')
 url="http://www.virtualbox.org"
@@ -20,7 +20,7 @@ makedepends=('bin86' 'dev86' 'iasl' 'libstdc++5' 'qt3' 'sdl_ttf' 'libxt'
 install=virtualbox-modules.install
 source=(http://download.virtualbox.org/virtualbox/$pkgver/VirtualBox-$pkgver-OSE.tar.bz2)
 build() {
-  cd "$srcdir/VirtualBox-2.1.2_OSE"
+  cd "$srcdir/VirtualBox-2.1.4_OSE"
   . /etc/profile.d/qt3.sh
   export PATH=$QTDIR/bin:$PATH
   export QMAKESPEC=$QTDIR/mkspecs/linux-g++
@@ -41,4 +41,5 @@ build() {
   install -D -m644 vboxdrv.ko "$pkgdir/lib/modules/${_kernver}/misc/vboxdrv.ko"
   sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" "$startdir/virtualbox-modules.install"
 }
-md5sums=('ce1360945d65a79dbea1bec997c25c00')
+md5sums=('272978b266007dda1942ea56b69daf31')
+

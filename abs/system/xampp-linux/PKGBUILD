@@ -1,0 +1,18 @@
+# Contributor: finswimmer <finswimmer@flossenschwimmen-berlin.de>
+pkgname=xampp-linux
+pkgver=1.7
+pkgrel=1
+pkgdesc="basic webserver enviroment e.g apache,mysql,php"
+url="http://www.apachefriends.org"
+license=('GPL')
+arch=('i686' 'x86_64')
+source=(http://downloads.sourceforge.net/xampp/$pkgname-$pkgver.tar.gz)
+noextract=($pkgname-$pkgver.tar.gz)
+md5sums=('8dd987ff1025d95c4ae478ee0ee4e293')
+
+build() {
+cd $startdir/pkg
+mkdir opt
+cd $startdir/src/
+tar xvfz $pkgname-$pkgver.tar.gz -C $startdir/pkg/opt
+}

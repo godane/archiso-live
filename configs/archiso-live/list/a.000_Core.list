@@ -33,7 +33,7 @@ madwifi
 rt2500
 #firmware
 rt2x00-rt61-fw
-rt2x00-rt71-fw
+rt2x00-rt71w-fw
 iwlwifi-3945-ucode
 iwlwifi-4965-ucode
 iwlwifi-5000-ucode
@@ -80,8 +80,6 @@ mysql-clients
 mysql-python
 postgresql-libs
 nmap
-apache
-cherokee
 lzma-utils
 xdelta
 lftp
@@ -93,3 +91,6 @@ neon
 perl-error
 mpfr
 nasm
+libxml2
+apr-util
+ed

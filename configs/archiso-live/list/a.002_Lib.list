@@ -28,9 +28,15 @@ gcalctool
 streamripper
 streamtuner
 gtk-recordmydesktop
+xchm
 #libs
+gtkglext
+libxslt
+tcl
 xplc
 wvstreams
+qt
+xalan-c
 liboil
 gstreamer0.10-base
 libisoburn
