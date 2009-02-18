@@ -4,7 +4,7 @@
 # Contributor: Michal Krenek <mikos@sg1.cz>
 # Contributor: niQo
 pkgname=virtualbox-ose
-pkgver=2.1.2
+pkgver=2.1.4
 pkgrel=1
 pkgdesc="Powerful x86 virtualization for enterprise as well as home use (Open Source Edition)"
 url="http://www.virtualbox.org"
@@ -18,7 +18,7 @@ makedepends=('gcc34' 'libstdc++5' 'bin86' 'dev86' 'iasl' 'libxslt' 'libxml2'
 	'libxcursor' 'qt3' 'qt' 'libidl2' 'sdl' 'sdl_ttf' 'alsa-lib' 'pulseaudio'
 	'hal')
 install=virtualbox.install
-_realver=2.1.2_OSE
+_realver=2.1.4_OSE
 source=(http://download.virtualbox.org/virtualbox/$pkgver/VirtualBox-$pkgver-OSE.tar.bz2
         '60-virtualbox.rules')
 build() {
@@ -71,5 +71,5 @@ build() {
   install -D -m644 "$srcdir/60-virtualbox.rules" \
                    "$pkgdir/etc/udev/rules.d/60-virtualbox.rules"
 }
-md5sums=('ce1360945d65a79dbea1bec997c25c00'
+md5sums=('272978b266007dda1942ea56b69daf31'
          '519d32d8c2408e0ed9d643f412117644')
