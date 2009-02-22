@@ -58,6 +58,14 @@ if [ ! "`cmdline_parameter noxconf`" ]; then
     [[ -x /usr/sbin/videoconfig ]] && /usr/sbin/videoconfig silent
 fi
 
+driver="$(cmdline_value driver)"
+if [ "${driver}" = "fglrx" ]; then
+	modprobe fglrx
+fi
+
+if [ "${driver}" = "nvidia" ]; then
+	modprobe nvidia
+fi
 
 # numlock: Override default numlock settings
 numlock="`cmdline_value numlock`"
@@ -71,7 +79,8 @@ fi
 
 
 if [ "`cmdline_parameter server`" ]; then
-	[[ -x /opt/lampp/lampp ]] && /opt/lampp/lampp start
+	[[ -x /etc/rc.d/httpd ]] && /etc/rc.d/httpd start
+	[[ -x /etc/rc.d/gnump3d ]] && /etc/rc.d/gnump3d start
 fi
 
 session="`cmdline_value session`"

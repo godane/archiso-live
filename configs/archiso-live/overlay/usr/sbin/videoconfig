@@ -390,6 +390,9 @@ function xprob(){
   | grep "Driver" \
   | sed -e 's/^[ \t]*Driver[ \t]*\"\(.*\)\".*$/\1/')"
   [ ! "$driver" ] && driver='vesa'
+  if [ "$(cmdline_value driver)" != "" ]; then
+	driver=$(cmdline_value driver)
+  fi
 
 
   videocard="$( sed -n '/^ *Section *\"Device\" *$/,/^ *EndSection *$/p' $tmpdir/xorg.conf.new \

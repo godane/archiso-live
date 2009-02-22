@@ -22,6 +22,10 @@ gstreamer0.10-ugly-plugins
 gstreamer0.10-python
 gstreamer0.10-ffmpeg
 python-pysqlite
+freetds
+python-clientform
+beautiful-soup
+psyco
 libstdc++5
 boost
 xine-lib
