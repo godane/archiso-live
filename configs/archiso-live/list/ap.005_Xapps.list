@@ -4,12 +4,13 @@ screenlets
 abiword
 gnumeric
 gimp
-#kino
+kino
 avidemux
-#blender
+blender
 gtkpod
 virtualbox-ose
 gnome-commander
+inkscape
 elisa-base
 elisa-plugins
 libdvdcss

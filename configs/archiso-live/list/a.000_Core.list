@@ -1,4 +1,7 @@
 base
+xinetd
+netkit-bsd-finger
+bc
 netcfg
 openssl
 openssh
@@ -31,6 +34,8 @@ virtualbox-modules
 ndiswrapper
 madwifi
 rt2500
+-d catalyst
+-d nvidia
 #firmware
 rt2x00-rt61-fw
 rt2x00-rt71w-fw
@@ -86,11 +91,14 @@ lftp
 espeak
 pmount
 p7zip
+#web-server
+apache
+lighttpd
+gnump3d
 #base-devel-deps
 neon
 perl-error
 mpfr
 nasm
 libxml2
-apr-util
 ed
