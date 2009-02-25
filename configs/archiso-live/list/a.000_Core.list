@@ -1,6 +1,7 @@
 base
 xinetd
 netkit-bsd-finger
+bc
 netcfg
 openssl
 openssh
