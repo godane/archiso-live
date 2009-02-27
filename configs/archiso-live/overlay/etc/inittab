@@ -15,7 +15,7 @@
 # Boot to console
 #id:4:initdefault:
 # Boot to X11
-id:5:initdefault:
+id:4:initdefault:
 
 rc::sysinit:/etc/rc.sysinit
 rs:S1:wait:/etc/rc.single
