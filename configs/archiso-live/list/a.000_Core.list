@@ -34,8 +34,6 @@ virtualbox-modules
 ndiswrapper
 madwifi
 rt2500
-#-d catalyst
--d nvidia
 #firmware
 rt2x00-rt61-fw
 rt2x00-rt71w-fw

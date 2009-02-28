@@ -199,6 +199,17 @@ modprobe_module()
    modprobe "$MODULE" $* 2>/dev/null
 }
 
+cdname()
+{
+	if [ "$(cmdline_value cdname)" != "" ]; then
+		LIVECDNAME="$(cmdline_value cdname)"
+	else
+		LIVECDNAME="archiso-live"
+	fi
+}
+
+cdname
+
 # mknod next loop device
 # - find biggest loop device in /dev/loop/, assume it to be used
 # - preallocate (mknod) 20 more loop devices in one round
