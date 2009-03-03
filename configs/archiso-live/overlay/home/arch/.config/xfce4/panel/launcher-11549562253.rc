@@ -1,8 +1,13 @@
 [Entry 0]
 Name=Multimedia player
+Comment=Play all sort of media
+Icon=smplayer
 Exec=smplayer
+Path=/home/arch
 Terminal=false
 StartupNotify=false
-Comment=Play all sort of media
-X-XFCE-IconCategory=6
+
+[Global]
+MoveFirst=false
+ArrowPosition=0
 

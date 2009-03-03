@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xsettings" version="1.0">
+  <property name="Gtk" type="empty">
+    <property name="CanChangeAccels" type="bool" value="false"/>
+    <property name="CursorThemeName" type="string" value="Xfce"/>
+    <property name="CursorThemeSize" type="int" value="24"/>
+    <property name="FontName" type="string" value="Serif 9"/>
+    <property name="KeyThemeName" type="string" value="Default"/>
+    <property name="ToolbarStyle" type="string" value="icons"/>
+  </property>
+  <property name="Net" type="empty">
+    <property name="CursorBlink" type="bool" value="true"/>
+    <property name="CursorBlinkTime" type="int" value="500"/>
+    <property name="DndDragThreshold" type="int" value="8"/>
+    <property name="IconThemeName" type="string" value="Rodent"/>
+    <property name="ThemeName" type="string" value="Xfce"/>
+  </property>
+  <property name="Xft" type="empty">
+    <property name="DPI" type="int" value="-1"/>
+    <property name="AntiAlias" type="int" value="1"/>
+    <property name="HintStyle" type="string" value="hintfull"/>
+    <property name="Hinting" type="int" value="1"/>
+    <property name="RGBA" type="string" value="none"/>
+  </property>
+</channel>

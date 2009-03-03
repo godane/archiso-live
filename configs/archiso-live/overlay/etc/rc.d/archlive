@@ -60,10 +60,12 @@ fi
 
 driver="$(cmdline_value driver)"
 if [ "${driver}" = "fglrx" ]; then
+	depmod
 	modprobe fglrx
 fi
 
 if [ "${driver}" = "nvidia" ]; then
+	depmod
 	modprobe nvidia
 fi
 

@@ -199,8 +199,12 @@ union_insert_modules $UNION $MEMORY $IMAGES
 
 debug_shell
 
-echolog "copying content of rootcopy directory"
-cp -af $DATA/rootcopy/* $UNION 2>/dev/null # may be empty
+if [ $(cmdline_parameter norootcopy) ]; then
+	echolog "not using rootcopy"
+else
+	echolog "copying content of rootcopy directory"
+	cp -af $DATA/rootcopy/* $UNION 2>/dev/null # may be empty
+fi
 
 # TODO: if copy2ram is used, there is no need to preserve the original in memory anymore
 #if [ "$DATA" = "$COPY2RAM" ]; then 

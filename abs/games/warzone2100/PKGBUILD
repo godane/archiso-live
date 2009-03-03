@@ -1,0 +1,22 @@
+# Maintainer: Vesa Kaihlavirta <vegai@iki.fi>
+# Contributor: Angelo Theodorou <encelo@users.sourceforge.net>
+pkgname=warzone2100
+pkgver=2.1.1
+pkgrel=1
+pkgdesc="3D realtime strategy game on a future Earth"
+url="http://wz2100.net/"
+arch=('i686' 'x86_64')
+conflicts=(warzone)
+license=(GPL)
+depends=(sdl_net libgl openal libjpeg libpng libvorbis libmad physfs mesa quesoglc popt)
+makedepends=(gawk bison flex zip unzip)
+source=(http://download.gna.org/warzone/releases/2.1/${pkgname}-$pkgver.tar.bz2)
+md5sums=('6294cd8eb6fe1ad5c64e2982d6728c28')
+
+build() {
+  cd $startdir/src/${pkgname}-$pkgver
+  sh autogen.sh
+  ./configure --prefix=/usr
+  make || return 1
+  make DESTDIR=$startdir/pkg install
+}
