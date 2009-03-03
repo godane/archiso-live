@@ -112,7 +112,7 @@ cat << EOF >>  /etc/X11/xorg.conf
 Section "ServerFlags"
 #    Option     "NoTrapSignals"
 #    Option     "DontVTSwitch"
-#    Option     "DontZap"
+    Option     "DontZap" "false"
 #    Option     "DontZoom"
 #    Option     "DisableVidModeExtension"
 #    Option     "AllowNonLocalXvidtune"
