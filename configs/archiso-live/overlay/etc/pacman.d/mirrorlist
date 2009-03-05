@@ -3,7 +3,7 @@
 #
 
 # United States
-Server = ftp://ftp.archlinux.org/$repo/os/i686
+#Server = ftp://ftp.archlinux.org/$repo/os/i686
 Server = ftp://locke.suu.edu/linux/dist/archlinux/$repo/os/i686
 Server = ftp://mirrors.unixheads.org/archlinux/$repo/os/i686
 Server = ftp://ftp-linux.cc.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
