@@ -204,7 +204,7 @@ cdname()
 	if [ "$(cmdline_value cdname)" != "" ]; then
 		LIVECDNAME="$(cmdline_value cdname)"
 	else
-		LIVECDNAME="archiso-live"
+		LIVECDNAME="${LIVECDNAME}"
 	fi
 }
 
