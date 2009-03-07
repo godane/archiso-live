@@ -1,0 +1,28 @@
+[Entry 1]
+Name=File locator
+Comment=Search files and directories on the system
+Icon=gnome-search
+Exec=search4files
+Terminal=false
+StartupNotify=false
+
+[Global]
+MoveFirst=false
+ArrowPosition=0
+
+[Entry 0]
+Name=Terminal
+Comment=X console
+Icon=gnome-terminal
+Exec=exo-open --launch TerminalEmulator
+Terminal=false
+StartupNotify=false
+
+[Entry 2]
+Name=Application locator
+Comment=Search applications on the system
+Icon=xfce4-appfinder
+Exec=xfce4-appfinder
+Terminal=false
+StartupNotify=false
+
