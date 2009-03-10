@@ -166,10 +166,12 @@ command_install () {
     mkdir -p "${union}"
     mkdir -p "${moduleplace}"
     mkdir -p "${moduledir}"
+    mkdir -p ${IMGROOT}/${CDNAME}/{modules,optional,rootcopy}
+    touch ${IMGROOT}/${CDNAME}/livecd.sgn
 	cp -af ${CDROOT}/* "${IMGROOT}"
     ln -sf ${LIVELINUX} initrd
     cd initrd
-    ./initrd_create "${CDNAME}"
+    ./initrd_create $CDNAME
     cd ../
     mv -f initrd/initrd.lzm "${IMGROOT}"
 
@@ -297,12 +299,12 @@ find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
     # always make an addon out of DEF_CONFIG_DIR
     echo "Creating default-config addon..."
     if [ "${QUIET}" = "y" ]; then
-        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.${EXT}" -noappend ${OPTION} >/dev/null
+        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}" -noappend ${OPTION} >/dev/null
     else
-	/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/archiso-live/optional/overlay.${EXT}" -noappend ${OPTION}
+	/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}" -noappend ${OPTION}
     fi
 	
-	chmod 0444 "${IMGROOT}/archiso-live/optional/overlay.${EXT}"
+	chmod 0444 "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}"
 }
 
 # Squash is the next step.
@@ -311,7 +313,7 @@ command_squash () {
 echo "Creating modules procede..."
 start=$(date +%s)
     if [ -d "${MODULESCOPY}" ]; then
-		cp -r ${MODULESCOPY}/* "${IMGROOT}/archiso-live/modules"
+		cp -r ${MODULESCOPY}/* "${IMGROOT}/${CDNAME}/modules"
     fi
 
 for DIR in $MODULES; do
