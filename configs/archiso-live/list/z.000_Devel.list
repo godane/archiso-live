@@ -10,3 +10,4 @@ pacbuilder-svn
 devtools
 aurtools
 pkgtools
+gdb
