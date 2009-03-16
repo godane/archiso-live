@@ -15,7 +15,7 @@ KERNEL="/etc/mkinitcpio.d/kernel26.kver"
 ROOT_MOD="$(ls -1 $(pwd)/list | head -1)"
 #MODULES=$(ls -1 $(pwd)/list)
 CDNAME="archiso-live"
-LINUXLIVE="../../linux-live/initrd"
+LIVELINUX="../../linux-live/initrd"
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
@@ -348,30 +348,12 @@ command_squash () {
 # Finally, make the image.
 command_imgprepare () {
     info "Making compressed initrd ( assuming ../linux-live/initrd/initrd_create )"
-    pushd .
-    cd $LINUXLIVE
-
-    if [ $? -ne 0 ]; then
-        error "Cannot chdir into ../linux-live/initrd"
-        exit -1
-    fi
-
+    #pushd .
+    ln -sf ${LIVELINUX} initrd
+    cd initrd
     ./initrd_create $CDNAME
-
-    if [ $? -ne 0 ]; then
-        error "Error while creating initrd.lzm"
-        exit -1
-    fi
-
-    popd
-
-    info "Moving initrd.lzm to $IMGROOT"
-    mv -f $LINUXLIVE/initrd.lzm $IMGROOT/
-
-    if [ $? -ne 0 ]; then
-        error "Error while copying initrd.lzm"
-        exit -1
-    fi
+    cd ../
+    mv -f initrd/initrd.lzm "${IMGROOT}"
 
     info "Making bootable image"
 
