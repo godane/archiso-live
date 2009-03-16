@@ -6,12 +6,10 @@ export PATH=.:/:/usr/sbin:/usr/bin:/sbin:/bin
 
 mount -n -t proc proc /proc
 mount -n -t sysfs sysfs /sys
-mount -n -o remount,rw /         # for the case we forgot rw boot option
+#mount -n -o remount,rw /         # for the case we forgot rw boot option
 ln -sf /proc/mounts /etc/mtab    # this allows us to use umount -a
 
 . liblinuxlive # it requires proc to be mounted
-
-header "starting Linux Live scripts <http://www.linux-live.org/>"
 
 # Don't print kernel messages to konsole now.
 # Syslog will reset printk settings, no need to remember it here anymore.
@@ -94,11 +92,11 @@ Workaround: Copy the directory $LIVECDNAME from your boot device to an IDE/SATA
 disk, eg. to /mnt/hda1/$LIVECDNAME or C:\\$LIVECDNAME. Then try to boot again."
 fi
 
-echolog "using $LIVECDNAME data from $DATA"
+echolog "Using $LIVECDNAME data from $DATA"
 
 debug_shell
 
-echolog "setting up directory for changes"
+echolog "Setting up directory for changes ..."
 CHANGESVAL=$(cmdline_value changes)
 
 if [ "$CHANGESVAL" ]; then
@@ -117,7 +115,7 @@ rm -f $MEMORY/empty 2>/dev/null
 # if changes can't be mounted or the filesystem is not writable,
 # fallback to the default: tmpfs
 if [ $? -ne 0 ]; then
-   echolog "changes not used or not writable, using memory only"
+   echolog "Changes not used or not writable, using memory only"
    fumount $MEMORY
    mkdir -p $MEMORY # mount_device might removed it
 
@@ -129,7 +127,7 @@ else
    # So it is writable, we will keep the filesystem mounted.
    # Check if it supports links and chmod.
    # If not, overmount CHANGES using posixovl
-   echolog "testing the filesystem for posix compatibility"
+   echolog "Testing the filesystem for posix compatibility ..."
    touch $MEMORY/.empty1 && \
    ln -sf $MEMORY/.empty1 $MEMORY/.empty2 2>/dev/null && \
    chmod +x $MEMORY/.empty1 2>/dev/null  && \
@@ -139,7 +137,7 @@ else
    rm $MEMORY/.empty1 $MEMORY/.empty2 2>/dev/null
 
    if [ $? -ne 0 ]; then
-      echolog "not compatible - starting posixovl"
+      echolog "Not compatible - starting posixovl"
       rm $MEMORY/.empty1 $MEMORY/.empty2 2>/dev/null
       mkdir -p $CHANGES
       posixovl -F $CHANGES -- -o attr_timeout=300,entry_timeout=300,negative_timeout=300,kernel_cache,allow_other
@@ -148,7 +146,7 @@ else
 fi
 
 # $UNION will be used as a root directory, livecd modules will be added soon
-echolog "setup union directory (using aufs)"
+echolog "Setup union directory (using aufs)"
 
 mkdir -p $CHANGES
 mkdir -p $IMAGES
@@ -190,7 +188,7 @@ debug_shell
 
 # DATA contains path to the base directory of all fs modules which need
 # to be mounted and inserted into live filesystem. Do it now.
-echolog "inserting all modules and creating live filesystem"
+echolog "Loading modules:"
 union_insert_modules $UNION $DATA $IMAGES
 
 # the $MEMORY directory can contain $MEMORY/modules too
@@ -200,9 +198,9 @@ union_insert_modules $UNION $MEMORY $IMAGES
 debug_shell
 
 if [ $(cmdline_parameter norootcopy) ]; then
-	echolog "not using rootcopy"
+	echolog "Not using rootcopy"
 else
-	echolog "copying content of rootcopy directory"
+	echolog "Copying content of rootcopy directory"
 	cp -af $DATA/rootcopy/* $UNION 2>/dev/null # may be empty
 fi
 
@@ -211,12 +209,12 @@ fi
 #    rm from memory once ??
 #fi
 
-echolog "copying liblinuxlive library to union"
+echolog "Copying liblinuxlive library to union"
 cp -af /liblinuxlive $UNION/usr/lib/
 
 debug_shell
 
-echolog "recreating /etc/fstab and /mnt directories"
+echolog "Recreating /etc/fstab and /mnt directories"
 touch $UNION/etc/fstab
 rmdir $UNION/mnt/* 2>/dev/null
 fstab_update $UNION
@@ -270,7 +268,6 @@ if [ "$INIT" = "" ]; then fatal "Can't find executable init command"; fi
 
 # time to end Linux Live scripts and start the distribution itself,
 # using /sbin/init or whatever was found.
-header "linux live end, starting $LIVECDNAME"
 
 debug_shell
 

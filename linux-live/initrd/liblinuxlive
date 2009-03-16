@@ -46,7 +46,7 @@ debug_log()
 #
 echogreen()
 {
-   echo -ne "[0;32m""$@""[0;39m"
+   echo -ne " [1;34m""$@""[0;39m"
 }
 
 # echolog
@@ -265,7 +265,7 @@ locale_id()
       if [ "$i" != "1" ]; then LOCALE=""; fi
    fi
 
-   if [ "$LOCALE" != "" ]; then
+   if [ "$LOCALE" != "" -a -e /usr/share ]; then
       cat /usr/share/locale/locale.alias | sed -r "s/#.*//" | egrep "$LOCALE|$LOCALE""_" | tail -n 1 | tr -s "[[:space:]]" " " | cut -d " " -f 2- | tr -d " "
    fi
 }
@@ -850,9 +850,9 @@ find_n_run_scripts()
 mdev_start_hotplug()
 {
    debug_log "mdev_start_hotplug" "$*"
-   echolog "creating /dev entries for block devices"
+   echolog "Creating /dev entries for block devices"
    mdev -s
-   rm /dev/pty??* /dev/tty??* # remove unneeded pty and tty devices
+   #rm /dev/pty??* /dev/tty??* # remove unneeded pty and tty devices
    echo /bin/mdev > /proc/sys/kernel/hotplug # use mdev as a hotplug handler
 }
 
@@ -862,21 +862,16 @@ modprobe_essential_modules()
 {
    debug_log "modprobe_essential_modules" "$*"
 
-   echolog "starting loop device support"
+   echolog "Loading filesystems modules ..."
    modprobe_module loop
-   echolog "starting cdrom filesystem support"
    modprobe_module isofs
-   echolog "starting squashfs support"
    modprobe_module squashfs
-   echolog "starting aufs support with brs=1"
    modprobe_module aufs brs=1
-   echolog "starting linux filesystem support"
    modprobe_module ext2
    modprobe_module ext3
    modprobe_module reiserfs
    modprobe_module xfs
    modprobe_module vfat
-   echolog "starting windows filesystem support"
    modprobe_module vfat
    modprobe_module fuse # for ntfs-3g
    modprobe_module ntfs # for ro driver
@@ -897,7 +892,7 @@ modprobe_usb_modules()
       return 0
    fi
 
-   echolog "starting USB support"
+   echolog "Loading USB modules ..."
    if [ "$(echo $LSPCI | grep -i ehci)" != "" ]; then
       modprobe_module ehci-hcd
    fi
@@ -919,7 +914,7 @@ modprobe_pcmcia_modules()
    # skip module loading if nohotplug bootparam is present
    if [ "$(cmdline_parameter nohotplug)" ]; then return 0; fi
 
-   echolog "starting PCMCIA CardBus support"
+   echolog "Loading PCMCIA CardBus modules ..."
    modprobe_module pcmcia_core
    modprobe_module pcmcia
    modprobe_module rsrc_nonstatic
@@ -1065,10 +1060,10 @@ fstab_update()
    mkdir -p $1/etc $1/mnt
    cat $FSTAB 2>/dev/null | grep -v "$FSTABLLFLAG" >$FSTABTMP
 
-   fstab_add_line $FSTABTMP aufs / aufs defaults
-   fstab_add_line $FSTABTMP proc /proc proc defaults
-   fstab_add_line $FSTABTMP sysfs /sys sysfs defaults
-   fstab_add_line $FSTABTMP devpts /dev/pts devpts gid=5,mode=620
+   fstab_add_line $FSTABTMP none / unionfs defaults
+   fstab_add_line $FSTABTMP none /proc proc defaults
+   fstab_add_line $FSTABTMP none /sys sysfs defaults
+   fstab_add_line $FSTABTMP none /dev/pts devpts gid=5,mode=620
    fstab_add_line $FSTABTMP tmpfs /dev/shm tmpfs defaults
 
    list_cdrom_devices | while read DEVICE; do
