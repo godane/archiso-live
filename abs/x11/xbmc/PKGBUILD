@@ -3,35 +3,92 @@
 
 pkgname=xbmc
 pkgver=8.10
-pkgrel=6
+pkgrel=10
 pkgdesc="XBMC Media Center"
-url="http://xbmc.org"
 arch=('i686' 'x86_64')
+url="http://xbmc.org"
 license=('GPL' 'custom')
 depends=('alsa-lib' 'curl' 'enca' 'faac' 'freetype2' 'fribidi' 'gawk' 'glew' \
-         'hal' 'jasper' 'libcdio' 'libgl' 'libjpeg>=6b-5' 'libmad' 'libmysqlclient' \
-         'libpng>=1.2.32-1' 'libxinerama' 'libxrandr' 'lzo2' 'pmount' 'sdl_gfx' 'sdl_image' \
-         'sdl_mixer' 'smbclient'  'sqlite3' 'tre' 'unrar' 'unzip' 'x-server')
-makedepends=('autoconf' 'automake' 'boost' 'cmake' 'gcc' 'gperf' 'libtool' \
-             'make' 'nasm' 'patch' 'pkgconfig' 'zip')
-optdepends=('lirc: remote controller support')
+         'hal' 'jasper' 'libgl' 'libjpeg>=6b-5' 'libmad' 'libmysqlclient' \
+         'libxinerama' 'libxrandr' 'lzo2' 'sdl_image' 'sdl_mixer' 'sqlite3' \
+         'tre' 'unzip' 'x-server')
+makedepends=('autoconf' 'automake' 'boost' 'cmake' 'gcc' 'gperf' 
+             'libtool>=2.2.6a-1' 'make' 'nasm' 'patch' 'pkgconfig' 'zip')
+optdepends=('libcdio: optical disc support'
+            'lirc: remote controller support'
+            'pmount: mount removable devices as normal user'
+            'smbclient: access windows shares'
+            'unrar: access compressed files without unpacking them')
 install=("${pkgname}.install")
 source=("http://downloads.sourceforge.net/${pkgname}/XBMC-${pkgver}.src.tar.gz")
 md5sums=('2d20d255a211223eaa47f1c6bcf4be8e')
 
 build() {
-    cd ${srcdir}/XBMC
+    cd "${srcdir}/XBMC"
 
+    # Remove Mac OS X specific files
+    rm -rf system/python/lib-osx/
+    rm system/players/dvdplayer/*-osx*
+    
     # Fix permissions for the configure scripts
     find -type f -name "configure"|xargs chmod a+x || return 1
+    
     # Fix other permissions
-    chmod a+x ${srcdir}/XBMC/xbmc/cores/dvdplayer/Codecs/ffmpeg/doc/texi2pod.pl \
-	      ${srcdir}/XBMC/xbmc/lib/libPython/Python/Doc/tools/html2texi.pl \
-	      ${srcdir}/XBMC/xbmc/lib/libPython/Python/Doc/tools/node2label.pl || return 1
+    find -type f -name "*.pl"|xargs chmod a+x || return 1
+    
+    # Make it gcc 4.3.x compatible
+    sed '92i#include <stdlib.h>' -i guilib/system.h || return 1
+    
+    # Clean up the configure files and make sure they support C++.
+    for file in `find . -type f -name configure.in -or -name configure.ac`; do
+        echo 'AC_PROG_CXX' >> "${file}"
+        sed -e '/AM_PATH_XMMS/ c\echo' \
+	    -e '/AM_PATH_SDL2/ c\echo' \
+	    -i ${file} || return 1
+    done
+    sed -e 's/test_libFLAC++//g' \
+        -i "${srcdir}/XBMC/xbmc/cores/paplayer/flac-1.2.1/src/Makefile.am" || return 1
 
-    # Build XBMC
+    # Fix some autoconf issues
+    touch ${srcdir}/XBMC/xbmc/cores/dvdplayer/Codecs/libmad/{NEWS,AUTHORS,ChangeLog} || return 1
+    touch ${srcdir}/XBMC/xbmc/visualizations/Goom/goom2k4-0/ylwrap || return 1
+    touch ${srcdir}/XBMC/xbmc/lib/libid3tag/libid3tag/{NEWS,README,AUTHORS,ChangeLog} || return 1
+    for dir in \
+    	. \
+    	xbmc/cores/dvdplayer/Codecs/libDVDCSS \
+    	xbmc/cores/dvdplayer/Codecs/libdts \
+    	xbmc/cores/dvdplayer/Codecs/libdvdnav \
+    	xbmc/cores/dvdplayer/Codecs/libfaad2 \
+    	xbmc/cores/dvdplayer/Codecs/libmad \
+    	xbmc/cores/dvdplayer/Codecs/libmpeg2 \
+    	xbmc/cores/paplayer/flac-1.2.1 \
+    	xbmc/cores/paplayer/vorbisfile/libvorbis \
+    	xbmc/cores/paplayer/vorbisfile/ogg \
+    	xbmc/visualizations/Goom/goom2k4-0 \
+    	xbmc/lib/libass \
+    	xbmc/lib/libid3tag/libid3tag
+    do
+	autoreconf --install "${srcdir}/XBMC/${dir}" || return 1
+    done
+
+    cd "${srcdir}/XBMC/"
+
+    # Configure XBMC
     ./configure --prefix=/usr \
                 --disable-debug || return 1
+    
+    # Fix false negative detections of realloc that happens some times
+    if grep -q 'HAVE_REALLOC 0' config.h; then
+      sed -e 's|#define HAVE_REALLOC 0|#define HAVE_REALLOC 1|' \
+          -e 's|#define realloc rpl_realloc|/* #define realloc rpl_realloc */|' \
+          -i config.h || return 1
+    fi
+
+    # XBMCTex will segfault on systems with nvidia instaleld if linked to OpenGL
+    sed -e 's/-lGLU -lGLEW -lGL//' \
+        -i ${srcdir}/XBMC/tools/XBMCTex/Makefile
+
+    # Now (finally) build
     make || return 1
     make prefix=${pkgdir}/usr install || return 1
 
