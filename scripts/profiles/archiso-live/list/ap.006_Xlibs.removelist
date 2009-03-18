@@ -10,7 +10,7 @@ avidemux
 blender
 gtkpod
 gnome-commander
-inkscape
+#inkscape
 brasero
 #kdelibs
 #kdebase-runtime

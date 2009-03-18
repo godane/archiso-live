@@ -25,8 +25,8 @@ sqlzma
 sqlzma-tools
 #squashfs-tools
 unionfs-utils
-larch
-larch-live
+#larch
+#larch-live
 hal
 dbus-python
 policykit

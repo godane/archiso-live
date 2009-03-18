@@ -10,6 +10,7 @@ makeiso()
 
 makeimg()
 {
+	mkarchiso -f imgprepare "${WORKDIR}"
 	mkarchiso -f img "${WORKDIR}" "${ISONAME}"
 }
 

@@ -10,7 +10,7 @@ avidemux
 blender
 gtkpod
 gnome-commander
-inkscape
+#inkscape
 brasero
 #kdelibs
 #kdebase-runtime
@@ -28,6 +28,9 @@ freetds
 python-clientform
 beautiful-soup
 psyco
+python-mills
+pymssql
+proftpd
 libstdc++5
 boost
 xine-lib
