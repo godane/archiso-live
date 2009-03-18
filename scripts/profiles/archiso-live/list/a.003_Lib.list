@@ -37,8 +37,8 @@ filezilla
 gtkglext
 libxslt
 tcl
-xplc
-wvstreams
+-d xplc
+-d wvstreams
 qt
 xalan-c
 liboil

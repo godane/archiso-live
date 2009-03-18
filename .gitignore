@@ -4,3 +4,7 @@ pkg/
 .working/
 *.iso
 *.md5
+*.o
+*.swp
+*.part
+*.tar

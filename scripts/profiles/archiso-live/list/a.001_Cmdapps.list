@@ -6,7 +6,7 @@ speedtouch
 lshwd
 hwd
 elinks
-irrsi
+irssi
 aspell-en
 screen
 weechat
@@ -38,6 +38,8 @@ lftp
 espeak
 pmount
 p7zip
+cups
+nmap
 #web-server
 apache
 lighttpd
@@ -49,16 +51,3 @@ mpfr
 nasm
 libxml2
 ed
-cups
-#pentest-apps
-nmap
-macchanger
-bluez
-aircrack-ng
-wipe
-stunnel
-driftnet
-dsniff
-ettercap
-fping
-john
