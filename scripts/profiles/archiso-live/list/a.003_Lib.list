@@ -39,6 +39,8 @@ libxslt
 tcl
 -d xplc
 -d wvstreams
+libwww
+liblrdf
 qt
 xalan-c
 liboil
