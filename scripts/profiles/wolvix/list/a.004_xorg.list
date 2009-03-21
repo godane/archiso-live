@@ -1,0 +1,16 @@
+xf86-input-keyboard
+xf86-input-mouse
+xf86-video-vesa
+#xorg-fonts-100dpi
+#xorg-fonts-75dpi
+xorg-res-utils
+xorg-server
+xorg-twm
+xorg-xinit
+xorg-utils
+xterm
+xorg-video-drivers
+xorg-input-drivers
+synaptics
+ttf-dejavu
+libxss

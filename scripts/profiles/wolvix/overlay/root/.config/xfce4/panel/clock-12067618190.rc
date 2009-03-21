@@ -1,0 +1,15 @@
+mode=1
+military=true
+ampm=false
+secs=false
+show_frame=false
+DigitalFormat=%R
+TooltipFormat=%A %d %B %Y
+ClockType=2
+ShowFrame=true
+ShowSeconds=false
+ShowMilitary=true
+ShowMeridiem=false
+TrueBinary=false
+FlashSeparators=false
+
