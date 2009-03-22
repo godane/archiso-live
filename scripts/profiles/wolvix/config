@@ -1,4 +1,4 @@
 #ROOT_MOD="a.000_Core"
-MODULES="a.000_Core a.001_base_app a.002_base_lib a.003_base_net a.004_xorg a.005_xfce_dep a.006_xfce a.007_gnome_core a.008_wolvix_dep a.009_wolvix_app"
+MODULES="a.000_Core a.001_base_app a.002_base_lib a.003_base_net a.004_xorg a.005_xfce_dep a.006_fluxbox a.007_xfce a.008_gnome_core a.009_wolvix_dep a.010_wolvix_app"
 DELDIR="usr/share/doc usr/share/devhelp usr/share/gtk-doc usr/share/wallpapers"
 KERNEL="/etc/mkinitcpio.d/kernel26.kver"
