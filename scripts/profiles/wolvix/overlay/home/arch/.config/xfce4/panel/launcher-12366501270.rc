@@ -1,7 +1,7 @@
 [Entry 0]
 Name=Email Client
 Comment=Read and write email
-Icon=email
+Icon=emblem-mail
 Exec=exo-open --launch MailReader
 Terminal=false
 StartupNotify=false

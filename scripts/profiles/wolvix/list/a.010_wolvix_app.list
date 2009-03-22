@@ -14,7 +14,7 @@ conky
 darkice
 deluge
 dia
-evince
+#evince
 epdfview
 exaile
 file-roller
@@ -52,6 +52,7 @@ linuxdcpp
 medit
 meld
 mirage
+midori
 mp3info
 mplayer
 smplayer
@@ -69,8 +70,8 @@ scrot
 streamripper
 streamtuner
 subtitleeditor
+thunderbird
 virtualbox-ose
-webkit
 wicd
 wifi-radar
 wvdial
