@@ -8,10 +8,10 @@ options {
 	toolbar_style -1;
 	toolbar_size -1;
 	always_reload no;
-	main_window_width 779;
-	main_window_height 556;
+	main_window_width 600;
+	main_window_height 400;
 	preferences_window_width 400;
-	preferences_window_height 228;
+	preferences_window_height 233;
 	preferences_selected_page "applications";
 	preferences_plugins_expanded yes;
 	stream_properties_window_width -1;
@@ -30,7 +30,7 @@ options {
 	music_dir "";
 	find_history {
 	}
-	selected_handler "shoutcast";
+	selected_handler "bookmarks";
 }
 action "play-m3u" {
 	command "audacious %q";
@@ -79,7 +79,7 @@ handler "bookmarks" {
 	}
 	field {
 		visible yes;
-		width 463;
+		width 284;
 		position -1;
 	}
 	field {
@@ -104,7 +104,7 @@ handler "preselections" {
 	}
 	field {
 		visible yes;
-		width 655;
+		width 496;
 		position -1;
 	}
 	field {
@@ -144,7 +144,7 @@ handler "live365" {
 	}
 	field {
 		visible yes;
-		width 208;
+		width 100;
 		position -1;
 	}
 	field {
@@ -229,7 +229,7 @@ handler "local" {
 	}
 	field {
 		visible yes;
-		width 120;
+		width 100;
 		position -1;
 	}
 	field {
@@ -249,7 +249,7 @@ handler "basic.ch.py" {
 	}
 	field {
 		visible yes;
-		width 483;
+		width 340;
 		position -1;
 	}
 	field {
@@ -269,7 +269,7 @@ handler "google-stations.py" {
 	}
 	field {
 		visible yes;
-		width 500;
+		width 340;
 		position -1;
 	}
 	field {
@@ -289,7 +289,7 @@ handler "punkcast.com.py" {
 	}
 	field {
 		visible yes;
-		width 638;
+		width 496;
 		position -1;
 	}
 	field {
@@ -302,12 +302,12 @@ handler "punkcast.com.py" {
 	}
 }
 handler "shoutcast" {
-	fields_sort_index 6;
+	fields_sort_index 0;
 	fields_sort_order 0;
 	paned_position 150;
 	field {
 		visible yes;
-		width 163;
+		width 100;
 		position -1;
 	}
 	field {
@@ -317,7 +317,7 @@ handler "shoutcast" {
 	}
 	field {
 		visible yes;
-		width 188;
+		width 100;
 		position -1;
 	}
 	field {
@@ -378,7 +378,7 @@ handler "xiph" {
 	}
 	field {
 		visible yes;
-		width 200;
+		width 100;
 		position -1;
 	}
 	field {

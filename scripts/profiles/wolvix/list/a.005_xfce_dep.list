@@ -2,13 +2,17 @@ gtk2
 desktop-file-utils
 fam
 freetype
+giblib
 gnome-icon-theme
 hicolor-icon-theme
+tango-icon-theme
+tango-icon-theme-extras
 icon-naming-utils
 iso-codes
 libart_lgpl
 libexif
 libgsf
+libglade
 librsvg
 libwnck
 libxklavier
@@ -19,3 +23,5 @@ slim
 archlinux-themes-slim
 startup-notification
 vte
+gstreamer0.10-base
+libnotify

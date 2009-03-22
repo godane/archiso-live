@@ -37,6 +37,7 @@ less
 loadin
 logrotate
 lvm2
+lzo2
 mdadm
 minicom
 ntfs-eg

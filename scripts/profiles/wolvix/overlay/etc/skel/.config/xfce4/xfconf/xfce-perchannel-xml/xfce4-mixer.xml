@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-mixer" version="1.0">
+  <property name="window-height" type="int" value="400"/>
+  <property name="window-width" type="int" value="600"/>
+  <property name="sound-card" type="string" value="VIA8237Alsamixer"/>
+  <property name="sound-cards" type="empty">
+    <property name="VIA8237Alsamixer" type="array">
+      <value type="string" value="Master"/>
+      <value type="string" value="Master Surround"/>
+      <value type="string" value="PCM"/>
+      <value type="string" value="Surround"/>
+      <value type="string" value="Center"/>
+      <value type="string" value="Line-in"/>
+      <value type="string" value="CD"/>
+      <value type="string" value="Microphone"/>
+    </property>
+  </property>
+</channel>

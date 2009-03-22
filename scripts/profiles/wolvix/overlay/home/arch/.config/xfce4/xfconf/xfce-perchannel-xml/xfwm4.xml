@@ -6,7 +6,7 @@
     <property name="borderless_maximize" type="bool" value="true"/>
     <property name="box_move" type="bool" value="false"/>
     <property name="box_resize" type="bool" value="false"/>
-    <property name="button_layout" type="string" value="O|HMC"/>
+    <property name="button_layout" type="string" value="OT|SHMC"/>
     <property name="button_offset" type="int" value="0"/>
     <property name="button_spacing" type="int" value="0"/>
     <property name="click_to_focus" type="bool" value="true"/>
@@ -36,7 +36,7 @@
     <property name="repeat_urgent_blink" type="bool" value="false"/>
     <property name="resize_opacity" type="int" value="100"/>
     <property name="restore_on_move" type="bool" value="true"/>
-    <property name="scroll_workspaces" type="bool" value="false"/>
+    <property name="scroll_workspaces" type="bool" value="true"/>
     <property name="shadow_delta_height" type="int" value="0"/>
     <property name="shadow_delta_width" type="int" value="0"/>
     <property name="shadow_delta_x" type="int" value="0"/>
@@ -48,9 +48,9 @@
     <property name="show_popup_shadow" type="bool" value="false"/>
     <property name="snap_resist" type="bool" value="false"/>
     <property name="snap_to_border" type="bool" value="true"/>
-    <property name="snap_to_windows" type="int" value="1"/>
+    <property name="snap_to_windows" type="int" value="0"/>
     <property name="snap_width" type="int" value="10"/>
-    <property name="theme" type="string" value="Zen48"/>
+    <property name="theme" type="string" value="Sassandra"/>
     <property name="title_alignment" type="string" value="center"/>
     <property name="title_font" type="string" value="Sans Bold 9"/>
     <property name="title_horizontal_offset" type="int" value="0"/>
@@ -63,8 +63,8 @@
     <property name="urgent_blink" type="bool" value="false"/>
     <property name="use_compositing" type="bool" value="false"/>
     <property name="workspace_count" type="int" value="4"/>
-    <property name="wrap_cycle" type="bool" value="false"/>
-    <property name="wrap_layout" type="bool" value="false"/>
+    <property name="wrap_cycle" type="bool" value="true"/>
+    <property name="wrap_layout" type="bool" value="true"/>
     <property name="wrap_resistance" type="int" value="10"/>
     <property name="wrap_windows" type="bool" value="true"/>
     <property name="wrap_workspaces" type="bool" value="false"/>

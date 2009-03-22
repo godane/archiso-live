@@ -1,0 +1,12 @@
+[Global]
+MoveFirst=false
+ArrowPosition=0
+
+[Entry 0]
+Name=Network Manager
+Comment=Configure wired and wireless networks
+Icon=preferences-system-network
+Exec=wicd-client -n
+Terminal=false
+StartupNotify=false
+

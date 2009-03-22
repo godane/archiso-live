@@ -1,0 +1,12 @@
+[Global]
+MoveFirst=false
+ArrowPosition=0
+
+[Entry 0]
+Name=Image Editor
+Comment=Create and edit images
+Icon=applications-graphics
+Exec=gimp
+Terminal=false
+StartupNotify=false
+
