@@ -71,6 +71,7 @@ archlinux-xdg-menu
 gtk-engines
 xdialog
 gtkdialog
+zenity
 gksu
 menumaker
 scrot
@@ -85,3 +86,4 @@ lxde
 obconf
 obmenu
 usbview
+vnc
