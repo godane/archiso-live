@@ -3,7 +3,9 @@ vlc
 screenlets
 abiword
 gnumeric
+homebank
 gimp
+thunderbird
 #kino
 avidemux
 #blender
@@ -11,9 +13,9 @@ gtkpod
 gnome-commander
 #inkscape
 brasero
+ogmrip
 elisa-base
 elisa-plugins
 libdvdcss
-mixxx
+#mixxx
 #lmms
-fasttrack

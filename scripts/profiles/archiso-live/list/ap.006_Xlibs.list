@@ -1,9 +1,9 @@
 pidgin
-shaman
 vlc
 screenlets
 abiword
 gnumeric
+homebank
 gimp
 kino
 avidemux
@@ -12,6 +12,7 @@ gtkpod
 gnome-commander
 #inkscape
 brasero
+ogmrip
 #kdelibs
 #kdebase-runtime
 #kdepimlibs

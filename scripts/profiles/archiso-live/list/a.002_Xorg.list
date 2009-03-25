@@ -60,6 +60,9 @@ alsa-oss
 shared-mime-info
 startup-notification
 hicolor-icon-theme
+tango-icon-theme
+tango-icon-theme-extras
+gnome-icon-theme
 desktop-file-utils
 slim
 archlinux-themes-slim
@@ -68,6 +71,7 @@ archlinux-xdg-menu
 gtk-engines
 xdialog
 gtkdialog
+zenity
 gksu
 menumaker
 scrot
@@ -82,3 +86,4 @@ lxde
 obconf
 obmenu
 usbview
+vnc

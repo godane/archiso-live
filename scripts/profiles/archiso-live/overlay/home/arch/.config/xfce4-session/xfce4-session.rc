@@ -2,3 +2,6 @@
 SessionName=Default
 SaveOnExit=true
 
+[Splash Screen]
+Engine=
+

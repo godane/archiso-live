@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# Extract files from any archive
+# Usage: ex <archive_name>
+# Thanks to rezza at Arch Linux, bodhi.zazen and mssever at ubuntuforums.org
+
+ex() {
+        if [ -f "$1" ] ; then
+                case "$1" in
+                        *.tar.bz2) tar xjvf "$1" ;;
+                        *.tar.gz) tar xzvf "$1" ;;
+                        *.bz2) bunzip2 "$1" ;;
+                        *.rar) rar x "$1" ;;
+                        *.gz) gunzip "$1" ;;
+                        *.tar) tar xvf "$1" ;;
+                        *.tbz2) tar xjvf "$1" ;;
+                        *.tgz) tar xzvf "$1" ;;
+                        *.zip) unzip "$1" ;;
+                        *.Z) uncompress "$1" ;;
+                        *.7z) 7z x "$1" ;;
+                        *) echo "'$1' cannot be extracted via $(basename "$0")" ;;
+                esac
+        else
+                echo "'$1' is not a valid file"
+        fi
+}
+
+for i in "$@"; do ex "$i"; done
