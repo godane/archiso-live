@@ -6,8 +6,8 @@
 # Modified: Flavio Olivera <http://www.goblinx.com.br>
 
 MODULE="$1"
-if [ "$(echo $MODULE | fgrep -i .sqfs)" = "" ]; then
-zenity --title="Error Message" --error --text "$(basename $MODULE): Module must end with .sqfs
+if [ "$(echo $MODULE | fgrep -i .lzm)" = "" ]; then
+zenity --title="Error Message" --error --text "$(basename $MODULE): Module must end with .lzm
 If you have .mo extension, convert it by using mo2lzm" 0 0
 exit 2
 fi

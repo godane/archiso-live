@@ -1,14 +1,14 @@
 #!/bin/bash
-# Convert directory tree into .sqfs compressed file
+# Convert directory tree into .lzm compressed file
 # Author: Flavio de Oliveira <http://www.goblinx.com.br>
 
 exec_(){
 if [ "$(whoami)" != 'root' ]; then
-gksu -c "mksquashfs "$1" $1.sqfs >/dev/null | chmod 0755 "$1.sqfs""
+gksu -c "mksquashfs "$1" $1.lzm >/dev/null | chmod 0755 "$1.lzm""
 else
 . /usr/lib/liblinuxlive
-create_module "$1" $1.sqfs -b 64K
-chmod 0755 $1.sqfs 
+create_module "$1" $1.lzm -b 128K
+chmod 0755 $1.lzm 
 fi
 }
 
@@ -18,6 +18,6 @@ exec_ $1
 }
 
 _progress $1 | zenity --title="Thunar/Nautilus Action" --progress --pulsate --auto-close --text "Wait... The script is building your module..."
-if [ $? -ne 0 ]; then $(killall mksquashfs); rm -rf "$1.sqfs"
+if [ $? -ne 0 ]; then $(killall mksquashfs); rm -rf "$1.lzm"
 
-zenity --info --title "Thunar/Nautilus Action" --text "The modules is saved to $1.sqfs"
+zenity --info --title "Thunar/Nautilus Action" --text "The modules is saved to $1.lzm"
