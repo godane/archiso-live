@@ -11,6 +11,9 @@ FORCE="n"
 IMG_TYPE="iso"
 DELDIR=""
 BOOT=""
+CDLABEL="Archiso-Live"
+PUBLISHER="http://godane.wordpress.com/"
+AUTHOR="Christopher Rogers aka Godane"
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
@@ -210,13 +213,15 @@ command_install () {
         
         pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
 
+	mkdir -p $(pwd)/log
+
         cat  "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
             info "Installing package $pkgname"
-            pacman -S -f --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname | tee current.log
+            pacman -S -f --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname | tee -a $(pwd)/log/${mod}-current.log
 
             if [ $? -ne 0 ]; then
                 warn "Package $pkgname not correctly installed"
-                cat current.log >> errors.log
+                cat $(pwd)/log/${mod}-current.log >> $(pwd)/log/${mod}-errors.log
             fi
         done
 	
@@ -452,11 +457,11 @@ command_img () {
         info "Creating ISO image..."
         qflag=""
         #[ "${QUIET}" = "y" ] && qflag="-q"
-        mkisofs ${qflag} -r -l $bootflags -uid 0 -gid 0 \
-			-input-charset utf-8 -p "prepared by mkarchiso" \
+        mkisofs ${qflag} -v -J -R -D -r -l $bootflags -uid 0 -gid 0 \
+	    -input-charset utf-8 -p "${AUTHOR}" \
             -no-emul-boot -boot-load-size 4 -boot-info-table \
-            -publisher "Arch Pwn <info@archpwn.org>" \
-            -A "Arch Pwn Live CD" \
+            -publisher "${PUBLISHER}" \
+            -A "${CDLABEL}" -V "${CDLABEL}" \
             -o "${imgname}" "${IMGROOT}"
        # This adds USB support
        isohybrid "${imgname}"
