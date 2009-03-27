@@ -8,6 +8,11 @@ makeiso()
 	mkarchiso -f all "${WORKDIR}" "${ISONAME}"
 }
 
+makesquashfs()
+{
+	mkarchiso -f squash "${WORKDIR}"
+}
+
 makeimg()
 {
 	mkarchiso -f imgprepare "${WORKDIR}"
@@ -29,4 +34,8 @@ fi
 
 if [ "${1}" = "clean" ]; then
 	clean
+fi
+
+if [ "${1}" = "squash" ]; then
+	makesquashfs
 fi

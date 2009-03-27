@@ -16,7 +16,6 @@
 		</properties>
 		<items>
 			<item name="showdesktop" id="1"/>
-			<item name="places" id="12350819500"/>
 			<item name="tasklist" id="3"/>
 			<item name="pager" id="2"/>
 			<item name="systray" id="4"/>
@@ -28,8 +27,8 @@
 			<property name="monitor" value="0"/>
 			<property name="screen-position" value="11"/>
 			<property name="fullwidth" value="0"/>
-			<property name="xoffset" value="365"/>
-			<property name="yoffset" value="1163"/>
+			<property name="xoffset" value="236"/>
+			<property name="yoffset" value="986"/>
 			<property name="handlestyle" value="0"/>
 			<property name="autohide" value="0"/>
 			<property name="transparency" value="20"/>
@@ -58,7 +57,7 @@
 			<item name="separator" id="12365573578"/>
 			<item name="actions" id="12"/>
 			<item name="separator" id="13"/>
-			<item name="datetime" id="12365569341"/>
+			<item name="clock" id="12381519530"/>
 		</items>
 	</panel>
 </panels>

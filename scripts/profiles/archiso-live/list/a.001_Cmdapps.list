@@ -42,6 +42,7 @@ cups
 nmap
 rdiff-backup
 lsof
+gmime
 #pentesting
 tcpdump
 tcpflow
