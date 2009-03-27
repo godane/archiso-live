@@ -18,20 +18,20 @@ libtool
 pkgconfig
 #live-tools
 syslinux
-aufs
-aufs-utils
+#aufs
+#aufs-utils
 #aufs-slax
-sqlzma
+-d sqlzma
 sqlzma-tools
 #squashfs-tools
-unionfs-utils
+#unionfs-utils
 #larch
 #larch-live
 hal
 dbus-python
 policykit
 fam
-virtualbox-modules
+#virtualbox-modules
 ndiswrapper
 madwifi
 rt2500
