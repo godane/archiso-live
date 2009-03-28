@@ -31,7 +31,7 @@ hal
 dbus-python
 policykit
 fam
-#virtualbox-modules
+virtualbox-modules
 ndiswrapper
 madwifi
 rt2500
