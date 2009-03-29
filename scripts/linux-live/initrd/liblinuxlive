@@ -351,7 +351,7 @@ device_filesystem()
    debug_log "device_filesystem" "$*"
    local NTFS
 
-   if [ -e /usr/bin/ntfsmount ]; then NTFS="ntfs-3g"; else NTFS="ntfs"; fi
+   if [ -e /bin/ntfsmount ]; then NTFS="ntfs-3g"; else NTFS="ntfs"; fi
    blkid -s TYPE "$1" -o value | sed "s/msdos/vfat/" | sed "s/ntfs/$NTFS/"
 }
 
@@ -406,16 +406,16 @@ mount_device()
    fi
 
    # not enough loop devices? try to create one.
-   #if [ $ERR -eq 2 ]; then
-   #    LOOPDEV=$(mknod_next_loop_dev)
-   #    OPTIONS=$(echo "$OPTIONS" | sed -r "s/,loop//g")
-   #    losetup "$LOOPDEV" "$DEV" 2>/dev/null # busybox's losetup doesn't support -r
-   #    if [ $? -ne 0 ]; then
-   #       losetup -r "$LOOPDEV" "$DEV" 2>/dev/null # force read-only in case of error
-   #    fi
-   #    mount -n -o $OPTIONS $FS "$LOOPDEV" "$2" >/dev/null 2>&1
-   #    ERR=$?
-   #fi
+   if [ $ERR -eq 2 ]; then
+       LOOPDEV=$(mknod_next_loop_dev)
+       OPTIONS=$(echo "$OPTIONS" | sed -r "s/,loop//g")
+       losetup "$LOOPDEV" "$DEV" 2>/dev/null # busybox's losetup doesn't support -r
+       if [ $? -ne 0 ]; then
+          losetup -r "$LOOPDEV" "$DEV" 2>/dev/null # force read-only in case of error
+       fi
+       mount -n -o $OPTIONS $FS "$LOOPDEV" "$2" >/dev/null 2>&1
+       ERR=$?
+   fi
 
    # if nothing works, try to force read-only mount
    if [ $ERR -ne 0 ]; then
@@ -863,7 +863,7 @@ modprobe_essential_modules()
    debug_log "modprobe_essential_modules" "$*"
 
    echolog "Loading filesystems modules ..."
-   modprobe_module loop max_loop=255
+   modprobe_module loop
    modprobe_module isofs
    modprobe_module squashfs
    modprobe_module aufs brs=1
@@ -871,7 +871,6 @@ modprobe_essential_modules()
    modprobe_module ext3
    modprobe_module reiserfs
    modprobe_module xfs
-   modprobe_module vfat
    modprobe_module vfat
    modprobe_module fuse # for ntfs-3g
    modprobe_module ntfs # for ro driver
