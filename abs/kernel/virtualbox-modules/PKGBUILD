@@ -6,40 +6,45 @@
 # Contributor: Ingmar Steen 
  
 pkgname=virtualbox-modules
-_kernver=2.6.28-ARCH
+_kernver=2.6.29-ARCH
 pkgver=2.1.4
-pkgrel=1
+pkgrel=3
 pkgdesc="Kernel modules for VirtualBox (vboxdrv)"
 arch=('i686')
 url="http://www.virtualbox.org"
 license=('GPL')
-depends=('kernel26>=2.6.28' 'kernel26<2.6.29')
-makedepends=('bin86' 'dev86' 'iasl' 'libstdc++5' 'qt3' 'sdl_ttf' 'libxt'
-             'libgl' 'alsa-lib' 'pulseaudio' 'gcc34' 'libxcursor' 'libidl2' 'libxslt'
-             'xalan-c' 'pth' 'libxml2' 'libidl2' 'libpng')
+depends=('kernel26>=2.6.29' 'kernel26<2.6.30')
+#makedepends=('bin86' 'dev86' 'iasl' 'libstdc++5' 'qt3' 'sdl_ttf' 'libxt'
+#             'libgl' 'alsa-lib' 'pulseaudio' 'gcc34' 'libxcursor' 'libidl2' 'libxslt'
+#             'xalan-c' 'pth' 'libxml2' 'libidl2' 'libpng')
 install=virtualbox-modules.install
-source=(http://download.virtualbox.org/virtualbox/$pkgver/VirtualBox-$pkgver-OSE.tar.bz2)
+#source=(http://download.virtualbox.org/virtualbox/$pkgver/VirtualBox-$pkgver-3-OSE.tar.bz2)
+source=($pkgname.tar.gz)
 build() {
-  cd "$srcdir/VirtualBox-2.1.4_OSE"
-  . /etc/profile.d/qt3.sh
-  export PATH=$QTDIR/bin:$PATH
-  export QMAKESPEC=$QTDIR/mkspecs/linux-g++
+  #cd "$srcdir/VirtualBox-2.1.4_OSE"
+  #. /etc/profile.d/qt3.sh
+  #export PATH=$QTDIR/bin:$PATH
+  #export QMAKESPEC=$QTDIR/mkspecs/linux-g++
 
-  sed -i 's/python2.5/python2.6/g' configure
-  ./configure --with-qt-dir=/opt/qt \
-    --with-gcc=/usr/bin/gcc-3.4 \
-    --with-g++=/usr/bin/g++-3.4 \
-    --disable-hardening
+  #sed -i 's/python2.5/python2.6/g' configure
+  #./configure --with-qt4-dir=/usr --build-headless \
+  #  --with-gcc=/usr/bin/gcc-3.4 \
+  #  --with-g++=/usr/bin/g++-3.4 \
+  #  --disable-hardening \
+  #  --disable-pulse
 
-  sed -i 's/-DVBOX_WITH_HARDENING//' src/VBox/HostDrivers/Support/linux/Makefile
-
-  source ./env.sh
-  kmk all || return 1
+  #sed -i 's/-DVBOX_WITH_HARDENING//' src/VBox/HostDrivers/Support/linux/Makefile
   
-  cd out/linux.x86/release/bin/src
+  #source ./env.sh
+  #kmk all || return 1
+  
+  #cd out/linux.x86/release/bin/src
+  #sed -i 's|# VBOX_USE_INSERT_PAGE = 1|VBOX_USE_INSERT_PAGE = 1|g' vboxdrv/Makefile
+  cd $pkgname
   make || return 1
   install -D -m644 vboxdrv.ko "$pkgdir/lib/modules/${_kernver}/misc/vboxdrv.ko"
+  install -D -m644 vboxnetflt.ko "$pkgdir/lib/modules/${_kernver}/misc/vboxnetflt.ko"
   sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" "$startdir/virtualbox-modules.install"
 }
-md5sums=('272978b266007dda1942ea56b69daf31')
+md5sums=('ef3cc76872cc6bd36c125bc77a215a42')
 

@@ -41,7 +41,7 @@ _mnt_squashfs()
 mount_tmpfs () 
 {
     #if [ "x${ramdisk_size}" = "x" ]; then
-        ramdisk_size="2M"
+        ramdisk_size="15M"
     #fi
     info -n "Mounting tmpfs, size=${ramdisk_size}... "
     mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
@@ -163,7 +163,7 @@ run_hook ()
     fi
 		
     ROOT=/real_root
-
+    cp -Rf /lib/modules/* /real_root/lib/modules/
     /bin/mkdir -p $ROOT/dev 2>&1 >/dev/null
     #/bin/mknod $ROOT/dev/console c 5 1 2>&1 >/dev/null
     #/bin/mknod $ROOT/dev/null c 1 3 2>&1 >/dev/null

@@ -213,6 +213,10 @@ command_install () {
         
         pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
 
+	if [ -e $(pwd)/log ]; then
+		rm -R $(pwd)/log
+	fi
+
 	mkdir -p $(pwd)/log
 
         cat  "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
