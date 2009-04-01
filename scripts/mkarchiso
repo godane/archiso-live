@@ -196,9 +196,9 @@ command_install () {
 
     if [ -e $(pwd)/log ]; then
 	rm -R $(pwd)/log
-    else
-    	mkdir -p $(pwd)/log
     fi
+
+    mkdir -p $(pwd)/log
 
     for mod in ${MODULES}; do
         mkdir -p "${moduledir}/${mod}"
