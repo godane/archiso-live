@@ -48,6 +48,7 @@ libgphoto2
 libbeagle
 streamripper
 liblrdf
+libtar
 perl-html-tagset
 perl-html-parser
 perl-libwww
