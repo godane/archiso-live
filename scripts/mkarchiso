@@ -194,6 +194,12 @@ command_install () {
         exit 1
     fi
 
+    if [ -e $(pwd)/log ]; then
+	rm -R $(pwd)/log
+    else
+    	mkdir -p $(pwd)/log
+    fi
+
     for mod in ${MODULES}; do
         mkdir -p "${moduledir}/${mod}"
         mount -o remount,add:0:${moduledir}/${mod}=rw aufs ${union}
@@ -212,12 +218,6 @@ command_install () {
         mknod ${union}/dev/zero c 1 5 >/dev/null
         
         pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
-
-	if [ -e $(pwd)/log ]; then
-		rm -R $(pwd)/log
-	fi
-
-	mkdir -p $(pwd)/log
 
         cat  "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
             info "Installing package $pkgname"
