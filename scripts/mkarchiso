@@ -251,10 +251,12 @@ command_install () {
         #info "Creating default home directory"
         #install -d -o1001 -g100 -m0755 "${union}/home/arch"
 	
-        #if [ -d "${OVERLAY}/home/arch" ]; then
-        #    chown -R arch:users "${OVERLAY}/home/arch"
-        #    chmod -R 755 "${OVERLAY}/home/arch"
-        #fi
+        if [ -d "${OVERLAY}/home/arch" ]; then
+            chown -R arch:users "${OVERLAY}/home/arch"
+            chmod -R 700 "${OVERLAY}/home/arch"
+        fi
+	chown -R root:root "${OVERLAY}/root"
+	chmod -R 700 "${OVERLAY}/root"
 
         # Cleanup
         info "Cleaning up image root files..."
