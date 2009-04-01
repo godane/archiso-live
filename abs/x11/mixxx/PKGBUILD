@@ -1,0 +1,21 @@
+# Contributor: Ryan Coyner <rcoyner@gmail.com>
+# Contributor: Stefan Husmann <stefan-husmann@t-online.de>
+
+pkgname=mixxx
+pkgver="1.6.1"
+pkgrel=2
+pkgdesc="Digital DJ mixing software"
+arch=('i686' 'x86_64')
+url="http://www.mixxx.org/"
+license=('GPL2')
+depends=('perl' 'libid3tag' 'libmad' 'libvorbis' 'portaudio' 'qt>=4.3.0')
+makedepends=('scons>=0.98' 'pkgconfig>=0.15.0')
+#optdepends=('ffmpeg' 'libdjconsole')
+source=(http://downloads.mixxx.org/$pkgname-$pkgver/$pkgname-$pkgver-src.tar.gz)
+md5sums=('1a68bdd02cdb0da729fee5778b34658a')
+
+build() {
+   cd "$srcdir/$pkgname-$pkgver"
+   scons qtdir=/usr/lib/qt prefix=/usr install_root=$pkgdir/usr || return 1
+   scons qtdir=/usr/lib/qt prefix=/usr install_root=$pkgdir/usr install || return 1
+}
