@@ -46,6 +46,8 @@ xalan-c
 liboil
 gstreamer0.10-base
 libisoburn
+gnome-python
+python-notify
 #xfce
 #xfce4
 #kdemod-arts

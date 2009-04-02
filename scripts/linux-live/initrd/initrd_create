@@ -137,7 +137,8 @@ ln -sf bin $INITRD_TREE/sbin
 
 # necessary modules and dependency files
 mkdir -p $INITRD_TREE/$LMK/kernel/fs
-rcopy $ROOT/$LMK/kernel/fs/aufs $INITRD_TREE
+#rcopy $ROOT/$LMK/kernel/fs/aufs $INITRD_TREE
+rcopy $ROOT/$LMK/fs/aufs25 $INITRD_TREE
 rcopy $ROOT/$LMK/kernel/fs/squashfs $INITRD_TREE
 
 # copy filesystem modules, if not directly copied into kernel

@@ -18,6 +18,6 @@ elisa-base
 elisa-plugins
 libdvdcss
 mixxx
-lmms
+#lmms
 lash
 hydrogen-svn
