@@ -30,10 +30,9 @@ elif [ ! "`cmdline_parameter noxconf`" ]; then
 fi
 
 # lang: Override default language
-lang="`cmdline_value locale`"
-if [ "$locale" ]; then
-    #echo "$lang ISO-8859-1" >> /etc/locale.gen
-    echo "$locale UTF-8" > /etc/locale.gen
+lang="`cmdline_value lang`"
+if [ "$lang" ]; then
+    echo "$lang ISO-8859-1" > /etc/locale.gen
     echo "$lang UTF-8" >> /etc/locale.gen
     locale-gen
 	[[ "`locale -a | grep -w $lang`" ]] && \
