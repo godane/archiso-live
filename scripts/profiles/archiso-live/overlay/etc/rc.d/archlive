@@ -67,5 +67,10 @@ fi
 chmod 0440 /etc/sudoers
 update-desktop-database -q
 
-chown arch:users -R /home/arch
-chown root:root -R /root
+#chown arch:users -R /home/arch
+#chown root:root -R /root
+
+acerone=$(cmdline_parameter acerone)
+if [ "$(acerone)" ]; then
+	/etc/rc.d/acerone
+fi
