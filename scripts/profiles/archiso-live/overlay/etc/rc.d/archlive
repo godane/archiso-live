@@ -27,6 +27,8 @@ if [ "`cmdline_parameter nonfree`" ]; then
     /etc/rc.d/xakra-nonfree start
 elif [ ! "`cmdline_parameter noxconf`" ]; then
     /etc/rc.d/xakra start
+elif [ -e "/etc/X11/xorg.conf" ]; then
+	echo "No auto config needed."
 fi
 
 # lang: Override default language
@@ -71,6 +73,6 @@ update-desktop-database -q
 #chown root:root -R /root
 
 acerone=$(cmdline_parameter acerone)
-if [ "$(acerone)" ]; then
+if [ "$acerone" ]; then
 	/etc/rc.d/acerone
 fi
