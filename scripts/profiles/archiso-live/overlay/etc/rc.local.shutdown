@@ -10,7 +10,7 @@
 
 . /usr/lib/liblinuxlive
 
-	if [ "$(cmdline_parameter nonfree) ]; then
+	if [ "$(cmdline_parameter nonfree)" ]; then
 		if [ "$(cmdline_value changes)" != "" ]; then
 			if [ "$(pacman -Qs catalyst)" ]; then
 				pacman -Rdf catalyst-utils

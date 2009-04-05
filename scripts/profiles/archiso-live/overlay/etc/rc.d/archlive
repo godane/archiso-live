@@ -24,6 +24,7 @@ if [ "`cmdline_parameter ldconfig`" ]; then
 fi
 
 if [ "`cmdline_parameter nonfree`" ]; then
+    /etc/rc.d/xakra start
     /etc/rc.d/xakra-nonfree start
 elif [ ! "`cmdline_parameter noxconf`" ]; then
     /etc/rc.d/xakra start
