@@ -1,0 +1,17 @@
+# Contributor: fancris3 <fancris3 at gmail.com>
+# Maintainer: Biru Ionut <biru.ionut at gmail.com>
+
+pkgname=httpripper
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="a tool to rip content out of the web"
+arch=(i686 x86_64)
+url="http://29a.ch/httpripper/"
+license=('GPL')
+depends=('pygtk')
+source=(http://29a.ch/httpripper/$pkgname-$pkgver.tar.gz)
+md5sums=('b355be07b538160b5bfed80b496dbca5')
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  python setup.py install --root=$pkgdir
+}
