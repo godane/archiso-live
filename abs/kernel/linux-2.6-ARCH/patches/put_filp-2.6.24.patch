@@ -1,0 +1,16 @@
+Index: fs/file_table.c
+===================================================================
+RCS file: /ext1/sysadm/transparent/repository/linux-2.6.23-rc6/fs/file_table.c,v
+retrieving revision 1.1
+retrieving revision 1.2
+diff -u -p -r1.1 -r1.2
+--- fs/file_table.c	12 Sep 2007 16:24:04 -0000	1.1
++++ fs/file_table.c	12 Sep 2007 16:24:38 -0000	1.2
+@@ -243,6 +243,7 @@ void put_filp(struct file *file)
+ 		file_free(file);
+ 	}
+ }
++EXPORT_SYMBOL(put_filp);
+ 
+ void file_move(struct file *file, struct list_head *list)
+ {

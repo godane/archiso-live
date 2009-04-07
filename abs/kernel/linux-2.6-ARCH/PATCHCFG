@@ -1,0 +1,70 @@
+# Kernel source file
+SRC="ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.28.tar.bz2"
+# Original source directory
+SRCORIG="linux-2.6.28"
+# Our source directory
+SRCNAME="linux-2.6.28.8-ARCH"
+# Patches:
+#   URL%patchlevel
+#  or
+#   filename%patchlevel (file must be in patches/ subdirectory)
+PATCHES=(
+         # add upstream patch from 2.6.27 series
+         ftp://ftp.kernel.org/pub/linux/kernel/v2.6/patch-2.6.28.8.bz2%1
+
+         # add latest fixes from stable queue, if needed
+         # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
+
+         # fix http://bugs.archlinux.org/task/12821
+         drm-915.patch%1
+
+         # fix http://bugs.archlinux.org/taks/13212
+         elgatedvb.patch%2
+
+         # add custom acpi dsdt patch, in reference to:
+         # http://gaugusch.at/kernel.shtml
+         # http://acpi.sourceforge.net
+         # fixed for 2.6.28 usage
+         acpi-dsdt-initrd-v0.9c-2.6.26.patch%1
+         
+        # fix http://bugs.archlinux.org/task/12180
+         quirks-h12y.patch%1
+
+         # add sqashfs support, in reference to:
+         # http://squashfs.sourceforge.net/
+         # diff extracted from: http://heanet.dl.sourceforge.net/sourceforge/squashfs/squashfs3.4.tar.gz
+         squashfs3.4-patch%1
+
+         # add unionfs support. in reference to:
+         # http://www.fsl.cs.sunysb.edu/project-unionfs.html
+         http://download.filesystems.org/unionfs/unionfs-2.x/unionfs-2.5_for_2.6.27-rc6.diff.gz%1
+
+         # add sec_perm-2.6.24.patch for aufs, in reference to:
+         # http://aufs.sourceforge.net/
+         sec_perm-2.6.24.patch%1
+         put_filp-2.6.24.patch%0
+         lhash-2.6.24.patch%1
+        )
+# Name of the resulting patch (will be bzipped afterwards)
+PATCHNAME="patch-2.6.28.8-1-ARCH"
+
+# Run this before applying patches
+pre_apply() {
+  :
+}
+
+# Run this after applying patches
+post_apply() {
+  # remove the extraversion from Makefile
+  # this ensures our kernel version is always 2.6.XX-ARCH
+  # this way, minor kernel updates will not break external modules
+  sed -i 's|^EXTRAVERSION = .*$|EXTRAVERSION = |g' Makefile
+
+  # Add Arch logo!
+  cp ${startdir}/patches/logo_linux_clut224.ppm drivers/video/logo/
+  cp ${startdir}/patches/logo_linux_mono.pbm drivers/video/logo/
+  cp ${startdir}/patches/logo_linux_vga16.ppm drivers/video/logo/
+
+  # Kill some files
+  find . -name '*~' -exec rm -f {} \; 2>/dev/null
+}
