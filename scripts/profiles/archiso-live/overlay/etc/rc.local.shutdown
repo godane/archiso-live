@@ -19,7 +19,7 @@
 				pacman -Rdf nvidia-utils
 				pacman -Rdf nvidia
 			else
-				echo "Not uninstalling any nonfree drivers.
+				echo "Not uninstalling any nonfree drivers."
 			fi
 		fi
 	fi
