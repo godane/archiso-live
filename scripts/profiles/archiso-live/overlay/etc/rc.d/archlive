@@ -24,16 +24,24 @@ if [ "`cmdline_parameter ldconfig`" ]; then
 fi
 
 if [ "`cmdline_parameter nonfree`" ]; then
-    /etc/rc.d/xakra-nonfree start
+	if [ -e "/etc/X11/xorg.conf" ]; then
+    		/etc/rc.d/xakra-nonfree start
+	else
+		/etc/rc.d/xakra start
+    		/etc/rc.d/xakra-nonfree start
+	fi
 elif [ ! "`cmdline_parameter noxconf`" ]; then
-    /etc/rc.d/xakra start
+	if [ -e "/etc/rc.d/xorg.conf" ]; then
+		echo "no auto config needed"
+	else
+		/etc/rc.d/xakra start
+	fi
 fi
 
 # lang: Override default language
-lang="`cmdline_value locale`"
-if [ "$locale" ]; then
-    #echo "$lang ISO-8859-1" >> /etc/locale.gen
-    echo "$locale UTF-8" > /etc/locale.gen
+lang="`cmdline_value lang`"
+if [ "$lang" ]; then
+    echo "$lang ISO-8859-1" > /etc/locale.gen
     echo "$lang UTF-8" >> /etc/locale.gen
     locale-gen
 	[[ "`locale -a | grep -w $lang`" ]] && \
@@ -68,5 +76,10 @@ fi
 chmod 0440 /etc/sudoers
 update-desktop-database -q
 
-chown arch:users -R /home/arch
-chown root:root -R /root
+#chown arch:users -R /home/arch
+#chown root:root -R /root
+
+acerone=$(cmdline_parameter acerone)
+if [ "$acerone" ]; then
+	/etc/rc.d/acerone
+fi

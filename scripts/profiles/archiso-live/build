@@ -1,22 +1,23 @@
 #!/bin/bash
 WORKDIR=.working
 DATE="$(date +%F)"
-ISONAME=archiso-live-${DATE}.iso
+CDNAME="archiso-live"
+ISONAME=$CDNAME-${DATE}.iso
 
 makeiso() 
 {
-	mkarchiso -f all "${WORKDIR}" "${ISONAME}"
+	mkarchiso -c $CDNAME -f all "${WORKDIR}" "${ISONAME}"
 }
 
 makesquashfs()
 {
-	mkarchiso -f squash "${WORKDIR}"
+	mkarchiso -c $CDNAME -f squash "${WORKDIR}"
 }
 
 makeimg()
 {
-	mkarchiso -f imgprepare "${WORKDIR}"
-	mkarchiso -f img "${WORKDIR}" "${ISONAME}"
+	mkarchiso -c $CDNAME -f imgprepare "${WORKDIR}"
+	mkarchiso -c $CDNAME -f img "${WORKDIR}" "${ISONAME}"
 }
 
 clean()

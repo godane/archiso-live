@@ -13,6 +13,7 @@ gnome-commander
 #inkscape
 brasero
 ogmrip
+elisa
 #kdelibs
 #kdebase-runtime
 #kdepimlibs
@@ -24,6 +25,7 @@ gstreamer0.10-bad-plugins
 gstreamer0.10-ugly-plugins
 gstreamer0.10-python
 gstreamer0.10-ffmpeg
+jasper
 python-pysqlite
 freetds
 python-clientform
