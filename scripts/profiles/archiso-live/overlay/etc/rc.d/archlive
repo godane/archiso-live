@@ -24,12 +24,18 @@ if [ "`cmdline_parameter ldconfig`" ]; then
 fi
 
 if [ "`cmdline_parameter nonfree`" ]; then
-    /etc/rc.d/xakra start
-    /etc/rc.d/xakra-nonfree start
+	if [ -e "/etc/X11/xorg.conf" ]; then
+    		/etc/rc.d/xakra-nonfree start
+	else
+		/etc/rc.d/xakra start
+    		/etc/rc.d/xakra-nonfree start
+	fi
 elif [ ! "`cmdline_parameter noxconf`" ]; then
-    /etc/rc.d/xakra start
-elif [ -e "/etc/X11/xorg.conf" ]; then
-	echo "No auto config needed."
+	if [ -e "/etc/rc.d/xorg.conf" ]; then
+		echo "no auto config needed"
+	else
+		/etc/rc.d/xakra start
+	fi
 fi
 
 # lang: Override default language
