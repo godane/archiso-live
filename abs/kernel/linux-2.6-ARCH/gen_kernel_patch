@@ -17,10 +17,10 @@ get_file() {
   file=$(basename ${1})
   OPWD=${PWD}
   if [ "${file}" != "${1}" ]; then
-    cd ${SRCDEST}
+    cd ${startdir}
     [ ! -f ${file} ] && wget -c ${1}
     cd ${startdir}/src
-    ln -s ${SRCDEST}/${file} .
+    ln -s ${startdir}/${file} .
   else
     cd ${startdir}/src
     ln -s ../patches/${file} .

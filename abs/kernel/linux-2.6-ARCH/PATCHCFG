@@ -3,20 +3,20 @@ SRC="ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-2.6.28.tar.bz2"
 # Original source directory
 SRCORIG="linux-2.6.28"
 # Our source directory
-SRCNAME="linux-2.6.28.8-ARCH"
+SRCNAME="linux-2.6.28.9-ARCH"
 # Patches:
 #   URL%patchlevel
 #  or
 #   filename%patchlevel (file must be in patches/ subdirectory)
 PATCHES=(
          # add upstream patch from 2.6.27 series
-         ftp://ftp.kernel.org/pub/linux/kernel/v2.6/patch-2.6.28.8.bz2%1
+         ftp://ftp.kernel.org/pub/linux/kernel/v2.6/patch-2.6.28.9.bz2%1
 
          # add latest fixes from stable queue, if needed
          # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
 
          # fix http://bugs.archlinux.org/task/12821
-         drm-915.patch%1
+         #drm-915.patch%1
 
          # fix http://bugs.archlinux.org/taks/13212
          elgatedvb.patch%2
@@ -37,7 +37,8 @@ PATCHES=(
 
          # add unionfs support. in reference to:
          # http://www.fsl.cs.sunysb.edu/project-unionfs.html
-         http://download.filesystems.org/unionfs/unionfs-2.x/unionfs-2.5_for_2.6.27-rc6.diff.gz%1
+         #http://download.filesystems.org/unionfs/unionfs-2.x/unionfs-2.5_for_2.6.27-rc6.diff.gz%1
+	 unionfs-2.5_for_2.6.27-rc6.diff%1
 
          # add sec_perm-2.6.24.patch for aufs, in reference to:
          # http://aufs.sourceforge.net/
