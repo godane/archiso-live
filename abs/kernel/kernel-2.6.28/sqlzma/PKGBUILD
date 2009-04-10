@@ -6,7 +6,7 @@ pkgname=sqlzma
 _realname=squashfs
 pkgver=3.4
 lzmaver=457
-pkgrel=5
+pkgrel=4
 url="http://www.squashfs-lzma.org"
 pkgdesc="A highly compressed read-only filesystem for Linux."
 depends=('kernel26>=2.6.28' 'kernel26<2.6.29' 'zlib')
