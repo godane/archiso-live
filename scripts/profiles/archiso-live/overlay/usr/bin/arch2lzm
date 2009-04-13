@@ -179,21 +179,14 @@ removelist()
 	mkdir -p $UNION
 	mkdir -p $CHANGES
 	
-	if [ "$(cmdline_parameter aufs)" ]; then
+	
 	modprobe aufs
     if [ $? -ne 0 ]; then
 	echo "Error loading Union filesystem module."
 	exit 1
     fi
 	mount -t aufs -o br:$CHANGES=rw:$IMAGES/$MODULE=rr aufs $UNION
-	else
-	modprobe unionfs
-	if [ $? -ne 0 ]; then
-	echo "Error loading Union filesystem module."
-	exit 1
-    fi
-    mount -t unionfs -o dirs=$CHANGES=rw:$IMAGES/$MODULE=ro none $UNION
-	fi
+
 	#sync
 	
 	cat $2 | grep -v "^#" | while read PKGNAME; do
@@ -236,21 +229,14 @@ addlist()
 	mkdir -p $UNION
 	mkdir -p $CHANGES
 	
-	if [ "$(cmdline_parameter aufs)" ]; then
+	
 	modprobe aufs
-    if [ $? -ne 0 ]; then
-	echo "Error loading Union filesystem module."
-	exit 1
-    fi
+    	if [ $? -ne 0 ]; then
+		echo "Error loading Union filesystem module."
+		exit 1
+    	fi
 	mount -t aufs -o br:$CHANGES=rw:$IMAGES/$MODULE=rr aufs $UNION
-	else
-	modprobe unionfs
-	if [ $? -ne 0 ]; then
-	echo "Error loading Union filesystem module."
-	exit 1
-    fi
-    mount -t unionfs -o dirs=$CHANGES=rw:$IMAGES/$MODULE=ro none $UNION
-	fi
+
 	#sync
 	
 	cat $2 | grep -v "^#" | while read PKGNAME; do
@@ -373,21 +359,13 @@ updateonly()
 	MODULE=$(basename "$1" .lzm).lzm
 	cp -aR /var/lib/pacman/local/* $DBPATH
 	
-    if [ "$(cmdline_parameter aufs)" ]; then
 	modprobe aufs
     if [ $? -ne 0 ]; then
 	echo "Error loading Union filesystem module."
 	exit 1
     fi
 	mount -t aufs -o br:$CHANGES=rw:$DB=rr aufs $UNION
-	else
-	modprobe unionfs
-	if [ $? -ne 0 ]; then
-	echo "Error loading Union filesystem module."
-	exit 1
-    fi
-    mount -t unionfs -o dirs=$CHANGES=rw:$DB=ro none $UNION
-	fi
+
 	#sync
 	pacman -Syu --noconfirm -d -r $UNION
 	
@@ -428,7 +406,8 @@ update()
 	fi
 	
 	if [ ! -d $IMAGES/$MODULE ]; then
-		echo "Module may not exist in union."
+		echo "Module does not exist in union."
+		exit 1
 	fi
 	mkdir -p $CHANGES
 	mkdir -p $UNION
