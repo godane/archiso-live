@@ -36,6 +36,8 @@ pymssql
 proftpd
 libstdc++5
 boost
+tre
+gc
 xine-lib
 rarian
 bluez-libs
