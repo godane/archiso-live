@@ -1,0 +1,20 @@
+# Contributor: Nick B <Shirakawasuna at gmail _dot_com>
+pkgname=crosswordpuzzle
+pkgver=1.0rc1
+pkgrel=1
+pkgdesc="A crossword puzzle game and editor."
+arch=('i686' 'x86_64')
+url="http://crosswordpuzzle.sourceforge.net"
+license=('GPL3')
+depends=('pygtk')
+source=(http://code.launchpad.net/crosswordpuzzle/1.0/1.0rc1/+download/$pkgname-$pkgver.tar.gz
+	crosswordpuzzle-script)
+md5sums=('3699b1c8fadd232536d81c462a0749c7'
+         '078dad0ad7c6bd4fd1ee89b758359eeb')
+build() {
+
+mkdir -p $pkgdir/usr/share/$pkgname
+cp -r $srcdir/$pkgname-$pkgver/* $pkgdir/usr/share/$pkgname
+install -D -m755 $srcdir/crosswordpuzzle-script $pkgdir/usr/bin/$pkgname
+install -D -m644 $srcdir/$pkgname-$pkgver/LICENSE $pkgdir/usr/share/licenses/$pkgname/license
+}
