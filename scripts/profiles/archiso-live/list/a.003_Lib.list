@@ -25,13 +25,22 @@ homebank
 mixxx
 lash
 hydrogen-svn
+rawstudio
 #libs
+tre
+gc
 libdvdcss
 bluez
 docbook-xml
 cpufrequtils
 exempi
+-d musicbrainz
 gstreamer0.10-good-plugins
+gstreamer0.10-base-plugins
+gstreamer0.10-bad-plugins
+gstreamer0.10-ugly-plugins
+gstreamer0.10-python
+gstreamer0.10-ffmpeg
 rarian
 libgphoto2
 libcanberra
@@ -52,6 +61,7 @@ openal
 physfs
 quesoglc
 gtkglext
+perl-locale-gettext
 #xfce
 #xfce4
 #kdemod-arts
