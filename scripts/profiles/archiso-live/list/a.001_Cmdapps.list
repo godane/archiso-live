@@ -43,6 +43,7 @@ p7zip
 cups
 nmap
 rdiff-backup
+rsnapshot
 lsof
 gmime
 #pentesting
