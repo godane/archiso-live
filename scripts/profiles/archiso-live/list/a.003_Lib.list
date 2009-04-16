@@ -26,6 +26,7 @@ mixxx
 lash
 hydrogen-svn
 rawstudio
+elisa
 #libs
 tre
 gc
@@ -73,8 +74,6 @@ libxfcegui4
 mousepad
 terminal
 thunar
-xfce-mcs-manager
-xfce-mcs-plugins
 xfce-utils
 xfce4-appfinder
 xfce4-icon-theme
