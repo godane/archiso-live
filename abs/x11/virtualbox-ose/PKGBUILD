@@ -5,7 +5,7 @@
 # Contributor: niQo
 pkgname=virtualbox-ose
 pkgver=2.2.0
-pkgrel=1
+pkgrel=3
 pkgdesc="Powerful x86 virtualization for enterprise as well as home use (Open Source Edition)"
 url="http://www.virtualbox.org"
 license=('GPL' 'custom')
@@ -26,6 +26,7 @@ build() {
   . /etc/profile.d/qt3.sh
   export PATH=$QTDIR/bin:$PATH
   export QMAKESPEC=$QTDIR/mkspecs/linux-g++
+  export MAKEFLAGS="-j1"
 
   sed -i 's/python2.5/python2.6/g' configure
   ./configure --with-qt4-dir=/usr \
