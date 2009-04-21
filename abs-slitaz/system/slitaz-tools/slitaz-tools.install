@@ -1,0 +1,21 @@
+pre_install()
+{
+	# Backup file to restore with post install
+	echo "Creating backups of configs..."
+	cp /etc/TZ /etc/TZ.bak 2>/dev/null
+	cp /etc/keymap.conf /etc/keymap.conf.bak 2>/dev/null
+	cp /etc/X11/screen.conf /etc/X11/screen.conf.bak 2>/dev/null
+	cp /etc/locale.conf /etc/locale.conf.bak 2>/dev/null
+	cp /etc/firewall.conf /etc/firewall.conf.bak 2>/dev/null
+}
+
+# Post install
+post_install()
+{
+	echo "Restoring configs backups..."
+	mv -f /etc/TZ.bak /etc/TZ 2>/dev/null
+	mv -f /etc/keymap.conf.bak /etc/keymap.conf 2>/dev/null
+	mv -f /etc/X11/screen.conf.bak /etc/X11/screen.conf 2>/dev/null
+	mv -f /etc/locale.conf.bak /etc/locale.conf 2>/dev/null
+	mv -f /etc/firewall.conf.bak /etc/firewall.conf 2>/dev/null
+}

@@ -1,0 +1,47 @@
+pkgname=slitaz-tools
+pkgver=2.12.1
+pkgrel=1
+pkgdesc="SliTaz tools provide installer and utils usable on termnial."
+arch=("i686" "x86_64")
+url="http://www.slitaz.org/"
+license=('GPL')
+depends=(slitaz-boot-scripts dialog)
+options=()
+replaces=()
+provides=()
+install=$pkgname.install
+source=(http://mirror.slitaz.org/sources/tools/$pkgname-$pkgver.tar.gz)
+md5sums=('abd1079bf260f98f8a22af6ddf38528c')
+
+build() {
+	mkdir -p $pkgdir/{sbin,usr/bin,usr/sbin,etc/X11,var/spool/cron/crontabs,usr/share/doc/slitaz-tools,usr/share/slitaz-tools/installer}
+	cp -a $srcdir/$pkgname-$pkgver/rootfs/* $pkgdir
+	
+	# Tinyutils
+	cp -a $srcdir/$pkgname-$pkgver/tinyutils/tazlocale $pkgdir/sbin
+	touch $pkgdir/etc/locale.conf
+	touch $pkgdir/etc/motd
+	cp -a $srcdir/$pkgname-$pkgver/tinyutils/tazkeymap $pkgdir/sbin
+	touch $pkgdir/etc/keymap.conf
+	touch $pkgdir/etc/TZ
+	cp -a $srcdir/$pkgname-$pkgver/tinyutils/gztazmod.sh $pkgdir/sbin
+	cp -a $srcdir/$pkgname-$pkgver/tinyutils/tazx $pkgdir/usr/bin
+	touch $pkgdir/etc/X11/screen.conf
+	cp -a $srcdir/$pkgname-$pkgver/tinyutils/startx $pkgdir/usr/bin
+	cp -a $srcdir/$pkgname-$pkgver/tinyutils/history $pkgdir/usr/bin
+	cp -a $srcdir/$pkgname-$pkgver/tinyutils/tazdialog $pkgdir/usr/bin
+	cp -a $srcdir/$pkgname-$pkgver/tinyutils/tazhw $pkgdir/sbin
+	# Sound config
+	cp -a $srcdir/$pkgname-$pkgver/tinyutils/soundconf $pkgdir/usr/sbin
+	cp -a $srcdir/$pkgname-$pkgver/tinyutils/setmixer $pkgdir/usr/sbin
+	
+	# Installer's
+	cp -a $srcdir/$pkgname-$pkgver/installer/slitaz-installer $pkgdir/usr/bin
+	cp -a $srcdir/$pkgname-$pkgver/installer/*.msg $pkgdir/usr/share/slitaz-tools/installer
+
+	# Tools doc in /usr/share/doc/slitaz-tools
+	cp $srcdir/$pkgname-$pkgver/doc/* $pkgdir/usr/share/doc/slitaz-tools
+	
+	chmod -R 755 $pkgdir/usr/bin
+	chmod -R 755 $pkgdir/sbin
+}
