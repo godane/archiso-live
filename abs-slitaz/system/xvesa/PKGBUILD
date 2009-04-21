@@ -1,0 +1,17 @@
+pkgname=xvesa
+pkgver=4.6.0
+pkgrel=1
+pkgdesc="Xvesa Tiny Xserver from XFree86."
+arch=("i686" "x86_64")
+url="http://www.xfree86.org/"
+license=('GPL')
+depends=("zlib")
+options=()
+source=(http://ftp.xfree86.org/pub/XFree86/$pkgver/binaries/Linux-ix86-glibc23/Xtinyx.tgz)
+md5sums=('e77545ee8e81759b4078be78fa9d0912')
+
+build() {
+  mkdir -p $pkgdir/usr/bin
+  cp $srcdir/bin/Xvesa $pkgdir/usr/bin
+  chmod 4711 $pkgdir/usr/bin/Xvesa
+}
