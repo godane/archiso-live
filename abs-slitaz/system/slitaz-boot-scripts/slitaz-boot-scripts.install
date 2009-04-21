@@ -1,0 +1,45 @@
+pre_install()
+{
+	# Backup file to restore with post install
+	echo "Creating backups of configs..."
+	cp /etc/rcS.conf /etc/rcS.conf.bak 2>/dev/null
+	cp /etc/network.conf /etc/network.conf.bak 2>/dev/null
+	cp /etc/inittab /etc/inittab.bak 2>/dev/null
+	cp /etc/init.d/local.sh /etc/init.d/local.sh.bak 2>/dev/null
+}
+
+post_install()
+{
+	echo "Restoring configs backups..."
+	mv -f /etc/rcS.conf.bak /etc/rcS.conf 2>/dev/null
+	mv -f /etc/network.conf.bak /etc/network.conf 2>/dev/null
+	mv -f /etc/inittab.bak /etc/inittab 2>/dev/null
+	mv -f /etc/init.d/local.sh.bak /etc/init.d/local.sh 2>/dev/null
+
+	# wifi config
+	if ! grep -q ^WIFI /etc/network.conf; then
+		cat >> /etc/network.conf << "EOT"
+# Wifi connection.
+# Enable/disable wireless connection at boot time.
+WIFI="no"
+
+# Wifi interface (iwconfig) and ESSID.
+WIFI_INTERFACE="wlan0"
+WIFI_ESSID="any"
+WIFI_MODE="managed"
+WIFI_KEY=""
+WIFI_KEY_TYPE="none"
+WPA_DRIVER=""
+WIFI_CHANNEL=""
+WIFI_IWCONFIG_ARGS=""
+
+EOT
+	fi
+	# From 2.3 default user have uid=1000 (standard), so change hacker
+	# id/group and chown.
+	if grep -q "500:500" /etc/passwd; then
+		sed -i s/'500:500'/'1000:1000'/ /etc/passwd
+		sed -i s/'500'/'1000'/ /etc/group
+		chown -R 1000.1000 /home/hacker
+	fi 
+}

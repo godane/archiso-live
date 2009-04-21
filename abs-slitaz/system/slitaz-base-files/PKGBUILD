@@ -1,0 +1,30 @@
+pkgname=slitaz-base-files
+pkgver=3.0
+pkgrel=1
+pkgdesc="Linux tree and the necessary files for the base system."
+arch=("i686" "x86_64")
+url="http://www.slitaz.org/"
+license=('GPL')
+depends=()
+options=()
+replaces=(filesystem)
+provides=(filesystem)
+install=$pkgname.install
+source=(http://mirror.slitaz.org/sources/base-files/$pkgname-$pkgver.tar.gz)
+md5sums=('ecb1e7d513c927ee663a96724b7ca002')
+
+build() {
+	cd $srcdir/$pkgname-$pkgver
+	mkdir -p $pkgdir/{bin,dev,home,mnt,proc,root,sbin,sys,tmp}
+	mkdir -p $pkgdir/media/{cdrom,flash,usbdisk}
+	mkdir -p $pkgdir/usr/{bin,games,lib,local,sbin,share/doc}
+	mkdir -p $pkgdir/var/{cache,games,lib,lock,log,spool,tmp}
+
+	cp -a $srcdir/$pkgname-$pkgver/rootfs/* $pkgdir
+	chown 1777 $pkgdir/tmp
+	chown 640 $pkgdir/etc/shadow
+	chown 640 $pkgdir/etc/gshadow
+	chown 0750 $pkgdir/root
+	
+	ln -s /proc/mounts $pkgdir/etc/mtab
+}

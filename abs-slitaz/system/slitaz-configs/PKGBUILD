@@ -1,0 +1,25 @@
+pkgname=slitaz-configs
+pkgver=2.7
+pkgrel=1
+pkgdesc="SliTaz config files, wallpaper and login sound."
+arch=("i686" "x86_64")
+url="http://www.slitaz.org/"
+license=('GPL')
+depends=(lxtask lxpanel lxappearance ttf-dejavu pcmanfm openbox obconf \
+	 slitaz-tools-boxes slitaz-menus)
+options=()
+replaces=()
+provides=()
+source=(http://mirror.slitaz.org/sources/configs/$pkgname-$pkgver.tar.gz gtkrc-2.0 Xdefaults)
+md5sums=('2d9e505a17c91fe2d34cdbe4bcf98d0a'
+         '1527f731a356109e608f69696750e1fc'
+         '604743a173d00e8bbe20249a3ce7720e')
+
+build() {
+	cp -a $srcdir/$pkgname-$pkgver/rootfs/* $pkgdir
+	mkdir -p $pkgdir/root
+	cp -af $srcdir/gtkrc-2.0 $pkgdir/root/.gtkrc-2.0
+	cp -af $srcdir/Xdefaults $pkgdir/root/.Xdefaults
+	chmod 0750 $pkgdir/root
+	
+}

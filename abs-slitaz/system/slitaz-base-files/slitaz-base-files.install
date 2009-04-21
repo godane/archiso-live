@@ -1,0 +1,35 @@
+
+
+pre_install()
+{
+	echo "Creating backup of all files in /etc..."
+	cp -a /etc /tmp/etc.bak 2>/dev/null
+}
+
+post_install()
+{
+	echo "Restoring files from /etc/etc.bak..."
+	cp -a /tmp/etc.bak/* /etc 2>/dev/null
+	rm -rf /tmp/etc.bak
+	chmod 640 /etc/shadow
+	chmod 640 /etc/gshadow
+
+	if ! grep -q audio /etc/group; then
+		addgroup -g 20 audio
+	fi
+
+	# daemons.conf (tftp + dnsd)
+	if ! grep -q ^TFTPD_OPTIONS /etc/daemons.conf; then
+		echo '# Tftp daemon options.' >> /etc/daemons.conf
+		echo 'TFTPD_OPTIONS="-r /boot"' >> /etc/daemons.conf
+		echo '' >> $root/etc/daemons.conf
+	fi
+	if ! grep -q ^DNSD_OPTIONS /etc/daemons.conf; then
+		echo '# Domain name server options.' >> /etc/daemons.conf
+		echo 'DNSD_OPTIONS="-d"' >> /etc/daemons.conf
+		echo '' >> /etc/daemons.conf
+	fi
+
+	# Populate /dev with /sbin/mktazdevs.sh.
+	exec /sbin/mktazdevs.sh /dev
+}
