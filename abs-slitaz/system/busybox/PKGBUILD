@@ -4,7 +4,7 @@
 
 pkgname=busybox
 pkgver=1.12.0
-pkgrel=1
+pkgrel=2
 pkgdesc="Utilities for rescue and embedded systems"
 arch=("i686" "x86_64")
 url="http://busybox.net"
@@ -51,6 +51,7 @@ EOT
   install -m755 busybox $pkgdir/bin/
 
   mkdir -p $pkgdir/etc/rc.d
+  ln -s /etc/rc.d $pkgdir/etc/init.d
   cp $srcdir/patches/busybox.conf $pkgdir/etc
   chmod 600 $pkgdir/etc/busybox.conf
   cp $srcdir/patches/dnsd.conf $pkgdir/etc
