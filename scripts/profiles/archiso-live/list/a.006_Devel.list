@@ -11,3 +11,4 @@ devtools
 aurtools
 pkgtools
 gdb
+distcc

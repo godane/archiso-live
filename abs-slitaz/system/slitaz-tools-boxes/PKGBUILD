@@ -1,0 +1,38 @@
+pkgname=slitaz-tools-boxes
+pkgver=2.12.1
+pkgrel=1
+pkgdesc="SliTaz tools provide installer and utils usable on termnial."
+arch=("i686" "x86_64")
+url="http://www.slitaz.org/"
+license=('GPL')
+depends=(slitaz-tools gtkdialog)
+options=()
+replaces=(gksu)
+provides=(gksu)
+_realname=slitaz-tools
+source=(http://mirror.slitaz.org/sources/tools/$_realname-$pkgver.tar.gz)
+md5sums=('abd1079bf260f98f8a22af6ddf38528c')
+
+build() {
+	mkdir -p $pkgdir/{etc/wireless,usr/bin,usr/sbin,usr/lib/slitaz,usr/share/slitaz-tools/glade}
+	
+	# Gtkdialog boxes
+	cp -a $srcdir/$_realname-$pkgver/tinyutils/bootfloppybox $pkgdir/usr/bin
+	cp -a $srcdir/$_realname-$pkgver/tinyutils/burnbox $pkgdir/usr/bin
+	cp -a $srcdir/$_realname-$pkgver/tinyutils/mountbox $pkgdir/usr/bin
+	cp -a $srcdir/$_realname-$pkgver/tinyutils/netbox $pkgdir/usr/bin
+	cp -a $srcdir/$_realname-$pkgver/tinyutils/wifibox $pkgdir/usr/bin
+	cp -a $srcdir/$_realname-$pkgver/tinyutils/scpbox $pkgdir/usr/bin
+	cp -a $srcdir/$_realname-$pkgver/tinyutils/subox $pkgdir/usr/bin
+	cp -a $srcdir/$_realname-$pkgver/tinyutils/desktopbox $pkgdir/usr/bin
+	cp -a $srcdir/$_realname-$pkgver/tinyutils/tazctrlbox $pkgdir/usr/sbin
+
+	# Libs and Glade XML files.
+	cp -a $srcdir/$_realname-$pkgver/lib/[a-z]* $pkgdir/usr/lib/slitaz
+	cp -a $srcdir/$_realname-$pkgver/glade/*.glade $pkgdir/usr/share/slitaz-tools/glade
+	
+	# Gksu fake for pcmanfm
+	ln -s subox $pkgdir/usr/bin/gksu
+
+	chmod -R 755 $pkgdir/usr/bin
+}

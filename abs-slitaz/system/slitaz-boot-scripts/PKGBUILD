@@ -1,0 +1,26 @@
+pkgname=slitaz-boot-scripts
+pkgver=2.8.2
+pkgrel=1
+pkgdesc="Provide all the initialisation scripts used at boot time."
+arch=("i686" "x86_64")
+url="http://www.slitaz.org/"
+license=('GPL')
+depends=()
+options=()
+replaces=()
+provides=()
+install=$pkgname.install
+source=(http://mirror.slitaz.org/sources/boot-scripts/$pkgname-$pkgver.tar.gz)
+md5sums=('ec5fc56517c4d4d65512987e767e9ced')
+
+build() {
+	mkdir -p $pkgdir/usr/share $pkgdir/etc/X11
+	cp -a $srcdir/$pkgname-$pkgver/etc $pkgdir
+	cp -a $srcdir/$pkgname-$pkgver/applications $pkgdir/usr/share
+
+	# Perms
+	mv $pkgdir/etc/init.d $pkgdir/etc/rc.d
+	chown -R root.root $pkgdir/etc/rc.d
+	chmod 755 $pkgdir/etc/rc.d/*.sh
+	chmod 755 $pkgdir/etc/rc.d/rc*
+}

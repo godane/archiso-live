@@ -1,0 +1,13 @@
+# ~/.gtkrc-2.0 - GTK+ theme, icon and font configuration.
+#
+# System files   : /usr/share/{themes,icons,fonts}
+# Personal files : ~/.icons and ~/.fonts
+#
+
+gtk-theme-name = "Clearlooks-DeepSky"
+#gtk-theme-name = "Clearlooks-Quicksilver"
+#gtk-theme-name = "Clearlooks-Olive"
+
+gtk-icon-theme-name = "Tango"
+
+gtk-font-name = "DejaVu Sans 11"

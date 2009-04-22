@@ -1,5 +1,6 @@
 #apps
 firefox
+flashplugin
 thunderbird
 pidgin
 abiword
@@ -27,6 +28,7 @@ lash
 hydrogen-svn
 rawstudio
 elisa
+blender
 #other-apps
 asunder
 mtpaint
@@ -48,3 +50,4 @@ streamtuner
 leafpad
 xarchiver
 gcalctool
+lmms

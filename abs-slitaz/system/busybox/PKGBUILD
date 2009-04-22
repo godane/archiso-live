@@ -1,0 +1,75 @@
+# $Id: PKGBUILD,v 1.6 2009/04/16 09:06:32 sergej Exp $
+# Maintainer: Sergej Pupykin <pupykin.s+arch@gmail.com>
+# Contributor: Jens Pranaitis <jens@jenux.homelinux.org>
+
+pkgname=busybox
+pkgver=1.12.0
+pkgrel=2
+pkgdesc="Utilities for rescue and embedded systems"
+arch=("i686" "x86_64")
+url="http://busybox.net"
+license=('GPL')
+makedepends=("make" "gcc" "sed" "ncurses")
+replaces=("tar" "sed" "cpio" "coreutils" "syslogd" "time" "patch" "wget" "diffutils" "unzip" "findutils" "eject" "dcron" "vi" "gzip")
+provides=("tar" "sed" "cpio" "coreutils" "syslogd" "time" "patch" "wget" "diffutils" "unzip" "findutils" "eject" "dcron" "vi" "gzip")
+options=()
+source=($url/downloads/$pkgname-$pkgver.tar.bz2 \
+	patches.tar.bz2)
+md5sums=('427a4802f27f04484e0833307f0a7844'
+         'd22e66fa054e81a6b179d60de5b56acb')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+  #ln -s $srcdir/$pkgname-$pkgver $srcdir/patches/$pkgname-$pkgver
+  while read file; do
+	[ -f done.$file ] && continue
+	echo "Apply $file..."
+	patch -p1 < $srcdir/patches/$pkgname-$pkgver-$file || return 1
+	touch done.$file
+  done <<EOT
+vcsa2txt.u
+dhcpc.u
+cpio-mkdir.u
+tar.u
+stat.u
+zmodules.u
+modinfo.u
+modprobe.u
+paths.u
+mkswap.u
+install.u
+basename.u
+EOT
+  cp $srcdir/patches/$pkgname-$pkgver.config $srcdir/$pkgname-$pkgver/.config
+
+  # if you want to run menuconfig uncomment the following line:
+  # make menuconfig
+  make || return 1
+  make install
+  cp -r $srcdir/$pkgname-$pkgver/_install/* $pkgdir/
+  #mkdir $pkgdir/bin
+  install -m755 busybox $pkgdir/bin/
+
+  mkdir -p $pkgdir/etc/rc.d
+  ln -s /etc/rc.d $pkgdir/etc/init.d
+  cp $srcdir/patches/busybox.conf $pkgdir/etc
+  chmod 600 $pkgdir/etc/busybox.conf
+  cp $srcdir/patches/dnsd.conf $pkgdir/etc
+  cp $srcdir/patches/udhcpd.conf $pkgdir/etc
+  touch $pkgdir/etc/resolv.conf
+  cp $srcdir/patches/inetd.conf $pkgdir/etc
+  cp $srcdir/patches/dnsd $pkgdir/etc/rc.d
+  cp $srcdir/patches/udhcpd $pkgdir/etc/rc.d
+  cp $srcdir/patches/inetd $pkgdir/etc/rc.d
+  cp $srcdir/patches/zcip $pkgdir/etc/rc.d
+  #cp $srcdir/patches/init $pkgdir
+  rm $pkgdir/linuxrc
+  mkdir -p $pkgdir/etc/modprobe.d
+  # Udhcpc stuff.
+  mkdir -p $pkgdir/usr/share/udhcpc
+  cp $srcdir/patches/udhcp.script $pkgdir/usr/share/udhcpc/default.script
+  chmod +x $pkgdir/usr/share/udhcpc/default.script
+  # ZeroConf stuff.
+  cp $srcdir/patches/zcip.script $pkgdir/etc
+  cp -r $srcdir/patches/applications $pkgdir/usr/share
+}
