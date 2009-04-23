@@ -1,0 +1,36 @@
+# Contributor: Jose Negron <josenj.arch@mailnull.net>
+# This PKGBUILD file and patches was taken from the 'extra' repo
+# using abs and changed to compile the GTK version as well.
+# Many thanks to the following people:
+# Maintainer: Varun Acharya <varun@archlinux.org>
+# Contributor: Sebastien Piccand <sebcactus gmail com>
+
+pkgname=handbrakegtk
+pkgver=0.9.3
+pkgrel=2
+pkgdesc="HandBrake is a multiplatform, multithreaded DVD to MPEG-4 ripper/converter (GTK GUI)"
+arch=('i686' 'x86_64')
+url="http://handbrake.m0k.org/"
+license=('GPL')
+depends=('gtkhtml')
+makedepends=('ftjam' 'wget' 'patch' 'yasm' 'intltool')
+source=("HandBrake-${pkgver}.tar.gz::http://handbrake.fr/rotation.php?file=HandBrake-${pkgver}.tar.gz")
+md5sums=('ee79c94b5acd68f28351ba2704b4d55d')
+
+build() {
+  cd $startdir/src/HandBrake-${pkgver}
+
+  #Build with optimizations:
+  if [ "$CARCH" = "x86_64" ]; then
+  	OPTIM="-march=x86-64" ./configure
+  else  OPTIM="-march=i686" ./configure
+  fi
+  jam || return 1
+  cd gtk
+  ./autogen.sh || return 1
+  make || return 1
+  cd src
+  install -D -m644 ghb.desktop ${pkgdir}/usr/share/applications/ghb.desktop || return 1
+  install -D -m755 ghb $startdir/pkg/usr/bin/ghb || return 1
+  ln -s /usr/bin/ghb ${startdir}/pkg/usr/bin/HandBrakeGTK || return 1
+}

@@ -1,0 +1,24 @@
+# Contributor: Yvan <madridista40@orange.fr>
+
+pkgname=gens-gs
+pkgver=2.15.5_gs_m6
+_pkgver=2.15.5-gs-m6
+pkgrel=1
+pkgdesc="An emulator for Sega Genesis, Sega CD and 32X. This version features a cleaned up souce code and combine features from various forks of Gens."
+url="http://info.sonicretro.org/Gens/GS"
+license=('GPL')
+arch=('i686')
+depends=('gtk2>=2.4.0' 'sdl>=1.1.3')
+makedepends=('nasm')
+conflicts=('gens-cvs' 'gens-opengl' 'gens-mythgame-opengl' 'gens-patched' 'bin32-gens' 'bin32-gens-patched' 'gens')
+source=(http://info.sonicretro.org/images/9/92/Gens-${_pkgver}.tar.gz)
+md5sums=('3f56ef964da5b853d88e23eac30b9995')
+
+build() {
+  cd ${startdir}/src/gens-${_pkgver}
+  ./configure --prefix=/usr || return 1
+  make || return 1
+  make DESTDIR=${startdir}/pkg install
+}
+
+
