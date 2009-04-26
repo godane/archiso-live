@@ -1,0 +1,32 @@
+# Contributer: N30N <archlinux@alunamation.com>
+
+pkgname=alchemy
+pkgver=007
+pkgrel=1
+pkgdesc="Sketch, draw, and create on computers in new ways"
+url="http://al.chemy.org/"
+license=("GPL")
+arch=("i686" "x86_64")
+depends=("java-runtime")
+makedepends=()
+source=(${url}download/Alchemy-${pkgver}.tar.gz \
+	"alchemy.png" \
+	"alchemy.desktop")
+md5sums=('8adc07774c79ed81301b7d5a896d37c1'
+         '9bcfe1285e5e02fcc3ff125e44eee6a9'
+         '88e4f7ac40176920b0770bb32c8061fb')
+
+build() {
+	cd ${srcdir}
+	install -D -m644 alchemy.png ${pkgdir}/usr/share/pixmaps/alchemy
+	install -D -m644 alchemy.desktop ${pkgdir}/usr/share/applications/alchemy.desktop
+
+	cd Alchemy
+	sed "s|^cd.*|cd /opt/alchemy|" -i Alchemy
+	install -D -m755 Alchemy ${pkgdir}/usr/bin/alchemy
+	install -D -m644 Alchemy.pdf ${pkgdir}/opt/alchemy/Alchemy.pdf
+	install -D -m644 Alchemy.jar ${pkgdir}/opt/alchemy/Alchemy.jar
+	# Till someone makes a v4ljmyron package
+	cp -r ${srcdir}/Alchemy/lib ${pkgdir}/opt/alchemy/
+	cp -r modules ${pkgdir}/opt/alchemy/
+}

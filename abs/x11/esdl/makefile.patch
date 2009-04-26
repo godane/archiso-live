@@ -1,0 +1,22 @@
+--- Makefile	2006-06-26 15:26:48.000000000 +0200
++++ Makefile.modified	2009-03-29 17:28:51.000000000 +0200
+@@ -41,16 +41,16 @@
+ release: target relsrc relwin
+ 
+ ## Install needs to find the erlang directory
+-ERL_DIR := $(shell echo 'io:format("~s~n",[code:root_dir()]),halt().' | erl | sed 's,^[0-9]*> *,,g' | tail +2)
++ERL_DIR := $(shell echo 'io:format("~s~n",[code:root_dir()]),halt().' | erl | sed 's,^[0-9]*> *,,g' | tail -n 1)
+ 
+-INSTALLDIR = $(ERL_DIR)/lib/$(ESDL_VSN)
++INSTALLDIR = $(DESTDIR)/$(ERL_DIR)/lib/$(ESDL_VSN)
+ 
+ ## I assume that make install are only made on unixes... :-)
+ install: 
+ 	@echo Found erlang at $(ERL_DIR)
+ 	@echo Installing $(ESDL_VSN) in $(INSTALLDIR)
+ 	@if test ! -d $(INSTALLDIR) ; then \
+-		mkdir $(INSTALLDIR) ; \
++		mkdir -p $(INSTALLDIR) ; \
+ 	else \
+ 		rm -rf $(INSTALLDIR)/* ; \
+ 	fi ;

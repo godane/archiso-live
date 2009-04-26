@@ -1,0 +1,20 @@
+# Contributor: kappa <kappacurve@gmail.com>
+
+pkgname=esdl
+pkgver=0.96.0626
+pkgrel=2
+arch=('i686' 'x86_64')
+pkgdesc="SDL and OpenGL bindings for the Erlang programming language"
+url="http://esdl.sourceforge.net"
+license=('custom')
+depends=('erlang' 'sdl' 'mesa')
+source=(http://downloads.sourceforge.net/esdl/$pkgname-$pkgver.src.tar.gz
+        makefile.patch)
+md5sums=('5007750ddd989319442e8e040db3b6dd' '10154481bda56a1504ea3db3b6a806c9 ')
+build() {
+  cd $startdir/src/$pkgname-$pkgver
+  patch -p0 < $startdir/src/makefile.patch || return 1
+  make || return 1
+  make DESTDIR=$startdir/pkg install || return 1
+  install -D -m 644 $startdir/src/$pkgname-$pkgver/license.terms $startdir/pkg/usr/share/licenses/esdl/license.terms
+}

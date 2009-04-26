@@ -1,0 +1,37 @@
+# Contributor: kappa <kappacurve@gmail.com>
+
+pkgname=wings
+pkgver=0.99.55
+pkgrel=3
+pkgdesc="3D modeling program."
+arch=('i686' 'x86_64')
+url="http://www.wings3d.com"
+license=('custom')
+depends=('esdl')
+install=wings.install
+source=(http://downloads.sourceforge.net/wings/$pkgname-$pkgver.tar.bz2
+        wings wings.desktop wings.png wings.install)
+md5sums=('d86ce0838024a59e28ead892aa1cbce5'
+         '4bd571237e47f4e0d398a8c7c70154ba'
+         '556c82942e9871b5e57daf96f8068ef2'
+         '196494d13a8fcbf8cf652a581228588a'
+         'fe97a01e5f683b08eb8079120117d94e')
+
+build() {
+  export ESDL_PATH=`echo /usr/lib/erlang/lib/esdl-*`
+  cd $startdir/src/$pkgname-$pkgver
+  export MAKEFLAGS="-j 1"
+  make || return 1
+
+  mkdir -p $startdir/pkg/usr/lib/$pkgname
+  for subdir in ebin fonts plugins shaders textures ; do
+    cp -r $startdir/src/$pkgname-$pkgver/$subdir/ $startdir/pkg/usr/lib/$pkgname
+  done
+
+  install -D -m 755 $startdir/src/wings $startdir/pkg/usr/bin/wings
+  install -D -m 644 $startdir/src/wings.desktop $startdir/pkg/usr/share/applications/wings.desktop
+  install -D -m 644 $startdir/src/wings.png $startdir/pkg/usr/share/pixmaps/wings.png
+
+  install -D -m 644 $startdir/src/$pkgname-$pkgver/license.terms $startdir/pkg/usr/share/licenses/wings/license.terms
+
+}

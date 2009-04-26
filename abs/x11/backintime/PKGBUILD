@@ -1,6 +1,6 @@
 # Maintainer: Matias Korhonen <webadmin@draco-vulgaris.net>
 pkgname=backintime
-pkgver=0.9.20
+pkgver=0.9.22
 pkgrel=1
 pkgdesc="Back In Time is a simple backup system for Linux inspired from 'flyback project' and 'TimeVault'."
 arch=('i686' 'x86_64')
@@ -8,9 +8,12 @@ url="http://backintime.le-web.org/"
 license="GPL"
 depends=('python' 'pygtk' 'python-notify' 'gnome-python')
 source=(http://backintime.le-web.org/download/backintime/backintime-${pkgver//_/-}_src.tar.gz)
-md5sums=('4fa800758e98f3bfad5850d6e7f5098c')
+md5sums=('d29aca14d0158f72e9585a895aa7bf10')
 build() {
-	cd $startdir/src/$pkgname-$pkgver || return 1;
-	./install-common.sh $startdir/pkg/  || return 1;
-	./install-gnome.sh $startdir/pkg/  || return 1;
+	cd $startdir/src/$pkgname-$pkgver
+	./configure --auto-gnome --prefix=/usr  || return 1
+	
+	cd $startdir/src/$pkgname-$pkgver
+	make  || return 1
+	make DESTDIR=${pkgdir} install
 }
