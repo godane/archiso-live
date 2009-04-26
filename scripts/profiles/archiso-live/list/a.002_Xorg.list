@@ -46,6 +46,8 @@ synaptics
 xorg-input-drivers
 mesa
 freeglut
+xf86dgaproto
+libxxf86dga
 #fonts
 ttf-dejavu
 gsfonts

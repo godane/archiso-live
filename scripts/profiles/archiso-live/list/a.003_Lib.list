@@ -31,6 +31,7 @@ blender
 #libs
 tre
 gc
+libstdc++5
 libdvdcss
 bluez
 docbook-xml
