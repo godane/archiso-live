@@ -1,0 +1,28 @@
+# Contributor: Jason Taylor <jftaylor21@gmail.com>
+# Contributor: seratne
+# Contributor: Nick B <Shirakawasuna at gmail _dot_com>
+
+pkgname=foldingathome
+pkgver=6.02
+pkgrel=1
+pkgdesc="Folding@Home is a distributed computing project which studies protein folding, misfolding, aggregation, and related diseases."
+arch=('i686')
+url="http://folding.stanford.edu/"
+license=('custom')
+depends=('bash')
+backup=('etc/conf.d/foldingathome')
+install=foldingathome.install
+source=(http://www.stanford.edu/group/pandegroup/folding/release/FAH$pkgver-Linux.tgz
+	archpatch_foldingathome.diff)
+md5sums=('112b3d66909050f1bb990993a1464cb9'
+         '02f4ca64d552b442d484c51fa5f4228a')
+
+build() {
+  cd $startdir/src/
+  patch -p1 <archpatch_foldingathome.diff
+  install -D -c -m755 fah6 $startdir/pkg/opt/fah/fah6 || return 1
+  install -D -c -m755 $startdir/src/foldingathome.rc.d $startdir/pkg/etc/rc.d/foldingathome || return 1
+  install -D -c -m644 $startdir/src/foldingathome.conf.d $startdir/pkg/etc/conf.d/foldingathome || return 1
+  install -D -m644 foldingathome.license $startdir/pkg/usr/share/licenses/$pkgname/COPYING
+  
+}
