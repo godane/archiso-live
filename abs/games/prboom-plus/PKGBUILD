@@ -1,0 +1,41 @@
+# Contributor: Christoph Zeiler <rabyte*gmail>
+
+pkgname=prboom-plus
+pkgver=2.5.0.1
+pkgrel=3
+pkgdesc="An enhanced version of the PrBoom Doom engine"
+arch=('i686' 'x86_64')
+url="http://prboom-plus.sourceforge.net/"
+license=('GPL')
+depends=('libgl' 'mesa' 'sdl_image' 'sdl_mixer' 'sdl_net')
+makedepends=('autoconf' 'automake' 'deutex-devel' 'freedoom' 'unzip')
+source=(http://downloads.sourceforge.net/$pkgname/$pkgname-$pkgver.zip \
+	$pkgname.png \
+	$pkgname.desktop \
+	$pkgname-game-server.png \
+	$pkgname-game-server.desktop)
+md5sums=('f64d72f8d0840a9017911b4d6003a5f9'
+         '4e164aeecda9a6b38d87b594645e42f9'
+         '67a2ae75edf575971928d5104aa6da1b'
+         'dcc3202ad84bafb97388c7261c041c7b'
+         '3137a72a4ed216f862178b434b8e509f')
+
+build() {
+  cd $pkgname-$pkgver
+
+  tr -d '\r' < bootstrap > bootstrap.fixed
+  mv -f bootstrap.fixed bootstrap
+  ln -sf /usr/share/doom/doom2.wad data/
+  sed 's|/games|/bin|g' -i src/Makefile.am
+  sed 's|CFLAGS_OPT=.*|:|g' -i configure.ac
+
+  sh bootstrap
+  ./configure --prefix=/usr --with-waddir=/usr/share/doom --disable-dogs
+
+  make || return 1
+  make DESTDIR="$pkgdir" install
+
+  mkdir -p "$pkgdir"/usr/share/{applications,pixmaps}
+  install -m644 ../prboom-plus{,-game-server}.png "$pkgdir"/usr/share/pixmaps/
+  install -m644 ../prboom-plus{,-game-server}.desktop "$pkgdir"/usr/share/applications/
+}

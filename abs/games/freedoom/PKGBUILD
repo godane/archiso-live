@@ -1,0 +1,23 @@
+# Contributor: Christoph Zeiler <rabyte*gmail>
+
+pkgname=freedoom
+pkgver=0.6.3
+pkgrel=3
+pkgdesc="Completely free Doom IWADs (game data)"
+arch=('any')
+url="http://www.nongnu.org/$pkgname/"
+license=('BSD')
+makedepends=('deutex-devel' 'imagemagick')
+source=(http://www.very-clever.com/download/nongnu/$pkgname/source/$pkgname-$pkgver.tar.gz)
+md5sums=('e547f3861227bc30b0df4401926cee59')
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
+
+  make || return 1
+
+  mkdir -p $pkgdir/usr/share/doom
+  #install -m644 -D $srcdir/$pkgname-$pkgver/wads/{doom,doom2,freedm}.wad $pkgdir/usr/share/doom/
+  cp $srcdir/$pkgname-$pkgver/wads/{doom,doom2,freedm}.wad $pkgdir/usr/share/doom
+  install -m644 -D $srcdir/$pkgname-$pkgver/COPYING $pkgdir/usr/share/licenses/$pkgname/COPYING
+}
