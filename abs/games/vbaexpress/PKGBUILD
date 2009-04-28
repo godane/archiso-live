@@ -1,0 +1,17 @@
+# Contributor: Achraf cherti <achrafcherti@gmail.com>
+pkgname=vbaexpress
+pkgver=1.2
+pkgrel=2
+pkgdesc="A VisualBoyAdvance frontend to configure the emulator easily."
+arch=(i686)
+url="http://vbaexpress.tuxfamily.org"
+depends=('sdl' 'fltk' 'libxpm' 'visualboyadvance')
+makedepends=()
+source=(http://vbaexpress.tuxfamily.org/$pkgname-$pkgver.tar.gz)
+md5sums=('09aa109c9adf2b1e70fed04016546d89')
+
+build() {
+  cd $startdir/src/$pkgname-$pkgver
+  make CFLAGS='-Os -DLINUX `fltk-config --cxxflags` `sdl-config --cflags` -Isrc' LIBS='`fltk-config --use-images --ldflags` `sdl-config --libs` -lXpm'
+  make PREFIX=$startdir/pkg/usr install
+}
