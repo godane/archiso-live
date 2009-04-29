@@ -41,11 +41,11 @@ fi
 # lang: Override default language
 lang="`cmdline_value lang`"
 if [ "$lang" ]; then
-    echo "$lang ISO-8859-1" > /etc/locale.gen
-    echo "$lang UTF-8" >> /etc/locale.gen
+    #echo "$lang ISO-8859-1" > /etc/locale.gen
+    #echo "$lang UTF-8" >> /etc/locale.gen
     locale-gen
-	[[ "`locale -a | grep -w $lang`" ]] && \
-	sed -i -e 's/^ *\(LOCALE=\).*$/\1$lang.UTF-8/' /etc/rc.conf
+	#[[ "`locale -a | grep -w $lang`" ]] && \
+	#sed -i -e "s/^ *\(LOCALE=\).*$/\1$lang.utf8/" /etc/rc.conf
 fi
 
 # Make firefox match OS locale
@@ -74,7 +74,10 @@ if [ "$session" != "" ]; then
 fi
 
 chmod 0440 /etc/sudoers
-update-desktop-database -q
+
+if [ -x /usr/bin/update-desktop-database ]; then
+	update-desktop-database -q
+fi
 
 #chown arch:users -R /home/arch
 #chown root:root -R /root
@@ -82,4 +85,9 @@ update-desktop-database -q
 acerone=$(cmdline_parameter acerone)
 if [ "$acerone" ]; then
 	/etc/rc.d/acerone
+fi
+
+fah=$(cmdline_parameter fah)
+if [ "$fah" ]; then
+	/etc/rc.d/foldingathome start
 fi
