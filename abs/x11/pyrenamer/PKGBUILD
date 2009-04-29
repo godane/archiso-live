@@ -1,0 +1,25 @@
+# Contributor: Christoph Zeiler <rabyte*gmail>
+
+pkgname=pyrenamer
+pkgver=0.6.0
+pkgrel=3
+pkgdesc="An application for the mass renaming of files"
+arch=('any')
+url="http://www.infinicode.org/code/$pkgname/"
+license=('GPL')
+depends=('gnome-python' 'gconf')
+makedepends=('pkgconfig>=0.9' 'perlxml')
+optdepends=('hachoir-metadata (rename audio files)' \
+	'python-eyed3 (rename MP3 files)')
+install=$pkgname.install
+source=($url/$pkgname-$pkgver.tar.gz)
+md5sums=('a7159f803cd919ab76f17789189c577b')
+
+build() {
+  cd $pkgname-$pkgver
+
+  ./configure --prefix=/usr --sysconfdir=/etc \
+		--with-gconf-schema-file-dir=/usr/share/gconf/schemas
+  make || return 1
+  make DESTDIR=$pkgdir install
+}

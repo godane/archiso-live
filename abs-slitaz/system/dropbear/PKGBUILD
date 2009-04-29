@@ -1,0 +1,39 @@
+pkgname=dropbear
+pkgver=0.52
+pkgrel=1
+pkgdesc="Light SSH client and server."
+arch=("i686" "x86_64")
+url="http://matt.ucc.asn.au/dropbear/dropbear.html"
+license=('GPL')
+makedepends=("zlib")
+replaces=()
+provides=()
+options=()
+install=$pkgname.install
+source=(http://matt.ucc.asn.au/dropbear/releases/$pkgname-$pkgver.tar.gz banner dropbear)
+md5sums=('1c69ec674481d7745452f68f2ea5597e'
+         '797d5d10dbd889ae54371054168f749a'
+         'a0944b267ea98f80be6ddc6c6c5bd58f')
+
+build() {
+	local i
+	local DROPBEARS
+	DROPBEARS="dropbearkey dropbearconvert dbclient scp"
+	mkdir -p $pkgdir/usr
+	cd $srcdir/$pkgname-$pkgver
+	sed -i 's|/usr/X11R6/bin/xauth|/usr/bin/xauth|' options.h
+	./configure --prefix=/usr --without-pam
+	make PROGRAMS="dropbear $DROPBEARS" MULTI=1 &&
+	install -d -m 755 $pkgdir/usr/sbin &&
+	install -m 755 dropbearmulti $pkgdir/usr/sbin/dropbear &&
+	install -d -m 755 $pkgdir/usr/bin &&
+	for i in $DROPBEARS ssh; do
+		ln -s /usr/sbin/dropbear $pkgdir/usr/bin/$i
+	done
+	mkdir -p $pkgdir/etc/dropbear
+	mkdir -p $pkgdir/etc/rc.d
+	cp $srcdir/banner $pkgdir/etc/dropbear
+	cp $srcdir/dropbear $pkgdir/etc/rc.d
+	touch $pkgdir/etc/dropbear/dropbear_dss_host_key
+	touch $pkgdir/etc/dropbear/dropbear_rsa_host_key
+}

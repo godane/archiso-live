@@ -28,15 +28,20 @@ hydrogen-svn
 rawstudio
 elisa
 blender
+-d musicbrainz
+arista
+audacity
 #libs
+redland
+fltk
 tre
 gc
+libstdc++5
 libdvdcss
 bluez
 docbook-xml
 cpufrequtils
 exempi
--d musicbrainz
 gstreamer0.10-good-plugins
 gstreamer0.10-base-plugins
 gstreamer0.10-bad-plugins

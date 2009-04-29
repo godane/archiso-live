@@ -1,0 +1,35 @@
+# Contributor: Marcel Wysocki <maci@satgnu.net>
+# Maintainer: Marcel Wysocki <maci@satgnu.net>
+
+pkgname=snes9x-gtk
+pkgver=1.51.70
+pkgrel=1
+pkgdesc="GTK+ Version of snes9x, a portable Emulator for the Super Nintento Entertainment System"
+arch=(i686 x86_64)
+url="http://snes9x.com/phpbb2/viewtopic.php?t=3703"
+license=('Freeware')
+# remove nasm on non x86 platforms
+depends=('zlib' 'libpng' 'sdl' 'nasm' 'mesa' 'gtkglext' 'portaudio' 'libxrandr' 'intltool')
+source=(http://snes9x-gtk.googlecode.com/files/snes9x-1.51-src-gtk-70.tar.bz2)
+
+build() {
+  mkdir -p ${startdir}/pkg/usr/bin
+
+  cd ${startdir}/src/snes9x-1.51-src/gtk
+
+  # build snes9x-gtk with opengl
+  ./configure --prefix=/usr \
+              --with-opengl \
+              --with-netplay
+  make || return 1
+  install -D ${startdir}/src/snes9x-1.51-src/gtk/snes9x-gtk ${startdir}/pkg/usr/bin/snes9x-gtk
+
+    # Install Desktop Icons
+    install -D -m644 $startdir/src/snes9x-1.51-src/gtk/data/snes9x.desktop \
+        $startdir/pkg/usr/share/applications/snes9x-gtk.desktop
+    install -D -m644 $startdir/src/snes9x-1.51-src/gtk/data/snes9x.svg \
+        $startdir/pkg/usr/share/pixmaps/snes9x.svg
+
+
+}
+md5sums=('9df1e5d7c059986c26a986172db58f33')

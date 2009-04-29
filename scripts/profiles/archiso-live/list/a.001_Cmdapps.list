@@ -90,6 +90,7 @@ rsakeyfind
 samdump2
 sqlmap
 clamav
+foldingathome
 #web-server
 apache
 lighttpd

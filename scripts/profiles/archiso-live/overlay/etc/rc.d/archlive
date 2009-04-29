@@ -41,20 +41,15 @@ fi
 # lang: Override default language
 lang="`cmdline_value lang`"
 if [ "$lang" ]; then
-    echo "$lang ISO-8859-1" > /etc/locale.gen
-    echo "$lang UTF-8" >> /etc/locale.gen
     locale-gen
-	[[ "`locale -a | grep -w $lang`" ]] && \
-	sed -i -e 's/^ *\(LOCALE=\).*$/\1$lang.UTF-8/' /etc/rc.conf
-fi
-
-# Make firefox match OS locale
-if [ -w /usr/lib/firefox/greprefs/all.js ]; then
-    sed -i -e 's/pref("intl.locale.matchOS",                 false);/pref("intl.locale.matchOS",                 true);/g' /usr/lib/firefox-3.0/greprefs/all.js
+    # Make firefox match OS locale
+    #if [ -f /usr/lib/firefox-3.0/defaults/preferences/firefox-I10n.js ]; then
+    # 	echo "pref("general.useragent.locale", "$lang")" > /usr/lib/firefox-3.0/defaults/preferences/firefox-I10n.js
+    #fi
 fi
 
 # Make thunderbird match OS locale
-#if [ -w /usr/lib/thunderbird/greprefs/all.js ]; then
+#if [ -w /usr/lib/thunderbird-2.0/greprefs/all.js ]; then
 #    sed -i -e 's/pref("intl.locale.matchOS",                 false);/pref("intl.locale.matchOS",                 true);/g' /usr/lib/thunderbird/greprefs/all.js
 #fi
 
@@ -74,7 +69,10 @@ if [ "$session" != "" ]; then
 fi
 
 chmod 0440 /etc/sudoers
-update-desktop-database -q
+
+if [ -x /usr/bin/update-desktop-database ]; then
+	update-desktop-database -q
+fi
 
 #chown arch:users -R /home/arch
 #chown root:root -R /root
@@ -82,4 +80,9 @@ update-desktop-database -q
 acerone=$(cmdline_parameter acerone)
 if [ "$acerone" ]; then
 	/etc/rc.d/acerone
+fi
+
+fah=$(cmdline_parameter fah)
+if [ "$fah" ]; then
+	/etc/rc.d/foldingathome start
 fi

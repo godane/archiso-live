@@ -241,6 +241,19 @@ chmod 1777 $UNION/tmp
 
 debug_shell
 
+# This is for setup of locale varible in archiso-live
+lang=$(cmdline_value lang)
+if [ "$lang" ]; then
+	if [ -f "$UNION/etc/rc.conf" ]; then
+		sed -i -e "s/^ *\(LOCALE=\).*$/\1"$lang.utf8"/" $UNION/etc/rc.conf
+		touch $UNION/etc/locale.gen
+		echo "$lang.UTF-8 UTF-8" > $UNION/etc/locale.gen
+		echo "$lang ISO-8859-1" >> $UNION/etc/locale.gen
+	fi
+fi
+
+debug_shell
+
 # Union contains all the files and directories unioned from all modules.
 # Change root directory to it, and move initrd's root to /mnt/live/initramdisk
 # Finaly execute /sbin/init to start the distribution.

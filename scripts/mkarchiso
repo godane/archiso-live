@@ -331,9 +331,9 @@ command_overlay () {
     find "${OVERLAY}" -name ".svn" -type d > exclude
 
     if [ "${QUIET}" = "y" ]; then
-        /sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}" -noappend -ef exclude ${OPTION} >/dev/null
+        mksquashfs "${OVERLAY}" "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}" -noappend -ef exclude ${OPTION} >/dev/null
     else
-	/sbin/mksquashfs "${OVERLAY}" "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}" -noappend -ef exclude ${OPTION}
+	mksquashfs "${OVERLAY}" "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}" -noappend -ef exclude ${OPTION}
     fi
 
     rm exclude
@@ -355,9 +355,9 @@ command_squash () {
         MOD="$(basename $DIR).${EXT}"
         info "Building module $MOD"
         if [ "${QUIET}" = "y" ]; then
-            /sbin/mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${OPTION} > /dev/null
+            mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${OPTION} > /dev/null
         else
-            /sbin/mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${OPTION}
+            mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${OPTION}
         fi
         chmod 0444 ${moduleplace}/$MOD
     done
