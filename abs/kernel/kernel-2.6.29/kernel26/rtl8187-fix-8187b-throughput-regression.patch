@@ -1,0 +1,33 @@
+From: Herton Ronaldo Krzesinski <herton@mandriva.com.br>
+Date: Thu, 13 Nov 2008 15:39:14 +0000 (-0500)
+Subject: rtl8187: fix 8187B throughput regression
+X-Git-Tag: v2.6.29-rc1~581^2~383^2~61
+X-Git-Url: http://git.kernel.org/?p=linux%2Fkernel%2Fgit%2Fstable%2Flinux-2.6.29.y.git;a=commitdiff_plain;h=54ac218ae676931813169e0ca074aca2e4adee38
+
+rtl8187: fix 8187B throughput regression
+
+Hin-Tak Leung reported that after the change "rtl8187: add short slot
+handling for 8187B" his RTL8187B started to give low throughput on
+network transfers. Turns out that the SIFS setting used isn't ok, it
+doesn't look to be the real aSIFSTime, using the "magical" 0x22 value
+like on other 818x variants as the vendor does too fixes the issue.
+
+Tested-by: Larry Finger <Larry.Finger@lwfinger.net>
+Tested-by: Hin-Tak Leung <htl10@users.sourceforge.net>
+Signed-off-by: Herton Ronaldo Krzesinski <herton@mandriva.com.br>
+Signed-off-by: John W. Linville <linville@tuxdriver.com>
+---
+
+diff --git a/drivers/net/wireless/rtl818x/rtl8187_dev.c b/drivers/net/wireless/rtl818x/rtl8187_dev.c
+index 4a9f76f..5fe7473 100644
+--- a/drivers/net/wireless/rtl818x/rtl8187_dev.c
++++ b/drivers/net/wireless/rtl818x/rtl8187_dev.c
+@@ -935,7 +935,7 @@ static void rtl8187_conf_erp(struct rtl8187_priv *priv, bool use_short_slot,
+ 			difs = 0x32;
+ 			eifs = 0x5b;
+ 		}
+-		rtl818x_iowrite8(priv, &priv->map->SIFS, 0xa);
++		rtl818x_iowrite8(priv, &priv->map->SIFS, 0x22);
+ 		rtl818x_iowrite8(priv, &priv->map->SLOT, slot_time);
+ 		rtl818x_iowrite8(priv, &priv->map->DIFS, difs);
+ 
