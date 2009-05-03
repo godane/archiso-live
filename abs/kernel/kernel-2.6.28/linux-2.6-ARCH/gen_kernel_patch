@@ -17,10 +17,10 @@ get_file() {
   file=$(basename ${1})
   OPWD=${PWD}
   if [ "${file}" != "${1}" ]; then
-    cd ${startdir}
+    cd ${SRCDEST}
     [ ! -f ${file} ] && wget -c ${1}
     cd ${startdir}/src
-    ln -s ${startdir}/${file} .
+    ln -s ${SRCDEST}/${file} .
   else
     cd ${startdir}/src
     ln -s ../patches/${file} .
@@ -29,6 +29,7 @@ get_file() {
 }
 
 source /etc/makepkg.conf
+source $HOME/.makepkg.conf
 source PATCHCFG
 
 export SRCNAME
