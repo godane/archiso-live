@@ -7,7 +7,7 @@
  
 pkgname=virtualbox-modules
 _kernver=2.6.29-ARCH
-pkgver=2.2.0
+pkgver=2.2.2
 pkgrel=1
 pkgdesc="Kernel modules for VirtualBox (vboxdrv)"
 arch=('i686')
@@ -21,13 +21,9 @@ install=virtualbox-modules.install
 source=(http://download.virtualbox.org/virtualbox/$pkgver/VirtualBox-$pkgver-OSE.tar.bz2)
 #source=($pkgname.tar.gz)
 build() {
-  cd "$srcdir/VirtualBox-2.2.0_OSE"
-  . /etc/profile.d/qt3.sh
-  export PATH=$QTDIR/bin:$PATH
-  export QMAKESPEC=$QTDIR/mkspecs/linux-g++
-
+  cd "$srcdir/VirtualBox-2.2.2_OSE"
   sed -i 's/python2.5/python2.6/g' configure
-  ./configure --with-qt4-dir=/usr --build-headless \
+  ./configure \
     --with-gcc=/usr/bin/gcc-3.4 \
     --with-g++=/usr/bin/g++-3.4 \
     --disable-hardening \
@@ -39,12 +35,10 @@ build() {
   kmk all || return 1
   
   cd out/linux.x86/release/bin/src
-  sed -i 's|# VBOX_USE_INSERT_PAGE = 1|VBOX_USE_INSERT_PAGE = 1|g' vboxdrv/Makefile
-  cd $pkgname
   make || return 1
   install -D -m644 vboxdrv.ko "$pkgdir/lib/modules/${_kernver}/misc/vboxdrv.ko"
   install -D -m644 vboxnetflt.ko "$pkgdir/lib/modules/${_kernver}/misc/vboxnetflt.ko"
   sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" "$startdir/virtualbox-modules.install"
 }
-md5sums=('37bd7d58cf7b6c46998cfd82c1b70573')
+md5sums=('82a76247b63e1813695175e7ddf01975')
 

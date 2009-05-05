@@ -1,0 +1,30 @@
+# package by godane
+pkgname=sfdumper
+pkgver=1.7
+pkgrel=1
+pkgdesc="SFDumper is a Bash script which can retrieve all the files of a chosen type (e.g. .doc or .jpg), regardless if they are active, deleted or unallocated. "
+arch=('i686' 'x86_64')
+url="http://sfdumper.sourceforge.net/"
+license=('LGPL2.1')
+depends=('bash' 'sleuthkit' 'foremost' 'grep' 'awk' 'coreutils')
+optdepends=('zenity')
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+source=(http://voxel.dl.sourceforge.net/sourceforge/sfdumper/${pkgname}${pkgver}.tar)
+noextract=()
+md5sums=()
+
+build() {
+    cd $srcdir
+    mkdir -p $pkgdir/usr/bin
+    cp -f sfdumper.sh $pkgdir/usr/bin/sfdumper
+    cp -f sfdumper-gui.sh $pkgdir/usr/bin/sfdumper-gui
+    cp -f lnk4helix.sh $pkgdir/usr/bin/lnk4helix
+    chmod +x $pkgdir/usr/bin/sfdumper
+    chmod +x $pkgdir/usr/bin/sfdumper-gui
+    chmod +x $pkgdir/usr/bin/lnk4helix
+}
