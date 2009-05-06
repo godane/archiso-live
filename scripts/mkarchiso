@@ -49,6 +49,7 @@ usage ()
     echo "    -c CDNAME        The name of the data folder for liblinuxlibe script to look for. Default: archpwn-live"
     echo "    -b BOOT		Boot option (syslinux,grub,grub-gfx)"
     echo "    -M MODULES       Modules for livecd. default: ${MODULES}"
+    echo "    -m MODULESCOPY   Copy modules from a folder to modules place in IMGROOT. default: none"
     echo "    -a ADDON_DIR     Use addons from DIR. default: none"
     echo "    -t <iso,disk>    Type of image to create. Defaults to iso."
     echo "    -v               Enable verbose output."
@@ -64,13 +65,14 @@ usage ()
 }
 
 #while getopts 'i:P:p:a:t:fvh' arg; do
-while getopts 'i:P:b:M:a:t:c:nfvh' arg; do
+while getopts 'i:P:b:M:m:a:t:c:nfvh' arg; do
     case "${arg}" in
         i) CPIOCONFIG="${OPTARG}" ;;
         #P) PKGFILE="${OPTARG}" ;;
         #p) PKGLIST="${PKGLIST} ${OPTARG}" ;;
 		b) BOOT="${OPTARG}" ;;
 	M) MODULES="${OPTARG}" ;;
+	m) MODULESCOPY="${OPTARG}" ;;
         a) ADDON_DIR="${OPTARG}" ;;
         t) IMG_TYPE="${OPTARG}" ;;
     c) CDNAME="${OPTARG}" ;;
@@ -407,12 +409,15 @@ command_imgprepare () {
 command_img () {
 
     # Here we copy packages .lzm modules to the correct location
-    if [ -d modules ]; then
+    if [ -d "${MODULESCOPY}" ]; then
+    	info "Copying modules ..."
+	cp -rf ${MODULESCOPY}/* "${IMGROOT}/${CDNAME}/modules/"
+	chmod 0444 "${IMGROOT}/${CDNAME}/modules/"
+    elif [ -d modules ]; then
 	info "Copying modules ..."
 	cp -rf modules/* "${IMGROOT}/${CDNAME}/modules/"
 	chmod 0444 "${IMGROOT}/${CDNAME}/modules/"
     fi
-
 	bootflags=""
 	if [ "$BOOT" = "grub" -o "$BOOT" = "grub-gfx" ]; then
 		tst=0
