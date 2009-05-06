@@ -347,10 +347,6 @@ command_squash () {
 
     start=$(date +%s)
 
-    if [ -d "${MODULESCOPY}" ]; then
-        cp -r ${MODULESCOPY}/* "${IMGROOT}/${CDNAME}/modules"
-    fi
-
     for DIR in $MODULES; do
         MOD="$(basename $DIR).${EXT}"
         info "Building module $MOD"
@@ -413,11 +409,15 @@ command_imgprepare () {
 command_img () {
 
     # Here we copy packages .lzm modules to the correct location
-    for mod in packages/*.lzm; do
-        info "Copying $mod ..."
-        cp $mod $IMGROOT/${CDNAME}/modules/
-    done
-	
+    if [ -d "${MODULESCOPY}" ]; then
+    	info "Copying modules ..."
+	cp -rf ${MODULESCOPY}/* "${IMGROOT}/${CDNAME}/modules/"
+	chmod 0444 "${IMGROOT}/${CDNAME}/modules/"
+    elif [ -d modules ]; then
+	info "Copying modules ..."
+	cp -rf modules/* "${IMGROOT}/${CDNAME}/modules/"
+	chmod 0444 "${IMGROOT}/${CDNAME}/modules/"
+    fi
 	bootflags=""
 	if [ "$BOOT" = "grub" -o "$BOOT" = "grub-gfx" ]; then
 		tst=0
