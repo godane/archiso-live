@@ -11,9 +11,9 @@ FORCE="n"
 IMG_TYPE="iso"
 DELDIR=""
 BOOT=""
-CDLABEL="Archiso-Live"
-PUBLISHER="http://godane.wordpress.com/"
-AUTHOR="Christopher Rogers aka Godane"
+CDLABEL="Livecd"
+PUBLISHER=""
+AUTHOR=""
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
