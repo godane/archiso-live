@@ -190,7 +190,7 @@ command_install () {
 
     mount -t aufs -o br:${lastbr}=rw aufs ${union}
     if [ $? -ne 0 ]; then 
-        error "Error mounting $UNION."
+        error "Error mounting $union."
         exit 1
     fi
 
