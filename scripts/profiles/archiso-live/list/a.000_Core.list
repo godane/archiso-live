@@ -18,13 +18,11 @@ libtool
 pkgconfig
 #live-tools
 syslinux
-aufs
-aufs-utils
+aufs2-util
 #aufs-slax
 -d sqlzma
 sqlzma-tools
 #squashfs-tools
-unionfs-utils
 #larch
 #larch-live
 hal
