@@ -17,6 +17,12 @@ if [ ! "$newrootpass" = "" ]; then
     echo "root:$newrootpass" | /usr/sbin/chpasswd
 fi
 
+AUTOCMD=$(cmdline_value "autoexec" | tr "~" " ")
+if [ "$AUTOCMD" != "" ]; then
+   echo "starting autoexec command: su --login -c \"$AUTOCMD\""
+   su --login -c "$AUTOCMD"
+fi
+
 # ldconfig: Updates dynamic library cache. Useful when new modules are
 # added to the live cd.
 if [ "`cmdline_parameter ldconfig`" ]; then
