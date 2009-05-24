@@ -1,0 +1,36 @@
+# Contributor: Andrea Scarpino <andrea@archlinux.org>
+
+pkgname=pacbuilder-svn
+pkgver=135
+pkgrel=1
+pkgdesc="A tool to massively recompile archlinux packages from sources"
+arch=('i686' 'x86_64')
+url="http://code.google.com/p/pacbuilder/"
+license=('GPL3')
+backup=('etc/pacbuilder.conf')
+depends=('rsync')
+makedepends=('subversion')
+source=()
+md5sums=()
+
+_svntrunk=http://pacbuilder.googlecode.com/svn/trunk/
+_svnmod=pacbuilder
+
+build() {
+  cd "$srcdir"
+
+  if [ -d $_svnmod/.svn ]; then
+    (cd $_svnmod && svn up -r $pkgver)
+  else
+    svn co $_svntrunk --config-dir ./ -r $pkgver $_svnmod
+  fi
+
+  msg "SVN checkout done or server timeout"
+  msg "Starting make..."
+
+  rm -r "$srcdir/$_svnmod-build"
+  cp -r $_svnmod $_svnmod-build
+  cd $_svnmod-build
+
+  make DESTDIR="$pkgdir" install || return 1
+}

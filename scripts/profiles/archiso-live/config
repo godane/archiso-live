@@ -2,3 +2,6 @@
 MODULES="a.000_Core a.001_Cmdapps a.002_Xorg a.003_Lib a.004_Apps a.005_Xfce a.006_Devel ap.007_E17svn ap.008_Gnome"
 DELDIR="usr/share/doc usr/share/devhelp usr/share/gtk-doc usr/share/wallpapers"
 KERNEL="/etc/mkinitcpio.d/kernel26.kver"
+CDLABEL="Archiso-Live"
+PUBLISHER="http://godane.wordpress.com/"
+AUTHOR="Christopher Rogers aka Godane"

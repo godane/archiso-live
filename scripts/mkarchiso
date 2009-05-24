@@ -6,14 +6,14 @@ CACHE="/var/cache/pacman/pkg"
 PKGFILE="$(pwd)/packages.list"
 PKGLIST=""
 QUIET="n"
-FORCE="n"
+FORCE="y"
 #MOUNTFILE="$(pwd)/mounts"
 IMG_TYPE="iso"
 DELDIR=""
 BOOT=""
-CDLABEL="Archiso-Live"
-PUBLISHER="http://godane.wordpress.com/"
-AUTHOR="Christopher Rogers aka Godane"
+CDLABEL="Livecd"
+PUBLISHER=""
+AUTHOR=""
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
@@ -190,7 +190,7 @@ command_install () {
 
     mount -t aufs -o br:${lastbr}=rw aufs ${union}
     if [ $? -ne 0 ]; then 
-        error "Error mounting $UNION."
+        error "Error mounting $union."
         exit 1
     fi
 

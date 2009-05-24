@@ -92,6 +92,7 @@ samdump2
 sqlmap
 clamav
 foldingathome
+xz-utils
 #web-server
 apache
 lighttpd
