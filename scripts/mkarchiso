@@ -337,7 +337,7 @@ command_overlay () {
     fi
 
     rm exclude
-    chmod 0444 "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}"
+    chmod 0755 "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}"
 }
 
 # Squash is the next step.
@@ -355,7 +355,7 @@ command_squash () {
         else
             mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${OPTION}
         fi
-        chmod 0444 ${moduleplace}/$MOD
+        chmod 0755 ${moduleplace}/$MOD
     done
 
     minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
@@ -371,7 +371,7 @@ command_imgprepare () {
     ./initrd_create ${CDNAME}
     cd ../
     mv -f initrd/initrd.lzm "${IMGROOT}"
-    chmod 0444 "${IMGROOT}/initrd.lzm"
+    chmod 0755 "${IMGROOT}/initrd.lzm"
 
     info "Making bootable image"
 
@@ -412,11 +412,11 @@ command_img () {
     if [ -d "${MODULESCOPY}" ]; then
     	info "Copying modules ..."
 	cp -rf ${MODULESCOPY}/* "${IMGROOT}/${CDNAME}/modules/"
-	chmod 0444 "${IMGROOT}/${CDNAME}/modules/"
+	chmod 0755 "${IMGROOT}/${CDNAME}/modules/"
     elif [ -d modules ]; then
 	info "Copying modules ..."
 	cp -rf modules/* "${IMGROOT}/${CDNAME}/modules/"
-	chmod 0444 "${IMGROOT}/${CDNAME}/modules/"
+	chmod 0755 "${IMGROOT}/${CDNAME}/modules/"
     fi
 	bootflags=""
 	if [ "$BOOT" = "grub" -o "$BOOT" = "grub-gfx" ]; then
