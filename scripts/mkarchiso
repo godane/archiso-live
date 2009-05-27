@@ -394,10 +394,10 @@ command_imgprepare () {
     [ "${INSTROOT:0:1}" != "/" ] && basedir="$(pwd)/${INSTROOT}"
     info "Generating initcpio for image..."
     if [ "${QUIET}" = "y" ]; then
-        mkinitcpio -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${IMGROOT}/boot/archlive.img" >/dev/null
+        mkinitcpio -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${IMGROOT}/boot/initrd.img" >/dev/null
         ret=$?
     else
-        mkinitcpio -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${IMGROOT}/boot/archlive.img"
+        mkinitcpio -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${IMGROOT}/boot/initrd.img"
         ret=$?
     fi
     if [ $ret -ne 0 ]; then

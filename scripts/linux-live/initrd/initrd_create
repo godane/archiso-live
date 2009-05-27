@@ -72,7 +72,7 @@ debug()
 
 MOUNTDIR=/tmp/initrd_mountdir_$$
 INITRD_TREE=/tmp/initrd_tree_$$
-INITRDIMG=initrd
+INITRDIMG=base
 
 if [ ! -d $ROOT/$LMK ]; then
    echo "cannot find your kernel modules (*.ko) in $ROOT/$LMK"
@@ -250,4 +250,4 @@ chmod ago-x $INITRDIMG.lzm
 debug "deleting directory $INITRD_TREE"
 rm -Rf $INITRD_TREE
 
-debug "$INITRDIMG.gz created"
+debug "$INITRDIMG.lzm created"
