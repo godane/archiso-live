@@ -1,0 +1,266 @@
+--- setup.orig 2009-02-10 23:13:45.000000000 +0100
++++ setup	2009-05-22 14:42:31.000000000 +0200
+@@ -1,9 +1,9 @@
+ #!/bin/bash
+ 
+ ANSWER="/tmp/.setup"
+-TITLE="Arch Linux Installation"
++TITLE="Archiso Installation"
+ # use the first VT not dedicated to a running console
+-LOG="/dev/tty7"
++LOG="/dev/tty8" # tty7 is dedicated to Xorg
+ DESTDIR="/mnt"
+ EDITOR=
+ 
+@@ -716,6 +719,38 @@
+     return 0
+ }
+ 
++# do_rsync()
++# does the rsync
++#
++# params: none
++# returns: 1 on error
++do_rsync() {
++    cat > /tmp/rsync-exclude << EOF
++/home/arch/.gvfs
++/tmp/*
++/media/*
++/mnt/*
++/arch/
++/dev/*
++/proc/*
++/sys/*
++EOF
++    DIALOG --infobox "Copy in progress. This may take a while - you can watch the output in the progress window." 6 45
++
++    rsync -av / ${DESTDIR} --exclude-from=/tmp/rsync-exclude 2>&1 >$LOG
++    if [ $? -ne 0 ]; then
++        DIALOG --msgbox "Rsync failed (maybe you're out of disk space?). See the log output for more information"
++        return 1
++    fi
++
++    mknod -m666 ${DESTDIR}/dev/zero c 1 5
++    mknod -m666 ${DESTDIR}/dev/null c 1 3
++    mknod -m600 ${DESTDIR}/dev/console c 5 1
++    mkdir -m755 ${DESTDIR}/media/{cd,dvd,fl}
++
++    S_SELECT=1
++}
++
+ # select_packages()
+ # prompts the user to select packages to install
+ #
+@@ -778,6 +813,91 @@
+     S_SELECT=1
+ }
+ 
++# installpkg_chaox()
++# performs package installation to the target system
++# 
++# params: none
++# returns 1 on error
++
++installpkg_chaox() {
++    if [ $S_SELECT -eq 0 ]; then
++        DIALOG --msgbox "You have to copy the distribution first." 0 0
++       return 1
++    fi
++
++    if [ $S_SRC -eq 0 ]; then
++        DIALOG --msgbox "You need do configure your network first". 0 0
++        return 1
++    fi
++
++    DIALOG --msgbox "Package installation will begin now. You can wath the output in the progress window. Please be patient." 0 0
++
++    # must mount chroot so pre/post installs don't fail out
++    chroot_mount
++
++    prepare_pacman || (DIALOG --msgbox "Something went wrong while synchronizing the package database, make sure you have a working internet connection. You can look at the error message on tty8." 0 0 && return 1)
++
++    # execute pacman in a subshell so we can follow its progress
++    # pacman output goes /tmp/pacman.log
++    # /tmp/setup-pacman-running acts as a lockfile
++    ( \
++        echo "Installing Packages..." >/tmp/pacman.log ; \
++        echo >>/tmp/pacman.log ; \
++        touch /tmp/setup-pacman-running ; \
++        rm /mnt/etc/mkinitcpio.d/kernel26-chaox.preset; $PACMAN -Rc kernel26-chaox >>/tmp/pacman.log 2>&1 ; \
++        $PACMAN -S kernel26-chaox initscripts grub >>/tmp/pacman.log 2>&1 ; \
++        echo $? > /tmp/.pacman-retcode ; \
++        if [ $(cat /tmp/.pacman-retcode) -ne 0 ]; then
++            echo -e "\nPackage Installation FAILED." >>/tmp/pacman.log
++        else
++            echo -e "\nPackage Installation Complete." >>/tmp/pacman.log
++        fi
++        for packet in ndiswrapper com-on-air_cs tiacx madwifi-newhal-svn; do
++            $PACMAN -S $packet >>/tmp/pacman.log 2>&1
++        done
++        rm /tmp/setup-pacman-running
++    ) &
++
++    sleep 2
++    DIALOG --title " Installing... Please Wait " \
++        --no-kill --tailboxbg "/tmp/pacman.log" 18 70 2>$ANSWER
++    while [ -f /tmp/setup-pacman-running ]; do
++        sleep 1
++    done
++
++    kill $(cat $ANSWER)
++
++    # pacman finished, display scrollable output
++    local _result=''
++    if [ $(cat /tmp/.pacman-retcode) -ne 0 ]; then
++        _result="Installation Failed (see errors below)"
++    else
++        _result="Installation Complete"
++    fi
++    rm /tmp/.pacman-retcode
++
++    DIALOG --title "$_result" --exit-label "Continue" \
++        --textbox "/tmp/pacman.log" 18 70 || return 1
++
++    chroot_umount
++
++    sync
++
++    S_INSTALL=1
++
++    # automagic time!
++    # any automatic configuration should go here
++    DIALOG --infobox "Writing base configuration..." 6 40
++    auto_fstab
++
++    # depmod time
++    source ${DESTDIR}/etc/mkinitcpio.d/kernel26.kver
++    chroot ${DESTDIR} depmod -v ${ALL_kver} 2>&1 >$LOG
++
++    # initscripts backups the following files: etc/inittab etc/rc.conf etc/rc.local etc/rc.local.shutdown
++    mv ${DESTDIR}/etc/rc.conf.pacsave ${DESTDIR}/etc/rc.conf
++    rm ${DESTDIR}/etc/*.pacsave
++}
+ 
+ # installpkg()
+ # performs package installation to the target system
+@@ -1024,19 +1144,20 @@
+             fi
+             # remove default entries by truncating file at our little tag (#-*)
+             sed -i -e '/#-\*/q' $grubmenu
++	    _cmdline=$(cat /proc/cmdline)
+             cat >>$grubmenu <<EOF
+ 
+ # (0) Arch Linux
+-title  Arch Linux
++title  Archiso
+ root   $grubdev
+-kernel $subdir/vmlinuz26 root=${_rootpart} ro
+-initrd $subdir/kernel26.img
++kernel $subdir/vmlinuz26 root=${_rootpart} ro $_cmdline
++initrd $subdir/kernel26.img
+ 
+ # (1) Arch Linux
+-title  Arch Linux Fallback
++title  Archiso Fallback
+ root   $grubdev
+-kernel $subdir/vmlinuz26 root=${_rootpart} ro
+-initrd $subdir/kernel26-fallback.img
++kernel $subdir/vmlinuz26 root=${_rootpart} ro $_cmdline
++initrd $subdir/kernel26-fallback.img
+ 
+ # (2) Windows
+ #title Windows
+@@ -1092,7 +1213,7 @@
+         DIALOG --msgbox "GRUB root and setup devices could not be auto-located.  You will need to manually run the GRUB shell to install a bootloader." 0 0
+         return 1
+     fi
+-    $DESTDIR/sbin/grub-install --recheck --grub-shell=$DESTDIR/sbin/grub --root-directory=$DESTDIR $ROOTDEV >/tmp/grub.log 2>&1
++    $DESTDIR/sbin/grub-install --no-floppy --recheck --grub-shell=$DESTDIR/sbin/grub --root-directory=$DESTDIR $ROOTDEV >/tmp/grub.log 2>&1
+     cat /tmp/grub.log >$LOG
+     # unfreeze xfs filesystems
+     if [ -x /usr/sbin/xfs_freeze ]; then
+@@ -1116,18 +1237,7 @@
+ # returns: nothing
+ select_source()
+ {
+-    DIALOG --menu "Please select an installation source" 10 35 3 \
+-    "1" "CD-ROM or OTHER SOURCE" \
+-    "2" "FTP/HTTP" 2>$ANSWER
+-
+-    case $(cat $ANSWER) in
+-        "1")
+-            MODE="cd"
+-            ;;
+-        "2")
+-            MODE="ftp"
+-            ;;
+-    esac
++    MODE="ftp"
+ 
+     if [ "$MODE" = "cd" ]; then
+         TITLE="Arch Linux CDROM or OTHER SOURCE Installation"
+@@ -1138,7 +1248,7 @@
+         fi
+         echo "Using CDROM for package installation" >$LOG
+     else
+-        TITLE="Arch Linux FTP/HTTP Installation"
++        TITLE="Archiso Installation"
+         DIALOG --msgbox "If you wish to load your ethernet modules manually, please do so now in another terminal." 12 65
+         local CURRENT_SELECTION=""
+         while true; do
+@@ -1378,11 +1488,11 @@
+     fi
+     DIALOG $DEFAULT --title " MAIN MENU " \
+         --menu "Use the UP and DOWN arrows to navigate menus.  Use TAB to switch between buttons and ENTER to select." 16 55 8 \
+-        "0" "Select Source" \
++        "0" "Network Configuration" \
+         "1" "Set Clock" \
+         "2" "Prepare Hard Drive" \
+-        "3" "Select Packages" \
+-        "4" "Install Packages" \
++        "3" "Copy the Distribution" \
++        "4" "Package Installation" \
+         "5" "Configure System" \
+         "6" "Install Bootloader" \
+         "7" "Exit Install" 2>$ANSWER
+@@ -1395,9 +1505,9 @@
+         "2")
+             prepare_harddrive ;;
+         "3")
+-            select_packages ;;
++            do_rsync ;;
+         "4")
+-            installpkg ;;
++            installpkg ;;
+         "5")
+             configure_system ;;
+         "6")
+@@ -1417,12 +1527,22 @@
+ #####################
+ ## begin execution ##
+ 
+-DIALOG --msgbox "Welcome to the Arch Linux Installation program. The install \
+-process is fairly straightforward, and you should run through the options in \
+-the order they are presented. If you are unfamiliar with partitioning/making \
+-filesystems, you may want to consult some documentation before continuing. \
+-You can view all output from commands by viewing your VC7 console (ALT-F7). \
+-ALT-F1 will bring you back here." 14 65
++THUNAR_IS_STARTED=$(su arch -c 'dbus-send --session --type=method_call --print-reply --dest=org.freedesktop.DBus / org.freedesktop.DBus.NameHasOwner string:"org.xfce.Thunar"' | grep -q 'boolean true'; echo $?)
++
++if [ $THUNAR_IS_STARTED -eq 0 ]; then
++    trap 'su arch -c "dbus-send --session --type=method_call --dest=org.freedesktop.DBus / org.freedesktop.DBus.StartServiceByName string:org.xfce.Thunar uint32:0"' EXIT
++    su arch -c "dbus-send --session --dest=org.xfce.Thunar --type=method_call /org/xfce/FileManager org.xfce.Thunar.Terminate"
++    THUNAR_NOTICE="\n\nNotice: The Thunar service will be disabled during the installation. It'll be restarted once you quit the installer."
++fi
++
++DIALOG --msgbox "Welcome to the Archiso Installation program
++(based on the fabulous Arch Linux Installer)
++
++The install process is fairly straightforward, and you should run through \
++the options in the order they are presented. If you are unfamiliar with \
++non-graphical partition managers, you may want to use gparted instead. \
++You can view all output from commands by viewing your VC8 console (ALT-F8). \
++$THUNAR_NOTICE" 14 65
+ 
+ while true; do
+     mainmenu
