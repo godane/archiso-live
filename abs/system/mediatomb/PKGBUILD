@@ -1,0 +1,53 @@
+# Orginal Contributor: William Rea <sillywilly@gmail.com>
+# Contributor: Nikhil Bysani <nikron@gmail.com>
+# Contributor: Mika Hynnä <igheax@gmail.com>
+
+# 20090525: 
+#	+ makedepends=('gcc' 'patch' 'make')
+#	+ mediatomb-0.11.0+glibc-2.10.patch
+
+pkgname=mediatomb
+pkgver=0.11.0
+pkgrel=10
+pkgdesc="A UPnP mediaserver"
+arch=('i686' 'x86_64')
+url="http://mediatomb.sourceforge.net"
+license=('GPL')
+depends=('libexif' 'taglib' 'sqlite3' 'expat' 'spidermonkey' 'curl' 'ffmpeg')
+makedepends=('gcc' 'patch' 'make')
+backup=(etc/conf.d/mediatomb)
+source=(
+	http://mesh.dl.sourceforge.net/sourceforge/mediatomb/mediatomb-$pkgver.tar.gz \
+	mediatomb.rc \
+	mediatomb.conf \
+	http://kapsi.fi/~ighea/arch/mediatomb-gcc-4.3.patch
+	mediatomb-0.11.0+glibc-2.10.patch
+)
+
+build()
+{
+	cd $startdir/src/mediatomb-$pkgver || return 1
+	patch -Np1 < ../mediatomb-gcc-4.3.patch || return 1
+	patch -Np0 < ../mediatomb-0.11.0+glibc-2.10.patch || return 1
+	
+	sed -e s/"ffmpeg\/avformat.h"/"libavformat\/avformat.h"/g -i configure
+	sed -e s/"ffmpeg\/avformat.h"/"libavformat\/avformat.h"/g -i configure.ac
+	sed -e s/"ffmpeg\/avformat.h"/"libavformat\/avformat.h"/g -i src/metadata/ffmpeg_handler.cc
+	
+
+	./configure --prefix=/usr --enable-mysql=no --enable-libmagic=yes \
+	 --enable-libjs=yes --enable-ffmpeg --with-ffmpeg-h=/usr/include/ || return 1
+
+	make || return 1
+	make DESTDIR=$startdir/pkg install || return 1
+
+	# rc-script
+	mkdir -p $startdir/pkg/etc/rc.d/ || return 1
+	install -m0755 ../mediatomb.rc $startdir/pkg/etc/rc.d/mediatomb || return 1
+
+	# config-file
+	mkdir -p $startdir/pkg/etc/conf.d/ || return 1
+	install -m0644 ../mediatomb.conf $startdir/pkg/etc/conf.d/mediatomb || return 1
+
+}
+

@@ -1,0 +1,58 @@
+#!/bin/bash
+
+DESC="MediaTomb UPnP A/V Media Server"
+
+USER=""
+
+if [ "$(whoami)" != "root" ];then
+ echo "You must be root to start/restart/stop services."
+ exit 1
+fi
+
+. /etc/rc.conf
+. /etc/rc.d/functions
+
+[ -r "/etc/conf.d/mediatomb" ] && . /etc/conf.d/mediatomb
+
+PID=`pidof -o %PPID /usr/bin/mediatomb`
+
+case "$1" in
+  start)
+    stat_busy "Starting $DESC"
+    if [ -z "$PID" ]; then
+	if [ -n "$USER" ]; then
+		echo -n "Starting as user: $USER"
+		su - $USER -c "/usr/bin/mediatomb -d $PARAMS &> /dev/null" || stat_fail
+	else
+		/usr/bin/mediatomb -d $PARAMS &> /dev/null || stat_fail
+	fi
+	PID=`pidof -o %PPID /usr/bin/mediatomb`
+	if [ -z "$PID" ]; then exit 1;fi
+	echo $PID > /var/run/mediatomb.pid
+	add_daemon mediatomb
+        stat_done
+    else    
+		echo -n "Already running!"
+		stat_fail
+    fi
+    ;;
+  stop)
+    stat_busy "Stopping $DESC"
+    [ ! -z "$PID" ] && kill $PID &> /dev/null
+    if [ $? -gt 0 ]; then
+      echo -n "Not started!"
+      stat_fail
+    else
+      rm /var/run/mediatomb.pid
+      rm_daemon mediatomb
+      stat_done
+    fi
+    ;;
+  restart)
+    $0 stop
+    sleep 1
+    $0 start
+    ;;
+  *)
+    echo "usage: $0 {start|stop|restart}"
+esac

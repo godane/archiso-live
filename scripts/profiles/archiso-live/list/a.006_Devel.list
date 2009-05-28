@@ -12,3 +12,5 @@ aurtools
 pkgtools
 gdb
 distcc
+bzr
+mercurial

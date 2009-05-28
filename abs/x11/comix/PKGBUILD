@@ -1,0 +1,20 @@
+pkgname=comix
+pkgver=4.0.4
+pkgrel=1
+pkgdesc="A comic book viewer"
+arch=('i686' 'x86_64')
+url="http://comix.sourceforge.net/"
+license=('GPL')
+depends=('unrar' 'pygtk' 'python-pysqlite' 'pil' 'gconf>=2.26.0')
+makedepends=('gettext' 'intltool')
+install=comix.install
+source=(http://downloads.sourceforge.net/sourceforge/${pkgname}/${pkgname}-${pkgver}.tar.gz)
+md5sums=('029227a77b122f7080ee0280d41bee78')
+
+build() {
+cd ${srcdir}/${pkgname}-${pkgver}
+mkdir -p ${pkgdir}/usr
+python install.py install --no-mime --dir ${pkgdir}/usr || return 1
+install -D -m644 mime/comicbook.schemas \
+${pkgdir}/usr/share/gconf/schemas/comix.schemas
+}

@@ -1,0 +1,24 @@
+# GCC-4.3 compatibility patch by Mika Hynnä (ighea) <igheaxATgmailDOTcom>
+#
+--- mediatomb-0.11.0/src/url.cc	2008-03-02 00:48:36.000000000 +0200
++++ mediatomb-0.11.0.new/src/url.cc	2008-04-14 00:53:21.000000000 +0300
+@@ -75,7 +75,7 @@
+ 
+     if (only_header)
+     {
+-        curl_easy_setopt(curl_handle, CURLOPT_NOBODY);
++        curl_easy_setopt(curl_handle, CURLOPT_NOBODY,0);
+         curl_easy_setopt(curl_handle, CURLOPT_HEADERFUNCTION, URL::dl);
+         curl_easy_setopt(curl_handle, CURLOPT_HEADERDATA, 
+                          (void *)buffer.getPtr());
+--- mediatomb-0.11.0/src/metadata/id3_handler.cc	2008-03-02 00:48:36.000000000 +0200
++++ mediatomb-0.11.0.new/src/metadata/id3_handler.cc	2008-04-14 01:22:36.000000000 +0300
+@@ -36,6 +36,8 @@
+ 
+ #ifdef HAVE_ID3
+ 
++#include <string.h>
++
+ #ifdef HAVE_CONFIG_H
+     #undef HAVE_CONFIG_H // else utils.h from the id3 library tries to import "config.h"
+ 

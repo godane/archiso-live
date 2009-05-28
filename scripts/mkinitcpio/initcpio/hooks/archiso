@@ -76,7 +76,7 @@ run_hook ()
         bootcdmnt="$(device_mountdir ${cdrom})"
         /bin/mkdir -p "${bootcdmnt}"
     	if mount -r -t iso9660 "${cdrom}" "${bootcdmnt}" >/dev/null 2>&1; then
-            if [ -f "${bootcdmnt}/initrd.lzm" ]; then
+            if [ -f "${bootcdmnt}/base.lzm" ]; then
                 found=1
                 hl "${cdrom}"; echo
                 BOOT_MOUNT="${bootcdmnt}"
@@ -99,14 +99,14 @@ run_hook ()
                mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
                 if [ "x${from}" != "x" ]; then
                     from=$(/usr/bin/basename ${from})
-                    if [ -f "${bootusbmnt}/${from}/initrd.lzm" ]; then
+                    if [ -f "${bootusbmnt}/${from}/base.lzm" ]; then
                         found=1
                         info "${usb}"; echo
                         BOOT_MOUNT="${bootusbmnt}"
                         break
                     fi
                 else
-                    if [ -f "${bootusbmnt}/initrd.lzm" ]; then
+                    if [ -f "${bootusbmnt}/base.lzm" ]; then
                         found=1
                         hl "${usb}"; echo
                         BOOT_MOUNT="${bootusbmnt}"
@@ -148,9 +148,9 @@ run_hook ()
     /bin/mount -t aufs -o nowarn_perm,xino=$XINO/.aufs.xino,br:/tmpfs=rw aufs /real_root
 
     if [ "x${from}" != "x" ]; then
-        _mnt_squashfs "${BOOT_MOUNT}/${from}/initrd.lzm"
+        _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm"
     else
-    	_mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
+    	_mnt_squashfs "${BOOT_MOUNT}/base.lzm"
     fi
 
     echo "aufs / aufs defaults 0 0" > /real_root/etc/fstab
