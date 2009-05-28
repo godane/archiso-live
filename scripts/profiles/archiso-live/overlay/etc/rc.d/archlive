@@ -92,3 +92,5 @@ fah=$(cmdline_parameter fah)
 if [ "$fah" ]; then
 	/etc/rc.d/foldingathome start
 fi
+
+chmod -x /etc/rc.d/archlive
