@@ -9,7 +9,7 @@ openvpn
 inetutils
 crda
 aif
-archlinux-installer
+archiso-installer
 chakra-hardware-detection
 chakra-xakra
 chakra-initscripts
