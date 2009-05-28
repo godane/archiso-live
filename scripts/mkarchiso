@@ -370,8 +370,8 @@ command_imgprepare () {
     cd initrd
     ./initrd_create ${CDNAME}
     cd ../
-    mv -f initrd/initrd.lzm "${IMGROOT}"
-    chmod 0755 "${IMGROOT}/initrd.lzm"
+    mv -f initrd/base.lzm "${IMGROOT}"
+    chmod 0755 "${IMGROOT}/base.lzm"
 
     info "Making bootable image"
 
