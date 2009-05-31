@@ -1,0 +1,13 @@
+The following files in this directory have been migrated to the new
+Xfconf configuration system and can be safely deleted if you so desire:
+
+    desktop.xml
+    gtk.xml
+    keyboard.xml
+    wmtweaks.xml
+    workspaces.xml
+    xfwm4.xml
+    xfwm4_keys.xml
+
+Other files have not been migrated and the applications previously using
+them may need to be reconfigured manually.

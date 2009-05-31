@@ -1,0 +1,12 @@
+[Global]
+MoveFirst=false
+ArrowPosition=0
+
+[Entry 0]
+Name=Spreadsheet
+Comment=Create, view and edit spreadsheets
+Icon=spreadsheet
+Exec=gnumeric
+Terminal=false
+StartupNotify=false
+
