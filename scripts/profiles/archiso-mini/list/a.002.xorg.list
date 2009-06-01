@@ -55,7 +55,6 @@ gsfonts
 hunspell
 lcms
 nss
-gtkmm
 libxres
 libxevie
 libxklavier
@@ -87,17 +86,3 @@ obmenu
 usbview
 xarchiver
 cups
-#apps
-gparted
-urlgre
-gftp
-epdfview
-wicd
-transmission-gtk
-leafpad
-unetbootin
-pan
-isomaster
-tcl
-xchat
-gcalctool

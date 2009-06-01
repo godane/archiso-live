@@ -1,16 +1,9 @@
 # Apps
-#firefox
-#firefox-i18n
-#flashplugin
 thunderbird
 thunderbird-i18n
-audacious
-audacious-plugins
 vlc
-#go-openoffice
 abiword
 gnumeric
-brasero
 gtkpod
 arista
 gimp
@@ -18,7 +11,6 @@ virtualbox-ose
 comix
 meld
 backintime
-hardinfo
 # IM
 pidgin
 #empathy

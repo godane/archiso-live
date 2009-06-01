@@ -1,3 +1,4 @@
+-d musicbrainz
 # Apps
 #firefox
 #firefox-i18n
@@ -18,7 +19,6 @@ virtualbox-ose
 comix
 meld
 backintime
-hardinfo
 # IM
 pidgin
 #empathy
