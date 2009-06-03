@@ -19,6 +19,7 @@ virtualbox-ose
 comix
 meld
 backintime
+asunder
 # IM
 pidgin
 #empathy
@@ -35,6 +36,7 @@ bluez
 docbook-xml
 cpufrequtils
 exempi
+redland
 gstreamer0.10-good-plugins
 gstreamer0.10-base-plugins
 gstreamer0.10-bad-plugins
@@ -46,14 +48,19 @@ libtracker
 portaudio
 intltool
 libcdio
+libdvdcss
+redland
 #gnome-deps
 at-spi
 libsexy
 sound-theme-freedesktop
 libwnck
 rarian
+gnome-python-extras
+pyrex
 #games-libs
 perl-locale-gettext
+gtkglext
 sdl_perl
 sdl_pango
 sdl_sound

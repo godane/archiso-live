@@ -66,6 +66,7 @@ startup-notification
 hicolor-icon-theme
 tango-icon-theme
 gnome-icon-theme
+tango-icon-theme-extras
 desktop-file-utils
 slim
 archlinux-themes-slim
@@ -75,6 +76,8 @@ gtk-engines
 zenity
 scrot
 gksu
+xdialog
+gtkdialog
 # Desktop
 openbox
 awesome
@@ -86,3 +89,4 @@ obmenu
 usbview
 xarchiver
 cups
+tightvnc
