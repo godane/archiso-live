@@ -4,6 +4,12 @@ DATE="$(date +%F)"
 CDNAME="archiso-live"
 ISONAME=$CDNAME-${DATE}.iso
 
+
+makeinstall()
+{
+	mkarchiso -c $CDNAME -m $1 -f install "${WORKDIR}"
+}
+
 makeiso() 
 {
 	mkarchiso -c $CDNAME -m $1 -f all "${WORKDIR}" "${ISONAME}"
@@ -24,6 +30,11 @@ clean()
 {
 	rm -rf "${WORKDIR}" "${ISONAME}"
 }
+
+
+if [ "${1}" = "makeinstall" ]; then
+	makeinstall $2
+fi
 
 if [ "${1}" = "makeiso" ]; then
 	makeiso $2

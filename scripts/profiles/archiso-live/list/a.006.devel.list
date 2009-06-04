@@ -1,16 +1,14 @@
+# Development
 base-devel
-abs
 git
 subversion
 cvs
 scons
-nasm
-yaourt
 pacbuilder-svn
+abs
+yaourt
 devtools
 aurtools
 pkgtools
 gdb
 distcc
-bzr
-mercurial

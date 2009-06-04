@@ -1,14 +1,14 @@
+# Xorg
 xf86-input-keyboard
 xf86-input-mouse
+xf86-input-evdev
 xf86-video-vesa
-#xorg-fonts-100dpi
-#xorg-fonts-75dpi
 xorg-res-utils
 xorg-server
 xorg-twm
 xorg-xinit
 xterm
-# xorg drivers
+# Xorg Drivers
 xf86-video-apm
 xf86-video-ark
 xf86-video-ati
@@ -20,7 +20,6 @@ xf86-video-geode
 xf86-video-glint
 xf86-video-i128
 xf86-video-i740
-xf86-video-imstt
 xf86-video-intel
 xf86-video-mga
 xf86-video-neomagic
@@ -39,7 +38,6 @@ xf86-video-tseng
 xf86-video-v4l
 xf86-video-vesa
 xf86-video-vga
-xf86-video-via
 xf86-video-voodoo
 scrnsaverproto
 synaptics
@@ -48,14 +46,18 @@ mesa
 freeglut
 xf86dgaproto
 libxxf86dga
-#fonts
+# Fonts
 ttf-dejavu
+ttf-liberation
+ttf-ms-fonts
 gsfonts
-#libs
+# Libs
+hunspell
+lcms
+nss
 libxres
 libxevie
 libxklavier
-libxvmc
 alsa-lib
 alsa-utils
 alsa-oss
@@ -63,30 +65,30 @@ shared-mime-info
 startup-notification
 hicolor-icon-theme
 tango-icon-theme
-tango-icon-theme-extras
 gnome-icon-theme
+tango-icon-theme-extras
 desktop-file-utils
 slim
 archlinux-themes-slim
 archlinux-menus
 archlinux-xdg-menu
 gtk-engines
+zenity
+scrot
+gksu
 xdialog
 gtkdialog
-zenity
-gksu
-menumaker
-scrot
 conky
 feh
-#mini-desktops
-fluxbox
+# Desktop
+openbox
 awesome
 icewm
-openbox
+fluxbox
 lxde
 obconf
 obmenu
 usbview
-vnc
-gtk-vnc
+xarchiver
+cups
+tightvnc
