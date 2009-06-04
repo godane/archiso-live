@@ -23,6 +23,19 @@ if [ "$AUTOCMD" != "" ]; then
    su --login -c "$AUTOCMD"
 fi
 
+VOL=$(cmdline_value "vol")
+if [ "$VOL" != "" ]; then
+   echo "Setting sound volume: ${VOL}%"
+   for SCONTROL in {"Master","PCM","Front","Surround","Center","CD","Video"}; do
+     /usr/bin/amixer -q sset $SCONTROL ${VOL}% unmute 2>/dev/null
+   done
+else
+   echo "Setting sound volume: 71%"
+   for SCONTROL in {"Master","PCM","Front","Surround","Center","CD","Video"}; do
+     /usr/bin/amixer -q sset $SCONTROL 71% unmute 2>/dev/null
+   done
+fi
+
 # ldconfig: Updates dynamic library cache. Useful when new modules are
 # added to the live cd.
 if [ "`cmdline_parameter ldconfig`" ]; then
