@@ -4,8 +4,6 @@
 #flashplugin
 thunderbird
 #thunderbird-i18n
-audacious
-audacious-plugins
 vlc
 #go-openoffice
 abiword
@@ -26,5 +24,3 @@ pidgin
 #telepathy-gabble
 # Other Apps
 #larchin
-shaman
-geany

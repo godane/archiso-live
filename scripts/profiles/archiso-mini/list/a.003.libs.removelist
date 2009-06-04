@@ -3,7 +3,6 @@ gcalctool
 urlgfe
 gftp
 epdfview
-tcl
 xchat
 leafpad
 transmission-gtk
@@ -20,3 +19,6 @@ wicd
 gpodder
 audacious
 audacious-plugins
+claws-mail
+shaman
+geany
