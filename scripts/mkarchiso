@@ -14,6 +14,7 @@ BOOT=""
 CDLABEL="Livecd"
 PUBLISHER=""
 AUTHOR=""
+MOVE_MODULES=""
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
@@ -252,7 +253,8 @@ command_install () {
         #install -d -o1001 -g100 -m0755 "${union}/home/arch"
 	
         if [ -d "${OVERLAY}/home/arch" ]; then
-            chown -R arch:users "${OVERLAY}/home/arch"
+            #chown -R arch:users "${OVERLAY}/home/arch"
+	    chown -R 1001:100 "${OVERLAY}/home/arch"
             chmod -R 700 "${OVERLAY}/home/arch"
         fi
 	chown -R root:root "${OVERLAY}/root"
@@ -357,6 +359,12 @@ command_squash () {
         fi
         chmod 0755 ${moduleplace}/$MOD
     done
+
+    if [ "${MOVE_MODULES}" != "" ]; then
+	for MOD in $MOVE_MODULES; do
+		mv -f "${moduleplace}/${MOD}.${EXT}" "${IMGROOT}/${CDNAME}/modules/${MOD}.${EXT}"
+	done
+    fi
 
     minutes=$(echo $start $(date +%s) | awk '{ printf "%0.2f",($2-$1)/60 }')
     info "Modules creation done in $minutes minutes."

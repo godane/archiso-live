@@ -4,12 +4,12 @@
 
 pkgname=archiso-installer
 pkgver=2009.02
-pkgrel=1
+pkgrel=2
 pkgdesc="The chaox install script"
 arch=('i686' 'x86_64')
 url="http://projects.archlinux.org/?p=installer.git"
 license=('GPL')
-depends=('bash')
+depends=('bash' 'dialog' 'grep' 'sed' 'util-linux-ng' 'rsync')
 source=("ftp://ftp.archlinux.org/other/archlinux-installer/archlinux-installer-$pkgver-2.tar.gz" "chaox-setup.diff")
 md5sums=('93bc355046775819baa9402ff0744bd3'
          '9bf9ba78cd32c81a46c797c5586fe93c')
