@@ -50,8 +50,6 @@ dmraid
 dnsutils
 gnu-netcat
 speedtouch
-lshwd
-hwd
 rsync
 dvd+rw-tools
 cdrdao
@@ -84,6 +82,13 @@ mc
 xdelta
 lsof
 lshwd
+rtorrent
+tor
+openvpn
+portmap
+mysql-clients
+mysql-python
+espeak
 #server
 apache
 lighttpd

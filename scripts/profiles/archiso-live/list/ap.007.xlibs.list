@@ -18,6 +18,7 @@ comix
 meld
 backintime
 asunder
+mixxx
 # IM
 pidgin
 #empathy
@@ -66,3 +67,9 @@ openexr
 openal
 physfs
 quesoglc
+gtkglextmm
+libglademm
+fltk
+tre
+lm_sensors
+exiv2
