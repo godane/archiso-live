@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Copyright (C) 2008 Francesco Piccinno
+# Copyright (C) 2008-2009 Francesco Piccinno
 #
 # Author: Francesco Piccinno <stack.box@gmail.com>
 #
@@ -65,9 +65,15 @@ class Scope(ConsoleP):
                 variable = 2
                 continue
             if variable == 2 and i == '}':
-                if "/" in variable_val:
+                if variable_val.count("/") >= 2:
                     # This handles expressions like: ${pkgver/-/_/}
-                    vname, vold, vnew = variable_val.split("/")
+                    li = variable_val.index("/")
+                    ri = variable_val.rindex("/")
+
+                    vname = variable_val[:li]
+                    vold = variable_val[li+1:ri]
+                    vnew = variable_val[ri+1:]
+
                     ret += self.cscope[vname].replace(vold, vnew)
                 else:
                     ret += self.cscope[variable_val]

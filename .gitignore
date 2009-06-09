@@ -9,6 +9,7 @@ pkg/
 *.swp
 *.part
 *.tar
+*.pyc
 scripts/profiles/*/log/
 scripts/profiles/*/packages.list
 scripts/profiles/*/initrd/
