@@ -17,6 +17,6 @@ gnome-python-desktop
 #gnome2-user-docs
 libgail-gnome
 metacity
-nautilus
+#nautilus
 yelp
 gksu
