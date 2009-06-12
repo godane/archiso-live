@@ -41,7 +41,7 @@ _mnt_squashfs()
 mount_tmpfs () 
 {
     #if [ "x${ramdisk_size}" = "x" ]; then
-        ramdisk_size="15M"
+        ramdisk_size="20M"
     #fi
     info -n "Mounting tmpfs, size=${ramdisk_size}... "
     mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
