@@ -22,6 +22,10 @@ audacious-plugins
 claws-mail
 shaman
 geany
+mplayer
+gnome-mplayer
+gecko-mediaplayer
+clamtk
 #libs
 aspell-en
 tcl
