@@ -1,0 +1,20 @@
+# Maintainer: Christopher Rogers <slaxemulator@gmail.com>
+pkgname=jnetmap
+pkgver=0.2.2
+pkgrel=1
+pkgdesc="Make a image of your network."
+url="http://www.rakudave.ch/?q=node/38"
+license=("GPL3")
+arch=("i686" "x86_64")
+depends=("java-runtime")
+makedepends=()
+source=(http://www.rakudave.ch/userfiles/java/jNetMap.jar)
+
+
+build() {
+	mkdir -p ${pkgdir}/usr/bin
+	cp ${srcdir}/jNetMap.jar ${pkgdir}/usr/bin
+	echo "#!/bin/bash" > ${pkgdir}/usr/bin/jnetmap
+	echo "java -jar /usr/bin/jNetMap.jar" >> ${pkgdir}/usr/bin/jnetmap
+	chmod +x ${pkgdir}/usr/bin/jnetmap
+}
