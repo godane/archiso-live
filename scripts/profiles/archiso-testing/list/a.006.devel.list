@@ -1,0 +1,14 @@
+# Development
+base-devel
+git
+subversion
+cvs
+scons
+pacbuilder-svn
+abs
+yaourt
+devtools
+aurtools
+pkgtools
+gdb
+distcc

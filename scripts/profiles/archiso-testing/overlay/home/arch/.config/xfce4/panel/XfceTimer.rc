@@ -1,0 +1,6 @@
+[others]
+nowin_if_alarm=false
+repeat_alarm=false
+repetitions=1
+repeat_interval=10
+

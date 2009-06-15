@@ -1,0 +1,23 @@
+#!/bin/bash
+# Convert directory tree into .lzm compressed file
+# Author: Flavio de Oliveira <http://www.goblinx.com.br>
+
+exec_(){
+if [ "$(whoami)" != 'root' ]; then
+gksu -c "mksquashfs "$1" $1.lzm >/dev/null | chmod 0755 "$1.lzm""
+else
+. /usr/lib/liblinuxlive
+create_module "$1" $1.lzm -b 128K
+chmod 0755 $1.lzm 
+fi
+}
+
+_progress(){
+if [ "$1" != "" ]; then echo; fi
+exec_ $1
+}
+
+_progress $1 | zenity --title="Thunar/Nautilus Action" --progress --pulsate --auto-close --text "Wait... The script is building your module..."
+if [ $? -ne 0 ]; then $(killall mksquashfs); rm -rf "$1.lzm"
+
+zenity --info --title "Thunar/Nautilus Action" --text "The modules is saved to $1.lzm"
