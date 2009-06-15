@@ -362,7 +362,11 @@ command_squash () {
 
     if [ "${MOVE_MODULES}" != "" ]; then
 	for MOD in $MOVE_MODULES; do
-		mv -f "${moduleplace}/${MOD}.${EXT}" "${IMGROOT}/${CDNAME}/modules/${MOD}.${EXT}"
+		if [ -f "${moduleplace}/${MOD}.${EXT}" ]; then
+			mv -f "${moduleplace}/${MOD}.${EXT}" "${IMGROOT}/${CDNAME}/modules/${MOD}.${EXT}"
+		else
+			error "${moduleplace}/${MOD}.${EXT} doesn't exist. Moving on."
+		fi
 	done
     fi
 
