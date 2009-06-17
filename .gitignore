@@ -10,6 +10,7 @@ pkg/
 *.part
 *.tar
 *.pyc
+scripts/profiles/*/packlist/
 scripts/profiles/*/log/
 scripts/profiles/*/packages.list
 scripts/profiles/*/initrd/
