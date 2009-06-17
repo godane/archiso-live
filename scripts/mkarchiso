@@ -144,6 +144,9 @@ moduleplace="${IMGROOT}/${CDNAME}/base"
 moduledir="${work_dir}/modules"
 INSTROOT="${moduledir}/$(basename ${ROOT_MOD} .list)"
 CDROOT="$(pwd)/cd-root"
+buildlog="$(pwd)/${work_dir}/log"
+packlist="$(pwd)/${work_dir}/packlist"
+PKGFILE="${IMGROOT}/packages.list"
 
 _kversion ()
 {
@@ -195,19 +198,17 @@ command_install () {
 		exit 1
 	fi
 
-	if [ -e $(pwd)/log ]; then
-		rm -R $(pwd)/log
+	if [ -d ${buildlog} ]; then
+		rm -R ${buildlog}
 	fi
 	
-	if [ -e $(pwd)/packlist ]; then
-		rm -R $(pwd)/packlist
+	if [ -d ${packlist} ]; then
+		rm -R ${packlist}
 	fi
 
-	mkdir -p $(pwd)/log
+	mkdir -p ${buildlog}
 
-	if [ ! -d $(pwd)/packlist ]; then
-		mkdir -p $(pwd)/packlist
-	fi
+	mkdir -p ${packlist}
 
 	for mod in ${MODULES}; do
 		mkdir -p "${moduledir}/${mod}"
@@ -228,17 +229,19 @@ command_install () {
         
 		pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
 
-		if [ -d ${moduledir}/${mod} ]; then
-			pacman -Q -r ${moduledir}/${mod} > $(pwd)/packlist/${mod}.old
+		if [ -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
+			pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.old
+		elif [ ! -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
+			touch ${packlist}/${mod}.old
 		fi
 
-        	cat  "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
+        	cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
 			info "Installing package $pkgname"
-			pacman -S -f --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname | tee -a $(pwd)/log/${mod}-current.log
+			pacman -S -f --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname | tee -a ${buildlog}/${mod}-current.log
 
 			if [ $? -ne 0 ]; then
 				warn "Package $pkgname not correctly installed"
-				cat $(pwd)/log/${mod}-current.log >> $(pwd)/log/${mod}-errors.log
+				cat ${buildlog}/${mod}-current.log >> ${buildlog}/${mod}-errors.log
 			fi
 		done
 
@@ -249,14 +252,14 @@ command_install () {
 			done
 		fi
 
-		pacman -Q -r ${moduledir}/${mod} > $(pwd)/packlist/${mod}.new
+		pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.new
 
-		if [ -f $(pwd)/packlist/${mod}.old ]; then
-			packagediff.py $(pwd)/packlist/${mod}.old $(pwd)/packlist/${mod}.new > $(pwd)/packlist/${mod}.list
+		if [ -f ${packlist}/${mod}.old ]; then
+			packagediff.py ${packlist}/${mod}.old ${packlist}/${mod}.new > ${packlist}/${mod}.list
 		fi
 
-		if [ -e "${mod}/etc/ld.so.conf" ]; then
-			ldconfig -r ${mod}
+		if [ -e "${union}/etc/ld.so.conf" ]; then
+			ldconfig -r ${union}
 		fi
 
 		if [ -d "${union}/usr/share/icons" ]; then
@@ -366,13 +369,13 @@ command_squash () {
 	start=$(date +%s)
 	# edit modules to the ones that updated or changed
 
-	find $(pwd)/packlist -size +0 -name "*.list" > $(pwd)/packlist/noupdate.list
-	sed -i "s|$(pwd)/packlist/noupdate.list||g" $(pwd)/packlist/noupdate.list
-	sed -i "s|$(pwd)/packlist/||g" $(pwd)/packlist/noupdate.list
-	sed -i "s|.list||g" $(pwd)/packlist/noupdate.list
-	#echo $MODULES > $(pwd)/packlist/modules.list
-	cat "$(pwd)/packlist/noupdate.list" | tr '\n' ' ' > "$(pwd)/packlist/noupdate"
-	MODULES=$(cat $(pwd)/packlist/noupdate)
+	find ${packlist} -size +0 -name "*.list" > ${packlist}/noupdate.list
+	sed -i "s|${packlist}/noupdate.list||g" ${packlist}/noupdate.list
+	sed -i "s|${packlist}/||g" ${packlist}/noupdate.list
+	sed -i "s|.list||g" ${packlist}/noupdate.list
+	#echo $MODULES > ${packlist}/modules.list
+	cat "${packlist}/noupdate.list" | tr '\n' ' ' > "${packlist}/noupdate"
+	MODULES=$(cat ${packlist}/noupdate)
 
 	if [ "$MODULES" = "" ]; then
 		info "Not build modules"
