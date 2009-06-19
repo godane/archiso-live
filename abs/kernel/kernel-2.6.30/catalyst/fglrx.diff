@@ -1,0 +1,15 @@
+diff --git linux-2.6.30/arch/x86/mm/tlb.c linux-2.6.30/arch/x86/mm/tlb.c
+index 61ddfa0..3d26c0b 100644
+--- linux-2.6.30/arch/x86/mm/tlb.c
++++ linux-2.6.30/arch/x86/mm/tlb.c
+*************** void flush_tlb_page(struct vm_area_struc
+*** 274,279 ****
+--- 274,280 ----
+  
+   preempt_enable();
+  }
++ EXPORT_SYMBOL(flush_tlb_page);
+  
+  static void do_flush_tlb_all(void *info)
+  {
+
