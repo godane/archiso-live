@@ -212,8 +212,10 @@ command_install () {
 
 	for mod in ${MODULES}; do
 		mkdir -p "${moduledir}/${mod}"
+		info "Adding ${moduledir}/${mod} as top branch of union."
 		mount -o remount,add:0:${moduledir}/${mod}=rw aufs ${union}
-		mount -o remount,mod:${lastbr}=ro aufs ${union}
+		info "Adding ${lastbr} as lower branch of union."
+		mount -o remount,mod:${lastbr}=rr+wh aufs ${union}
 		lastbr="${moduledir}/${mod}"
 
 		if [ -e "${union}/var/lib/pacman/db.lck" ]; then
@@ -226,8 +228,10 @@ command_install () {
 		mknod ${union}/dev/console c 5 1 >/dev/null
 		mknod ${union}/dev/null c 1 3 >/dev/null
 		mknod ${union}/dev/zero c 1 5 >/dev/null
-        
-		pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
+
+		#if [ ! -d "${union}/var/lib/pacman/sync/core" ]; then
+			pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
+		#fi
 
 		if [ -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
 			pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.old
@@ -265,6 +269,7 @@ command_install () {
 		if [ -d "${union}/usr/share/icons" ]; then
 			remove "${union}/usr/share/icons/hicolor/icon-theme.cache"
 			remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
+			remove "${union}/usr/share/icons/nuoveXT2/icon-theme.cache"
         	fi
 
 		# remove the initcpio images that were generated for the host system
@@ -299,7 +304,7 @@ command_install () {
 		done
 
 		# pacman DBs are big, delete all sync dbs
-		rm -rf ${union}/var/lib/pacman/sync/*
+		#rm -rf ${mod}/var/lib/pacman/sync/*
 
 		# copy over kernel and grub configs for boot
 		if [ "$BOOT" = "grub" -o "$BOOT" = "grub-gfx" ]; then
@@ -333,9 +338,12 @@ command_install () {
 	depmod -a -b "${INSTROOT}" "${kernelver}"
 
 	# Clean up unionfs whiteout files
-	#echo "Removing unionfs .wh. files."
+	info "Removing unionfs .wh. files."
 	find ${moduledir} -type f -name ".wh.*" -exec rm {} \;
 	find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
+
+	info "Removing sync subfolders from modules."
+	find ${moduledir}/*/var/lib/pacman/sync -type d -exec rm -rf {} \; 2>/dev/null
 
 	# TODO: this might belong somewhere else
 	#mkdir -p "${IMGROOT}/addons"
