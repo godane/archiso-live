@@ -29,3 +29,15 @@ clamtk
 #libs
 aspell-en
 tcl
+sdl_perl
+perl-locale-gettext
+sdl_sound
+sdl_pango
+gstreamer0.10-base
+libwnck
+libwmf
+openexr
+jasper
+libxslt
+sox
+setuptools
