@@ -1,0 +1,12 @@
+[Global]
+MoveFirst=false
+ArrowPosition=0
+
+[Entry 0]
+Name=Word Processor
+Comment=Create, read and edit documents
+Icon=applications-office
+Exec=abiword
+Terminal=false
+StartupNotify=false
+

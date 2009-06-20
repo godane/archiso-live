@@ -1,0 +1,111 @@
+#!/bin/sh
+
+# This script will download and install the Adobe Flash Player Plugin
+
+TARBALL_TYPE=tar.gz
+TARBALL_NAME=install_flash_player_10_linux
+TARBALL_URL=http://fpdownload.macromedia.com/get/flashplayer/current/$TARBALL_NAME.$TARBALL_TYPE
+
+CWD=`pwd`
+PRGNAM=flash-player-plugin
+VERSION=10
+ARCH=i386
+BUILD=1
+
+TMP=/tmp
+PKG=$TMP/package-$PRGNAM
+OUTPUT=${OUTPUT:-/tmp}
+
+set -e
+
+if [ -e "/usr/lib/mozilla/plugins/libflashplayer.so" ]; then
+clear
+echo 
+echo " It looks like the flash player plugin is already installed on your system."
+echo " Do you want to continue?"
+echo 
+echo -n "Press <Enter> to continue, or <Ctrl+C> to quit"
+read
+fi
+
+clear
+echo 
+echo "     This script will download and install the Adobe Flash Player Plugin"
+echo "     -------------------------------------------------------------------"
+echo 
+echo "      Before you proceede you must READ and ACCEPT the EULA found at:"
+echo "        <http://labs.adobe.com/technologies/eula/flashplayer.html>"
+echo 
+echo 
+echo -n "Press <Enter> to accept the EULA or <Ctrl+C> to exit..."
+
+read
+clear
+
+echo 
+echo "Please enter the root password..."
+echo 
+
+RUN_SCRIPT="
+cd $TMP
+
+if [ -d "$PKG" ]; then
+  rm -rf $PKG
+fi
+
+clear
+echo 
+echo Downloading: $TARBALL_NAME.$TARBALL_TYPE
+echo
+if [ ! -e "$TMP/$TARBALL_NAME.$TARBALL_TYPE" ]; then
+wget $TARBALL_URL
+fi
+tar xvf $TARBALL_NAME.$TARBALL_TYPE
+cd $TARBALL_NAME
+chown -R root:root .
+chmod -R u+w,go+r-w,a-s .
+mkdir -p $PKG/usr/lib/mozilla/plugins
+install -m 0755 libflashplayer.so $PKG/usr/lib/mozilla/plugins
+
+mkdir -p $PKG/install
+cat << EOF > $PKG/install/slack-desc
+flash-player-plugin: flash-player-plugin (flash plugin for web browsers)
+flash-player-plugin:
+flash-player-plugin: Provides Adobe Flash plugin for browsers that recognize
+flash-player-plugin: /usr/lib/mozilla/plugins as a valid plugin directory
+flash-player-plugin:
+flash-player-plugin: Plugin is subject to Adobe terms of use: 
+flash-player-plugin:  http://www.adobe.com/go/labs_term_of_use
+flash-player-plugin: Plugin is subject to Adobe Flash EULA:
+flash-player-plugin:  http://labs.adobe.com/technologies/eula/flashplayer.html
+flash-player-plugin:
+EOF
+
+clear
+echo 
+echo Building package
+echo
+cd $PKG
+/sbin/makepkg -l y -c n -p $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD.tgz
+
+cd $TMP
+
+clear
+echo 
+echo ' The package $PRGNAM-$VERSION-$ARCH-$BUILD.tgz'
+echo ' Has been successfully built, install it now?'
+echo 
+echo 
+echo -n 'Press Enter to install the package or Ctrl+C to exit...'
+read
+clear
+
+installpkg $PRGNAM-$VERSION-$ARCH-$BUILD.tgz
+
+rm $TARBALL_NAME.$TARBALL_TYPE
+rm -r $TARBALL_NAME
+rm -r $PKG
+rm $PRGNAM-$VERSION-$ARCH-$BUILD.tgz
+"
+su -c "$RUN_SCRIPT"
+exit 1

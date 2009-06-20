@@ -2,20 +2,22 @@
 # Maintainer: Marcel Wysocki <maci@satgnu.net>
 
 pkgname=snes9x-gtk
-pkgver=1.51.70
+pkgver=1.51.73
 pkgrel=1
 pkgdesc="GTK+ Version of snes9x, a portable Emulator for the Super Nintento Entertainment System"
 arch=(i686 x86_64)
 url="http://snes9x.com/phpbb2/viewtopic.php?t=3703"
 license=('Freeware')
 # remove nasm on non x86 platforms
-depends=('zlib' 'libpng' 'sdl' 'nasm' 'mesa' 'gtkglext' 'portaudio' 'libxrandr' 'intltool')
-source=(http://snes9x-gtk.googlecode.com/files/snes9x-1.51-src-gtk-70.tar.bz2)
+depends=('zlib' 'libpng' 'sdl' 'nasm' 'mesa' 'portaudio' 'libxrandr' 'intltool')
+source=(http://snes9x-gtk.googlecode.com/files/snes9x-1.51-src-gtk-73.tar.bz2)
 
 build() {
   mkdir -p ${startdir}/pkg/usr/bin
 
-  cd ${startdir}/src/snes9x-1.51-src/gtk
+  cd ${startdir}/src/snes9x-1.51-src
+  #patch -p0 < ../compile_fix.patch || return 1
+  cd gtk
 
   # build snes9x-gtk with opengl
   ./configure --prefix=/usr \
@@ -32,4 +34,4 @@ build() {
 
 
 }
-md5sums=('9df1e5d7c059986c26a986172db58f33')
+md5sums=('300834e5852d15fc06773153a5fae71c')
