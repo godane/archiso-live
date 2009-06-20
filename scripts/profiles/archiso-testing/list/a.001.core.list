@@ -63,11 +63,10 @@ clamav
 mc
 xdelta
 lsof
-lshwd
 rtorrent
 tor
 openvpn
-portmap
+rpcbind
 mysql-clients
 mysql-python
 espeak
