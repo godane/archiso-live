@@ -229,9 +229,9 @@ command_install () {
 		mknod ${union}/dev/null c 1 3 >/dev/null
 		mknod ${union}/dev/zero c 1 5 >/dev/null
 
-		#if [ ! -d "${union}/var/lib/pacman/sync/core" ]; then
+		if [ ! -d "${INSTROOT}/var/lib/pacman/sync/core" ]; then
 			pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
-		#fi
+		fi
 
 		if [ -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
 			pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.old
@@ -424,6 +424,7 @@ command_imgprepare () {
 	cd ../
 	mv -f initrd/base.lzm "${IMGROOT}"
 	chmod 0755 "${IMGROOT}/base.lzm"
+	rm -f $(pwd)/initrd
 
 	info "Making bootable image"
 
