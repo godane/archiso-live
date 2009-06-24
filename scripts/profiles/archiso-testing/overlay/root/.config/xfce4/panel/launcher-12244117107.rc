@@ -1,0 +1,12 @@
+[Global]
+MoveFirst=false
+ArrowPosition=0
+
+[Entry 0]
+Name=Video Player
+Comment=Play movie and video files
+Icon=applications-multimedia
+Exec=vlc
+Terminal=false
+StartupNotify=false
+
