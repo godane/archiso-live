@@ -1,6 +1,6 @@
 #ROOT_MOD="a.001.core"
-MOVE_MODULES="ap.007.xlibs ap.008.xapps ap.009.xfce ap.010.e17svn ap.011.gnome z.avidemux z.blender z.frozen-bubble z.hydrogen-svn z.kino z.lmms"
-MODULES="a.000.kernel a.001.core a.002.xorg a.003.libs a.004.apps a.005.firefox a.006.devel ${MOVE_MODULES}"
+#MOVE_MODULES="ap.007.xlibs ap.008.xapps ap.009.xfce ap.010.e17svn ap.011.gnome ap.012.pentest" # z.avidemux z.blender z.frozen-bubble z.hydrogen-svn z.kino z.lmms"
+MODULES="a.000.kernel a.001.core a.002.xorg a.003.libs a.004.apps a.005.firefox a.006.xfce a.007.devel ${MOVE_MODULES}"
 DELDIR="usr/share/doc usr/share/devhelp usr/share/gtk-doc usr/share/wallpapers"
 KERNEL="/etc/mkinitcpio.d/kernel26.kver"
 CDLABEL="Archiso-Testing"
