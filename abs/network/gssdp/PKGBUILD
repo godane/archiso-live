@@ -1,0 +1,19 @@
+pkgname=gssdp
+pkgver=0.6.4
+pkgrel=2
+pkgdesc="GSSDP implements resource discovery and announcement over SSDP"
+arch=('i686' 'x86_64')
+url="http://www.gupnp.org/"
+license=('LGPL')
+depends=('libglade>=2.6' 'libsoup>=2.4')
+makedepends=('gtk-doc' 'pkgconfig')
+source=("http://www.gupnp.org/sources/$pkgname/$pkgname-$pkgver.tar.gz")
+md5sums=('f212bbe3c539e95fab91d0dc825bd108')
+
+build() {
+  cd $srcdir/$pkgname-$pkgver
+  ./configure --prefix=/usr
+  make || return 1
+  make DESTDIR=$pkgdir install || return 1
+}
+

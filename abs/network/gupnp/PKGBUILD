@@ -1,0 +1,25 @@
+# Mantainer: William Díaz <wdiaz@archlinux.us>
+
+pkgname=gupnp
+pkgver=0.12.8
+pkgrel=2
+pkgdesc="An object-oriented open source framework"
+arch=('i686' 'x86_64')
+url="http://www.gupnp.org/"
+license=('LGPL')
+depends=('gssdp>=0.6' 'python')
+makedepends=('gettext' 'pkgconfig')
+# NOTE: libtool's files are needed for rygel to compile
+#options=('!libtool')
+source=("http://www.gupnp.org/sources/${pkgname}/${pkgname}-${pkgver}.tar.gz")
+md5sums=('ad20138c6da78cd03a056d30e40e36b9')
+
+build() {
+  cd ${srcdir}/${pkgname}-${pkgver}
+  ./configure --prefix=/usr
+              --disable-dependency-tracking
+              --disable-gtk-doc
+  make || return 1
+  make DESTDIR=${pkgdir} install || return 1
+}
+
