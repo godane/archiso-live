@@ -15,6 +15,7 @@ unetbootin
 isomaster
 pan
 wicd
+meiga-git
 gpodder
 audacious
 audacious-plugins
@@ -39,3 +40,10 @@ pidgin
 asunder
 mixxx
 vlc
+avidemux
+#other-apps
+recordmydesktop
+gtk-recordmydesktop
+streamripper
+streamtuner
+rawstudio

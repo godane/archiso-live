@@ -77,6 +77,9 @@ gnump3d
 #recoverly-tools
 ddrescue
 testdisk
+foremost
+autopsy
+bcwipe
 #base-devel-deps
 neon
 perl-error

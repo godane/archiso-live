@@ -390,6 +390,7 @@ command_squash () {
 			if [ $(cat ${packlist}/updated.list | grep $DIR) ]; then
 				sed -i "s|$DIR||g" ${packlist}/updated.list
 			fi
+			chmod 0755 ${moduleplace}/$MOD
 		fi
 	done
 	cat "${packlist}/updated.list" | tr '\n' ' ' > "${packlist}/updated"

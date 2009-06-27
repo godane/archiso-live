@@ -16,6 +16,7 @@ unetbootin
 isomaster
 pan
 wicd
+meiga-git
 gpodder
 audacious
 audacious-plugins
@@ -70,3 +71,4 @@ tre
 lm_sensors
 exiv2
 libtar
+gnome-common
