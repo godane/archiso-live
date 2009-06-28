@@ -2,7 +2,7 @@ _kernver=2.6.30-ARCH
 
 pkgname=catalyst
 pkgver=9.6
-pkgrel=1
+pkgrel=2
 pkgdesc="AMD/ATI kernel drivers for Radeon brand cards. Stock kernel"
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
@@ -14,7 +14,6 @@ provides=('catalyst')
 install=catalyst.install
 source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run \
 	2.6.30.diff
-	flush_tlb_page-94.patch
 	config_x86_32.patch)
 #md5sums=('ab0674fa3bacb23339f9b23d522c23be'
 #         '3a5896c62b6a37f0f1f752017d95762d')
@@ -25,7 +24,6 @@ build() {
   # Fix 2.6.30 kernel
   cd ${srcdir}/archive_files/common/lib/modules/fglrx/build_mod
   patch -p0 <${srcdir}/2.6.30.diff || return 1
-  patch -p0 <${srcdir}/flush_tlb_page-94.patch || return 1
   patch -p0 <${srcdir}/config_x86_32.patch || return 1
 
   if [ "${CARCH}" = "x86_64" ]; then

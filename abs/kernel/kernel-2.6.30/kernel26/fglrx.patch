@@ -1,0 +1,10 @@
+--- linux-2.6.30/arch/x86/mm/tlb.c	2009-06-09 20:05:27.000000000 -0700
++++ linux-2.6.30/arch/x86/mm/tlb.c	2009-06-20 20:35:05.000000000 -0700
+@@ -274,6 +274,7 @@ void flush_tlb_page(struct vm_area_struc
+ 
+ 	preempt_enable();
+ }
++EXPORT_SYMBOL(flush_tlb_page);
+ 
+ static void do_flush_tlb_all(void *info)
+ {

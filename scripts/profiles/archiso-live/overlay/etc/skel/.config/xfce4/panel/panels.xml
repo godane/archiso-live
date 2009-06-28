@@ -27,8 +27,8 @@
 			<property name="monitor" value="0"/>
 			<property name="screen-position" value="11"/>
 			<property name="fullwidth" value="0"/>
-			<property name="xoffset" value="236"/>
-			<property name="yoffset" value="986"/>
+			<property name="xoffset" value="271"/>
+			<property name="yoffset" value="987"/>
 			<property name="handlestyle" value="0"/>
 			<property name="autohide" value="0"/>
 			<property name="transparency" value="20"/>
@@ -48,8 +48,6 @@
 			<item name="launcher" id="12244111661"/>
 			<item name="launcher" id="12244116566"/>
 			<item name="launcher" id="12244117107"/>
-			<item name="separator" id="12365659132"/>
-			<item name="pager" id="12365658951"/>
 			<item name="separator" id="12244117449"/>
 			<item name="launcher" id="12366511520"/>
 			<item name="launcher" id="12365655830"/>
@@ -58,6 +56,7 @@
 			<item name="actions" id="12"/>
 			<item name="separator" id="13"/>
 			<item name="clock" id="12381519530"/>
+			<item name="xfce4-mixer-plugin" id="12459828591"/>
 		</items>
 	</panel>
 </panels>

@@ -2,7 +2,7 @@
 Name=Email Client
 Comment=Read and write email
 Icon=emblem-mail
-Exec=exo-open --launch MailReader
+Exec=sylpheed-claws
 Terminal=false
 StartupNotify=false
 

@@ -63,11 +63,10 @@ clamav
 mc
 xdelta
 lsof
-lshwd
 rtorrent
 tor
 openvpn
-portmap
+rpcbind
 mysql-clients
 mysql-python
 espeak
@@ -80,6 +79,7 @@ ddrescue
 testdisk
 foremost
 autopsy
+bcwipe
 #base-devel-deps
 neon
 perl-error

@@ -377,13 +377,24 @@ command_squash () {
 	start=$(date +%s)
 	# edit modules to the ones that updated or changed
 
-	find ${packlist} -size +0 -name "*.list" > ${packlist}/noupdate.list
-	sed -i "s|${packlist}/noupdate.list||g" ${packlist}/noupdate.list
-	sed -i "s|${packlist}/||g" ${packlist}/noupdate.list
-	sed -i "s|.list||g" ${packlist}/noupdate.list
+	find ${packlist} -size +0 -name "*.list" > ${packlist}/updated.list
+	sed -i "s|${packlist}/updated.list||g" ${packlist}/updated.list
+	sed -i "s|${packlist}/||g" ${packlist}/updated.list
+	sed -i "s|.list||g" ${packlist}/updated.list
 	#echo $MODULES > ${packlist}/modules.list
-	cat "${packlist}/noupdate.list" | tr '\n' ' ' > "${packlist}/noupdate"
-	MODULES=$(cat ${packlist}/noupdate)
+	for DIR in $MODULES; do
+		MOD="$(basename $DIR).${EXT}"
+		if [ ! -f ${moduleplace}/$MOD ]; then
+			mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${OPTION}
+			# subtrack module in updated.list file if it exist
+			if [ $(cat ${packlist}/updated.list | grep $DIR) ]; then
+				sed -i "s|$DIR||g" ${packlist}/updated.list
+			fi
+			chmod 0755 ${moduleplace}/$MOD
+		fi
+	done
+	cat "${packlist}/updated.list" | tr '\n' ' ' > "${packlist}/updated"
+	MODULES=$(cat ${packlist}/updated)
 
 	if [ "$MODULES" = "" ]; then
 		info "Not build modules"

@@ -6,7 +6,6 @@
 -d madwifi-utils
 -d ndiswrapper
 -d madwifi
--d rt2500
 -d virtualbox-modules
 -d aufs2-util
 # Firmware
