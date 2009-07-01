@@ -59,6 +59,7 @@ sox
 setuptools
 gnome-python-extras
 pyrex
+pyxdg
 libdvdcss
 #warzone2100-deps
 openal
@@ -72,3 +73,5 @@ lm_sensors
 exiv2
 libtar
 gnome-common
+dvdauthor
+vcdimager
