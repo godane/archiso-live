@@ -4,16 +4,14 @@
 # Contributor: Michal Krenek <mikos@sg1.cz>
 # Contributor: niQo
 pkgname=virtualbox-ose
-pkgver=2.2.2
-pkgrel=2
+pkgver=3.0.0
+pkgrel=1
 pkgdesc="Powerful x86 virtualization for enterprise as well as home use (Open Source Edition)"
 url="http://www.virtualbox.org"
 license=('GPL' 'custom')
 arch=('i686')
-provides=('virtualbox')
-conflicts=('virtualbox')
 depends=('virtualbox-modules' 'libxcursor' 'libidl2' 'libxslt' 'gcc-libs' 'sdl')
-makedepends=('gcc34' 'libstdc++5' 'bin86' 'dev86' 'iasl' 'libxslt' 'libxml2'
+makedepends=('libstdc++5' 'bin86' 'dev86' 'iasl' 'libxslt' 'libxml2'
 	'libxcursor' 'qt' 'libidl2' 'sdl' 'sdl_ttf' 'alsa-lib' 'pulseaudio'
 	'hal' 'libxmu' 'libxtst' 'xalan-c')
 optdepends=('qt: For VirtualBox GUI' 
@@ -22,16 +20,14 @@ optdepends=('qt: For VirtualBox GUI'
 	    'pulseaudio: For PulseAudio Support'
 	    'python: For Python Support')
 install=virtualbox.install
-source=(http://download.virtualbox.org/virtualbox/$pkgver/VirtualBox-$pkgver-OSE.tar.bz2
+source=(http://download.virtualbox.org/virtualbox/${pkgver}/VirtualBox-${pkgver}-OSE.tar.bz2
         '60-virtualbox.rules')
 build() {
   cd "$srcdir/VirtualBox-${pkgver}_OSE"
 
   sed -i 's/python2.5/python2.6/g' configure
-  ./configure  \
-    --with-gcc=/usr/bin/gcc-3.4 \
-    --with-g++=/usr/bin/g++-3.4 \
-    --disable-hardening
+  ./configure --disable-hardening
+
   source ./env.sh
   kmk all || return 1
 
@@ -44,12 +40,11 @@ build() {
     "$pkgdir/usr/lib/virtualbox/"
 
   # if you move the binaries in /usr/share the sky will fall on your head
-  for each in VBoxBFE VBoxHeadless VBoxSysInfo.sh VBoxManage VBoxSDL VBoxSVC VBoxTunctl VBoxXPCOMIPCD VirtualBox vditool xpidl; do
+  for each in VBoxSysInfo.sh VBoxBFE VBoxHeadless VBoxManage VBoxSDL VBoxSVC VBoxTunctl VBoxXPCOMIPCD VirtualBox xpidl; do
     install -m755 $each "$pkgdir/usr/lib/virtualbox/$each"
     ln -fs /usr/lib/virtualbox/$each "$pkgdir/usr/bin/$each"
-    chmod +x "$pkgdir/usr/lib/virtualbox/$each"
   done
-  
+
   install -D -m644 "$srcdir/VirtualBox-${pkgver}_OSE/src/VBox/Installer/linux/VBox.sh" \
                    "$pkgdir/usr/bin/Vbox.sh"
 
@@ -59,7 +54,14 @@ build() {
   cp -R components "$pkgdir/usr/lib/virtualbox/"
 
   cp -R nls/ "$pkgdir/usr/share/virtualbox/"
-  cd "$pkgdir/usr/lib/virtualbox/"; ln -s ../VBox* .
+#  broken symlinks
+#  cd "$pkgdir/usr/lib/virtualbox/"; ln -s ../VBox* .
+
+#  fix hardened build conform virtualbox wiki
+   cd "$pkgdir/usr/lib/virtualbox/components";
+   for each in VBoxDDU.so VBoxREM.so VBoxRT.so VBoxVMM.so VBoxXPCOM.so; do
+	   ln -s ../$each .
+   done
 
   install -D -m644 "$srcdir/VirtualBox-${pkgver}_OSE/src/VBox/Installer/linux/VirtualBox.desktop" \
     "$pkgdir/usr/share/applications/virtualbox.desktop"
@@ -72,5 +74,5 @@ build() {
   install -D -m644 "$srcdir/60-virtualbox.rules" \
                    "$pkgdir/etc/udev/rules.d/60-virtualbox.rules"
 }
-md5sums=('82a76247b63e1813695175e7ddf01975'
+md5sums=('d1560d8b0a766236161eeb659e802b5a'
          '519d32d8c2408e0ed9d643f412117644')

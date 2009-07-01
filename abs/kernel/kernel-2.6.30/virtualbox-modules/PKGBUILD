@@ -7,25 +7,22 @@
  
 pkgname=virtualbox-modules
 _kernver=2.6.30-ARCH
-pkgver=2.2.4
-pkgrel=2
+pkgver=3.0.0
+pkgrel=1
 pkgdesc="Kernel modules for VirtualBox (vboxdrv)"
 arch=('i686')
 url="http://www.virtualbox.org"
 license=('GPL')
 depends=('kernel26>=2.6.30' 'kernel26<2.6.31')
 makedepends=('bin86' 'dev86' 'iasl' 'libstdc++5' 'qt' 'sdl_ttf' 'libxt' 'libxmu' 'libxtst'
-             'libgl' 'alsa-lib' 'pulseaudio' 'gcc34' 'libxcursor' 'libidl2' 'libxslt'
+             'libgl' 'alsa-lib' 'pulseaudio' 'libxcursor' 'libidl2' 'libxslt'
              'xalan-c' 'pth' 'libxml2' 'libidl2' 'libpng')
 install=virtualbox-modules.install
-source=(http://download.virtualbox.org/virtualbox/$pkgver/VirtualBox-$pkgver-OSE.tar.bz2)
+source=(http://download.virtualbox.org/virtualbox/${pkgver}/VirtualBox-${pkgver}-OSE.tar.bz2)
 build() {
   cd "$srcdir/VirtualBox-${pkgver}_OSE"
   sed -i 's/python2.5/python2.6/g' configure
-  ./configure  \
-    --with-gcc=/usr/bin/gcc-3.4 \
-    --with-g++=/usr/bin/g++-3.4 \
-    --disable-hardening
+  ./configure --disable-hardening
 
   sed -i 's/-DVBOX_WITH_HARDENING//' src/VBox/HostDrivers/Support/linux/Makefile
 
@@ -38,4 +35,4 @@ build() {
   install -D -m644 vboxnetflt.ko "$pkgdir/lib/modules/${_kernver}/misc/vboxnetflt.ko"
   sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" "$startdir/virtualbox-modules.install"
 }
-md5sums=('b90176e3878ccfef2991322b2248dcb0')
+md5sums=('d1560d8b0a766236161eeb659e802b5a')
