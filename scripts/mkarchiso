@@ -231,6 +231,7 @@ command_install () {
 
 		if [ ! -d "${INSTROOT}/var/lib/pacman/sync/core" ]; then
 			pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
+			rmdir --ignore-fail-on-non-empty ${INSTROOT}/var/lib/pacman/local
 		fi
 
 		if [ -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
