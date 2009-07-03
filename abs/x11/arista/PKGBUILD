@@ -1,6 +1,6 @@
 # package by mrbug
 pkgname=arista
-pkgver=0.9.1
+pkgver=0.9.3
 pkgrel=1
 pkgdesc="Easy to use multimedia transcoder for the GNOME Desktop"
 arch=('i686' 'x86_64')
@@ -16,7 +16,7 @@ options=()
 install=
 source=(http://programmer-art.org/media/releases/arista-transcoder/$pkgname-$pkgver.tar.gz)
 noextract=()
-md5sums=('421d31b910b9ece7744f6552508503ac')
+md5sums=('aacb98b3a020ed1dbdd6b201699d32f5')
 
 build() {
     cd $startdir/src/$pkgname-$pkgver

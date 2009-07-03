@@ -231,29 +231,31 @@ command_install () {
 
 		if [ ! -d "${INSTROOT}/var/lib/pacman/sync/core" ]; then
 			pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
+			rmdir --ignore-fail-on-non-empty ${INSTROOT}/var/lib/pacman/local
 		fi
 
 		if [ -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
 			pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.old
+			pacman -Su -f --needed --noconfirm --config "${PACMANCONF}" -fr "${union}"
 		elif [ ! -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
 			touch ${packlist}/${mod}.old
-		fi
 
-        	cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
-			info "Installing package $pkgname"
-			pacman -S -f --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname | tee -a ${buildlog}/${mod}-current.log
+			cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
+				info "Installing package $pkgname"
+				pacman -S -f --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname | tee -a ${buildlog}/${mod}-current.log
 
-			if [ $? -ne 0 ]; then
-				warn "Package $pkgname not correctly installed"
-				cat ${buildlog}/${mod}-current.log >> ${buildlog}/${mod}-errors.log
-			fi
-		done
-
-		if [ -e "$(pwd)/list/${mod}.removelist" ]; then
-			cat "$(pwd)/list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
-				info "Removing package $pkgname"
-				pacman -R -d -n --noprogressbar --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname &> /dev/null
+				if [ $? -ne 0 ]; then
+					warn "Package $pkgname not correctly installed"
+					cat ${buildlog}/${mod}-current.log >> ${buildlog}/${mod}-errors.log
+				fi
 			done
+
+			if [ -e "$(pwd)/list/${mod}.removelist" ]; then
+				cat "$(pwd)/list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
+					info "Removing package $pkgname"
+					pacman -R -d -n --noprogressbar --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname &> /dev/null
+				done
+			fi
 		fi
 
 		pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.new
