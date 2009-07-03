@@ -5,9 +5,9 @@ pkgname=kernel26                # Build stock -ARCH kernel
 # pkgname=kernel26-custom       # Build kernel with a different name
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.30
-pkgver=${_basekernel}
-pkgrel=6
-_patchname="patch-${pkgver}-5-ARCH"
+pkgver=${_basekernel}.1
+pkgrel=1live
+_patchname="patch-${pkgver}-1-ARCH"
 pkgdesc="The Linux Kernel and modules"
 arch=(i686 x86_64)
 license=('GPL2')
@@ -25,7 +25,8 @@ replaces=('kernel24' 'kernel24-scsi' 'kernel26-scsi'
           'gspcav1' 'atl2' 'wlan-ng26' 'aufs' 'rt2500')
 install=kernel26.install
 source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
-        ftp://ftp.archlinux.org/other/kernel26/${_patchname}.bz2
+        #ftp://ftp.archlinux.org/other/kernel26/${_patchname}.bz2
+	${_patchname}.bz2
 	# the main kernel config files
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
@@ -33,9 +34,9 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         fglrx.patch)
 optdepends=('crda: to set the correct wireless channels of your country')
 md5sums=('7a80058a6382e5108cdb5554d1609615'
-         '0f3771767f168c3af934f3774ca6ec50'
-         '1f2be6cd357af5468c699307b9b30eee'
-         '965b4023d82a36a90fabc2f9787db34d'
+         '800a44e416ba892dd2a54df95925e19c'
+         'baab90a5a0ccd4bb1283d49600b21a3f'
+         'ac544d8075aab89c6ae1f418584339ec'
          '25584700a0a679542929c4bed31433b6'
          '24c054b6ebe942742f110c10886a3d49')
 
