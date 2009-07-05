@@ -1,0 +1,21 @@
+# Contributor: Ermak <ermak@email.it>
+pkgname=openvas-libraries
+pkgver=2.0.2
+pkgrel=1
+pkgdesc="The OpenVAS libraries"
+arch=('i686' 'x86_64')
+url="http://www.openvas.org/"
+license=('GPL')
+depends=('gnutls' 'libpcap' 'gpgme' 'glib2')
+source=(http://wald.intevation.org/frs/download.php/572/$pkgname-$pkgver.tar.gz)
+md5sums=('1323cf02bf11806929042c3e7fb056b0')
+
+build() {
+  cd "$srcdir/$pkgname-$pkgver"
+
+  ./configure --prefix=/usr
+  make || return 1
+  make DESTDIR="$pkgdir/" install
+}
+
+# vim:set ts=2 sw=2 et:

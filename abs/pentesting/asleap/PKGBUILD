@@ -1,0 +1,18 @@
+# Contributor: Jens Pranaitis <jens@jenux.homelinux.org>
+pkgname=asleap
+pkgver=2.2
+pkgrel=1
+pkgdesc="recover LEAP/PPTP passwords"
+arch=('i686')
+url="http://www.willhackforsushi.com/Asleap.html"
+license=('GPL')
+depends=('libpcap' 'openssl')
+source=(http://www.willhackforsushi.com/code/$pkgname/$pkgver/$pkgname-$pkgver.tgz)
+md5sums=('a1d06729fb2addcc5b09bfc14f9b3173')
+build() {
+  cd ${srcdir}/$pkgname-${pkgver}
+  sed -i "s|-g3 -ggdb -g|$CFLAGS|g" Makefile
+  make || return 1
+  install -D -m 755 asleap "${pkgdir}"/usr/bin/asleap
+  install -m 755 genkeys "${pkgdir}"/usr/bin/
+}
