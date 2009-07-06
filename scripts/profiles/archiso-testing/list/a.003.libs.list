@@ -34,16 +34,10 @@ backintime
 comix
 brasero
 gtkpod
-arista
 gimp
-virtualbox-ose
 pidgin
 asunder
-mixxx
 vlc
-xchm
-inkscape
-deluge
 #libs
 aspell-en
 tcl
@@ -76,5 +70,3 @@ lm_sensors
 exiv2
 libtar
 gnome-common
-dvdauthor
-vcdimager
