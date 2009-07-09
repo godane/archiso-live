@@ -2,7 +2,7 @@
 _mnt_bind()
 {
     info "Binding ${1} to ${2}"
-    mkdir -p /real_root${2}
+    /bin/mkdir -p /real_root${2}
     /bin/mount -o bind ${1} /real_root${2}
 }
 
@@ -18,13 +18,13 @@ _mnt_squashfs()
 
     if [ "${copy2ram}" = "y" ]; then
         info "Copying squashfs image to RAM"
-        mkdir -p /tmp
-        mount -t tmpfs -o "size=6M" tmpfs /tmp
+        /bin/mkdir -p /tmp
+        /bin/mount -t tmpfs -o "size=6M" tmpfs /tmp
         /bin/cat ${img} > "${base_img}"
         img="${base_img}"
     fi
 
-    mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
+    /bin/mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
     while [ ! -e "/dev/loop${LOOP_NUM}" ]; do
         sleep 1
     done
@@ -44,7 +44,7 @@ mount_tmpfs ()
         ramdisk_size="20M"
     #fi
     info -n "Mounting tmpfs, size=${ramdisk_size}... "
-    mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
+    /bin/mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
     hl "done."; echo
 }
 
@@ -75,7 +75,7 @@ run_hook ()
     	[ ! -e "${cdrom}" ] && continue
         bootcdmnt="$(device_mountdir ${cdrom})"
         /bin/mkdir -p "${bootcdmnt}"
-    	if mount -r -t iso9660 "${cdrom}" "${bootcdmnt}" >/dev/null 2>&1; then
+    	if /bin/mount -r -t iso9660 "${cdrom}" "${bootcdmnt}" >/dev/null 2>&1; then
             if [ -f "${bootcdmnt}/base.lzm" ]; then
                 found=1
                 hl "${cdrom}"; echo
@@ -86,7 +86,7 @@ run_hook ()
             hl "uhm"; echo
             error "Failed to mount ${cdrom}"
         fi
-        [ ${found} -eq 0 ] && umount "${bootcdmnt}" >/dev/null 2>&1
+        [ ${found} -eq 0 ] && /bin/umount "${bootcdmnt}" >/dev/null 2>&1
     done
 
     if [ ${found} -eq 0 ]; then
@@ -95,8 +95,8 @@ run_hook ()
             [ ! -e "${usb}" ] && continue
             bootusbmnt="$(device_mountdir ${usb})"
             /bin/mkdir -p "${bootusbmnt}"
-            if mount -t vfat "${usb}" "${bootusbmnt}" >/dev/null 2>&1 ||\
-               mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
+            if /bin/mount -t vfat "${usb}" "${bootusbmnt}" >/dev/null 2>&1 ||\
+               /bin/mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
                 if [ "x${from}" != "x" ]; then
                     from=$(/usr/bin/basename ${from})
                     if [ -f "${bootusbmnt}/${from}/base.lzm" ]; then
@@ -116,7 +116,7 @@ run_hook ()
             else
                 error "Failed to mount ${usb}"
             fi
-            [ ${found} -eq 0 ] && umount "${bootusbmnt}" >/dev/null 2>&1
+            [ ${found} -eq 0 ] && /bin/umount "${bootusbmnt}" >/dev/null 2>&1
         done
     fi
 
