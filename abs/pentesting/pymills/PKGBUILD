@@ -1,0 +1,18 @@
+# Contributor: Jens Pranaitis <jens@chaox.net>
+pkgname=pymills
+pkgver=3.4
+pkgrel=1
+pkgdesc="James Mills general purpose Python library"
+arch=("i686")
+url="http://pypi.python.org/pymills/"
+license=('GPL')
+depends=("python" "setuptools")
+source=("http://pypi.python.org/packages/source/p/$pkgname/$pkgname-$pkgver.tar.gz")
+md5sums=('5741d4a5c30aaed5def2f4b4f86e92a9')
+build() {
+  cd "$srcdir"/$pkgname-$pkgver
+  sed -i 's|name =.*|name = "pymills"|' setup.py
+  python setup.py install --root="$pkgdir/" || return 1 
+}
+
+# vim:set ts=2 sw=2 et:

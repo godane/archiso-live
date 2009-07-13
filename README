@@ -52,6 +52,9 @@ How you make the iso from scrach.
 How you make just the iso again.
 ./build makeimg
 
+How you do a live backup of your system
+./build livebackup
+
 -How do I customize the archiso-live profile?
 List of varibles that can be change for your Archiso-Live iso:
 

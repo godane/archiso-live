@@ -54,6 +54,7 @@ elif [ ! "`cmdline_parameter noxconf`" ]; then
 		echo "no auto config needed"
 	else
 		/etc/rc.d/xakra start
+		sed -i 's|"vga"|"vesa"|g' /etc/X11/xorg.conf
 	fi
 fi
 

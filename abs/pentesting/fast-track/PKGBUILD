@@ -1,0 +1,26 @@
+# Contributor: Jens Pranaitis <jens@chaox.net>
+pkgname=fast-track
+pkgver=4.0
+pkgrel=2
+pkgdesc="Automated penetration suite"
+arch=("i686")
+url="https://www.securestate.com/Pages/Fast-Track.aspx"
+license=('BSD')
+depends=("pymssql" "metasploit3" "python-pexpect" "python-clientform" "beautiful-soup" "psyco" "firefox"\
+         "pymills")
+source=("https://www.securestate.com/files/fasttrack/fasttrack.tgz")
+md5sums=('b0271ec1483170a08fbb1207de718dd8')
+build() {
+  cd "$srcdir"
+  python setup.py install
+  mkdir -p "${pkgdir}"{/opt/fast-track/,/usr/share/licenses/fast-track,/usr/bin}
+  cp -r bin fast-track.py ftgui readme "${pkgdir}"/opt/fast-track/
+  install -m 644 readme/LICENSE "${pkgdir}"/usr/share/licenses/fast-track/
+  cat > "${pkgdir}"/usr/bin/ftgui << EOF
+#!/bin/bash
+cd /opt/fast-track
+python ./ftgui \$@
+cd \$OLDPWD
+EOF
+  chmod 755 "${pkgdir}"/usr/bin/ftgui
+}

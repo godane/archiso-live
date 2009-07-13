@@ -10,6 +10,11 @@ makeinstall()
 	mkarchiso -c $CDNAME -m $1 -f install "${WORKDIR}"
 }
 
+livebackup()
+{
+	mkarchiso -c $CDNAME -m $1 -n -f livebackup "${WORKDIR}" "${ISONAME}"
+}
+
 makeiso() 
 {
 	mkarchiso -c $CDNAME -m $1 -f all "${WORKDIR}" "${ISONAME}"
@@ -36,6 +41,9 @@ if [ "${1}" = "makeinstall" ]; then
 	makeinstall $2
 fi
 
+if [ "${1}" = "livebackup" ]; then
+	livebackup $2
+fi
 if [ "${1}" = "makeiso" ]; then
 	makeiso $2
 fi

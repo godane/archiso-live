@@ -80,7 +80,15 @@ ddrescue
 testdisk
 foremost
 autopsy
+magicrescue
 bcwipe
+#pentesting
+aesfix
+aeskeyfind
+airpwn
+amap
+asleap
+cowpatty
 #base-devel-deps
 neon
 perl-error
