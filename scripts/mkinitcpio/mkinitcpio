@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # mkinitcpio - modular tool for building an init ramfs cpio image
 #
 # IMPORTANT: We need to keep a common base syntax here
