@@ -1,0 +1,29 @@
+run_hook ()
+{
+	# don't run if ...
+	# we miss splash kernel parameter
+	[ -n "${splash}" ] || return
+	# we fail to have fbcondecor_helper
+	[ -x /sbin/fbcondecor_helper ] || return
+	# we have a fbcondecor patched kernel
+	# avoid blinking - job already done
+	! [ -e /dev/fbsplash -o -e /dev/fbcondecor ] || return
+
+	SPLASH_MODE_REQ="off"
+	options=$( echo "${splash}" | sed -e 's/,/ /g' )
+	for i in ${options} ; do
+		case ${i%:*} in
+			silent)		SPLASH_MODE_REQ="silent" ;;
+			verbose) 	SPLASH_MODE_REQ="verbose" ;;
+		esac
+	done
+	[ "${SPLASH_MODE_REQ}" = 'silent' ] || return
+
+	SPLASH_MESSAGE_INIT="Initializing the Kernel..."
+	. /etc/conf.d/fbsplash
+	
+	export BOOT_MSG="${SPLASH_MESSAGE_INIT}"
+
+	## use 'init' to get fadein if it's on the cmdline
+	/sbin/fbcondecor_helper 2 init 0 0 $SPLASH_THEME
+}
