@@ -94,5 +94,6 @@ neon
 perl-error
 mpfr
 nasm
+bison
 libxml2
 ed
