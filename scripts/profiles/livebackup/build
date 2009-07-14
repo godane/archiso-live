@@ -1,0 +1,32 @@
+#!/bin/bash
+WORKDIR=.working
+DATE="$(date +%F)"
+CDNAME="livebackup"
+ISONAME=$CDNAME-${DATE}.iso
+
+livebackup()
+{
+	mkarchiso -c $CDNAME -m $1 -f livebackup "${WORKDIR}" "${ISONAME}"
+}
+
+liveimg()
+{
+	mkarchiso -c $CDNAME -m $1 -f liveimg "${WORKDIR}" "${ISONAME}"
+}
+
+clean()
+{
+	rm -rf "${WORKDIR}" "${ISONAME}"
+}
+
+if [ "${1}" = "livebackup" ]; then
+	livebackup $2
+fi
+
+if [ "${1}" = "makeimg" ]; then
+	liveimg $1
+fi
+
+if [ "${1}" = "clean" ]; then
+	clean
+fi

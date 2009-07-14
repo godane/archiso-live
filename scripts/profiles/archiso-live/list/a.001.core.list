@@ -15,7 +15,6 @@ parted
 archiso-installer
 chakra-hardware-detection
 chakra-xakra
-chakra-initscripts
 # Network
 netcfg
 openssl
