@@ -325,6 +325,11 @@ command_install () {
 	mkdir -p ${buildlog}
 
 	mkdir -p ${packlist}
+	
+	# in case of if you have to kill mkarchiso cause of something
+	if [ -d "${INSTROOT}/var/lib/pacman/sync" ]; then
+		rm -R "${INSTROOT}/var/lib/pacman/sync"
+	fi
 
 	for mod in ${MODULES}; do
 		mkdir -p "${moduledir}/${mod}"
