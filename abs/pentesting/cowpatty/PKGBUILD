@@ -2,16 +2,16 @@
 # Contributor: icarus <icarus.roaming@gmail.com>
 # Contributor: Thomas Schneider <blacklotus@jenux.homelinux.org>
 pkgname=cowpatty
-pkgver=4.5
-pkgrel=1
+pkgver=4.6
+pkgrel=2
 pkgdesc="Wireless WPA/WPA2 PSK handshake cracking utility"
 arch=('i686' 'x86_64')
 url="http://www.willhackforsushi.com/?page_id=50"
 license=('GPL')
 depends=('openssl' 'libpcap')
 source=("http://www.willhackforsushi.com/code/$pkgname/$pkgver/$pkgname-$pkgver.tgz" "cow.patch")
-md5sums=('13e13c79ce6f5695dae355792b80d8aa' '118bf4c19a1e1920cfe066ba6a2bfa02')
-
+md5sums=('b90fd36ad987c99e7cc1d2a05a565cbd'
+         '16b15fe7fa814f3e206c0010ba8c1411')
 build() {
   cd "${srcdir}/$pkgname-$pkgver"
   sed -e "s/-g3 -ggdb/${CFLAGS}/g" -i Makefile || return 1

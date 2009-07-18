@@ -9,12 +9,3 @@
  
  all: $(PROGOBJ) $(PROG)
  
-@@ -45,7 +45,7 @@
- 
- install: all
- 	install -d $(DESTDIR)$(BINDIR)
--	install -m 755 $(PROG) $(BINDIR)$(DESTDIR)
-+	install -m 755 $(PROG) $(DESTDIR)$(BINDIR)
- 
- love:
- 	@echo "Not right now, I have a headache."
