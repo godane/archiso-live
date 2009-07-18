@@ -114,6 +114,7 @@ case "${command_name}" in
 	img) work_dir="${2}"; imgname="${3}" ;;
 	all) work_dir="${2}"; imgname="${3}" ;;
 	livebackup) work_dir="${2}"; imgname="${3}" ;;
+	liveimg) work_dir="${2}"; imgname="${3}" ;;
 	*) warn "invalid command name '${command_name}'"; usage 1 ;;
 esac
 
@@ -215,6 +216,10 @@ command_livebackup ()
 	touch ${IMGROOT}/${CDNAME}/livecd.sgn
 	cp -af ${CDROOT}/* "${IMGROOT}"
 	
+	if [ ! "$(pacman -Qs fbsplash-themes-arch-banner)" ]; then
+		error "Fbsplash is not installed. Continuing without it."
+	fi
+	
 	if [ -f "${EXCLUDE}" ]; then
 		mksquash / -keep-as-directory -noappend -ef ${EXCLUDE} ${OPTION}
 	else
@@ -273,7 +278,8 @@ mkinitramfs()
 command_livebackup_imgprepare()
 {
 	slax_initrd
-	
+
+	INSTROOT="/"
 	kernelver=$(_kversion)
 	basedir=${INSTROOT}
 	[ "${INSTROOT:0:1}" != "/" ] && basedir="$(pwd)/${INSTROOT}"

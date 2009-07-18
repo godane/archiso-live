@@ -2,8 +2,8 @@
 install() {
 	[ -x /sbin/fbcondecor_helper ] || return 1
 
-	source /etc/conf.d/fbsplash.conf
-	[ -z "${THEME}" ] && THEME="darch"
+	source /etc/conf.d/fbsplash
+	[ -z "${THEME}" ] && THEME="arch-banner-icons"
 
 	add_binary "/sbin/fbcondecor_helper"	
 
