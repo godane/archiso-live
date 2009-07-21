@@ -8,6 +8,9 @@ xorg-server
 xorg-twm
 xorg-xinit
 xterm
+dmxproto
+libdmx
+xorg-utils
 # Xorg Drivers
 xf86-video-apm
 xf86-video-ark
