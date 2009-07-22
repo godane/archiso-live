@@ -16,6 +16,7 @@ CDLABEL="Livecd"
 PUBLISHER=""
 AUTHOR=""
 MOVE_MODULES=""
+EXCLUDE="$(pwd)/exclude"
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
@@ -113,6 +114,7 @@ case "${command_name}" in
 	img) work_dir="${2}"; imgname="${3}" ;;
 	all) work_dir="${2}"; imgname="${3}" ;;
 	livebackup) work_dir="${2}"; imgname="${3}" ;;
+	liveimg) work_dir="${2}"; imgname="${3}" ;;
 	*) warn "invalid command name '${command_name}'"; usage 1 ;;
 esac
 
@@ -214,8 +216,16 @@ command_livebackup ()
 	touch ${IMGROOT}/${CDNAME}/livecd.sgn
 	cp -af ${CDROOT}/* "${IMGROOT}"
 	
-	echo "/var/cache/pacman/pkg" > exclude
-	mksquash / -keep-as-directory -noappend -ef exclude ${OPTION}
+	if [ ! "$(pacman -Qs fbsplash-themes-arch-banner)" ]; then
+		error "Fbsplash is not installed. Continuing without it."
+	fi
+	
+	if [ -f "${EXCLUDE}" ]; then
+		mksquash / -keep-as-directory -noappend -ef ${EXCLUDE} ${OPTION}
+	else
+		mksquash / -keep-as-directory -noappend ${OPTION}
+	fi
+	
 }
 
 slax_initrd()
@@ -268,7 +278,8 @@ mkinitramfs()
 command_livebackup_imgprepare()
 {
 	slax_initrd
-	
+
+	INSTROOT="/"
 	kernelver=$(_kversion)
 	basedir=${INSTROOT}
 	[ "${INSTROOT:0:1}" != "/" ] && basedir="$(pwd)/${INSTROOT}"
@@ -320,6 +331,11 @@ command_install () {
 	mkdir -p ${buildlog}
 
 	mkdir -p ${packlist}
+	
+	# in case of if you have to kill mkarchiso cause of something
+	if [ -d "${INSTROOT}/var/lib/pacman/sync" ]; then
+		rm -R "${INSTROOT}/var/lib/pacman/sync"
+	fi
 
 	for mod in ${MODULES}; do
 		mkdir -p "${moduledir}/${mod}"
@@ -335,11 +351,15 @@ command_install () {
 	
 		mkdir -p "${union}/var/lib/pacman"	
 
+		# Added /dev folder and basic devices nodes
 		mkdir -p "${union}/dev"
 		mknod ${union}/dev/console c 5 1 >/dev/null
 		mknod ${union}/dev/null c 1 3 >/dev/null
 		mknod ${union}/dev/zero c 1 5 >/dev/null
-
+		
+		# Remove /var/lib/pacman/local folder in case it just there.
+		# This will not remove it if anything is in /var/lib/pacman/local folder. 
+		# Only if its a empty folder.
 		if [ ! -d "${INSTROOT}/var/lib/pacman/sync/core" ]; then
 			pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
 			rmdir --ignore-fail-on-non-empty ${INSTROOT}/var/lib/pacman/local
@@ -640,4 +660,10 @@ if [ "${command_name}" = "livebackup" ]; then
 	command_livebackup_imgprepare
 	command_img
 fi
+
+if [ "${command_name}" = "liveimg" ]; then
+	command_livebackup_imgprepare
+	command_img
+fi
+
 # vim:ts=4:sw=4:et:
