@@ -42,7 +42,7 @@ mkinitcpio installed anyway but my mkinitcpio is custom made for Archiso-Live.
 
 Your going to have to login to root on your system. Then you do this in shell:
 su root
-cd /home/arch/archiso-live/scripts
+cd $HOME/archiso-live/scripts
 source exports
 cd profiles/archiso-live
 
@@ -53,6 +53,10 @@ How you make just the iso again.
 ./build makeimg
 
 How you do a live backup of your system
+su root
+cd $HOME/archiso-live/scripts
+source exports
+cd profiles/livebackup
 ./build livebackup
 
 -How do I customize the archiso-live profile?

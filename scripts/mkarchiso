@@ -351,11 +351,15 @@ command_install () {
 	
 		mkdir -p "${union}/var/lib/pacman"	
 
+		# Added /dev folder and basic devices nodes
 		mkdir -p "${union}/dev"
 		mknod ${union}/dev/console c 5 1 >/dev/null
 		mknod ${union}/dev/null c 1 3 >/dev/null
 		mknod ${union}/dev/zero c 1 5 >/dev/null
-
+		
+		# Remove /var/lib/pacman/local folder in case it just there.
+		# This will not remove it if anything is in /var/lib/pacman/local folder. 
+		# Only if its a empty folder.
 		if [ ! -d "${INSTROOT}/var/lib/pacman/sync/core" ]; then
 			pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
 			rmdir --ignore-fail-on-non-empty ${INSTROOT}/var/lib/pacman/local
