@@ -1,0 +1,43 @@
+X-Git-Url: http://git.c3sl.ufpr.br/gitweb?p=aufs%2Faufs2-2.6.git;a=blobdiff_plain;f=drivers%2Fnet%2Fwireless%2Frtl818x%2Frtl8187_rtl8225.c;h=78df281b297a4604fd2e10e8b3bf67d3f9c1990a;hp=69030be62b366fc99f85b980485a08f1e59fca57;hb=88adc104476cccb4b5cfaa48da7019cf9184481b;hpb=1c740ed2210a0d124674a477ea538468aba47810
+
+diff --git a/drivers/net/wireless/rtl818x/rtl8187_rtl8225.c b/drivers/net/wireless/rtl818x/rtl8187_rtl8225.c
+index 69030be..78df281 100644
+--- a/drivers/net/wireless/rtl818x/rtl8187_rtl8225.c
++++ b/drivers/net/wireless/rtl818x/rtl8187_rtl8225.c
+@@ -285,7 +285,10 @@ static void rtl8225_rf_set_tx_power(struct ieee80211_hw *dev, int channel)
+ 	ofdm_power = priv->channels[channel - 1].hw_value >> 4;
+ 
+ 	cck_power = min(cck_power, (u8)11);
+-	ofdm_power = min(ofdm_power, (u8)35);
++	if (ofdm_power > (u8)15)
++		ofdm_power = 25;
++	else
++		ofdm_power += 10;
+ 
+ 	rtl818x_iowrite8(priv, &priv->map->TX_GAIN_CCK,
+ 			 rtl8225_tx_gain_cck_ofdm[cck_power / 6] >> 1);
+@@ -536,7 +539,10 @@ static void rtl8225z2_rf_set_tx_power(struct ieee80211_hw *dev, int channel)
+ 	cck_power += priv->txpwr_base & 0xF;
+ 	cck_power = min(cck_power, (u8)35);
+ 
+-	ofdm_power = min(ofdm_power, (u8)15);
++	if (ofdm_power > (u8)15)
++		ofdm_power = 25;
++	else
++		ofdm_power += 10;
+ 	ofdm_power += priv->txpwr_base >> 4;
+ 	ofdm_power = min(ofdm_power, (u8)35);
+ 
+@@ -878,12 +884,6 @@ static void rtl8225z2_b_rf_init(struct ieee80211_hw *dev)
+ 	for (i = 0; i < ARRAY_SIZE(rtl8225z2_ofdm); i++)
+ 		rtl8225_write_phy_ofdm(dev, i, rtl8225z2_ofdm[i]);
+ 
+-	rtl818x_iowrite32(priv, (__le32 *)0xFFF0, (7 << 12) | (3 << 8) | 28);
+-	rtl818x_iowrite32(priv, (__le32 *)0xFFF4, (7 << 12) | (3 << 8) | 28);
+-	rtl818x_iowrite32(priv, (__le32 *)0xFFF8, (7 << 12) | (3 << 8) | 28);
+-	rtl818x_iowrite32(priv, (__le32 *)0xFFFC, (7 << 12) | (3 << 8) | 28);
+-	rtl818x_iowrite8(priv, &priv->map->ACM_CONTROL, 0);
+-
+ 	rtl8225_write_phy_ofdm(dev, 0x97, 0x46);
+ 	rtl8225_write_phy_ofdm(dev, 0xa4, 0xb6);
+ 	rtl8225_write_phy_ofdm(dev, 0x85, 0xfc);

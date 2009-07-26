@@ -1,0 +1,35 @@
+From: Keith Packard <keithp@keithp.com>
+Date: Sat, 6 Jun 2009 01:19:56 +0000 (-0700)
+Subject: drm/i915: Hook connector to encoder during load detection (fixes tv/vga detect)
+X-Git-Url: http://git.kernel.org/?p=linux%2Fkernel%2Fgit%2Fanholt%2Fdrm-intel.git;a=commitdiff_plain;h=03d6069912babc07a3da20e715dd6a5dc8f0f867
+
+drm/i915: Hook connector to encoder during load detection (fixes tv/vga detect)
+
+With the DRM-driven DPMS code, encoders are considered idle unless a
+connector is hooked to them, so mode setting is skipped. This makes load
+detection fail as none of the hardware is enabled.
+
+Signed-off-by: Keith Packard <keithp@keithp.com>
+Signed-off-by: Eric Anholt <eric@anholt.net>
+---
+
+diff --git a/drivers/gpu/drm/i915/intel_display.c b/drivers/gpu/drm/i915/intel_display.c
+index a87eeff..b32a51f 100644
+--- a/drivers/gpu/drm/i915/intel_display.c
++++ b/drivers/gpu/drm/i915/intel_display.c
+@@ -2136,6 +2136,7 @@ struct drm_crtc *intel_get_load_detect_pipe(struct intel_output *intel_output,
+ 	}
+ 
+ 	encoder->crtc = crtc;
++	intel_output->base.encoder = encoder;
+ 	intel_output->load_detect_temp = true;
+ 
+ 	intel_crtc = to_intel_crtc(crtc);
+@@ -2171,6 +2172,7 @@ void intel_release_load_detect_pipe(struct intel_output *intel_output, int dpms_
+ 
+ 	if (intel_output->load_detect_temp) {
+ 		encoder->crtc = NULL;
++		intel_output->base.encoder = NULL;
+ 		intel_output->load_detect_temp = false;
+ 		crtc->enabled = drm_helper_crtc_in_use(crtc);
+ 		drm_helper_disable_unused_functions(dev);
