@@ -58,6 +58,8 @@ gnome-python-extras
 pyrex
 pyxdg
 libdvdcss
+libstdc++5
+tunepimp
 #warzone2100-deps
 openal
 physfs
