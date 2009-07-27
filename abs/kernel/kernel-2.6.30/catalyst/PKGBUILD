@@ -1,52 +1,69 @@
 _kernver=2.6.30-ARCH
 
 pkgname=catalyst
-pkgver=9.6
-pkgrel=2
+pkgver=9.7
+pkgrel=3
 pkgdesc="AMD/ATI kernel drivers for Radeon brand cards. Stock kernel"
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
-license=('custom') 
+license=('custom')
 depends=("catalyst-utils>=${pkgver}" "kernel26>=2.6.30" "kernel26<2.6.31")
 replaces=('ati-fglrx' 'fglrx') # Yay rebranding
 conflicts=('catalyst')
 provides=('catalyst')
 install=catalyst.install
 source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run \
-	2.6.30.diff
-	config_x86_32.patch)
-#md5sums=('ab0674fa3bacb23339f9b23d522c23be'
-#         '3a5896c62b6a37f0f1f752017d95762d')
+2.6.29-cat9.7.patch \
+fglrx-2.6.30-irqreturn_t.patch \
+fglrx-rt-compat.patch \
+fglrx-missing-pci_enable_msi.patch \
+config_x86_32.patch \
+fglrx-smp-problem.patch)
+
+md5sums=('33ab7b3152de35e49b4db95a19821c47'
+         '36522e2dbbd75225f1241752443ab62c'
+         '84241d492acbfaf6b8cbd55dcfa99c68'
+         '4517addc6576a1b46a30e2c1043de5a2'
+         '498e5b935f02970321f76271961e0335'
+         'ea52a55f5e143d46c6106344f6ee682d'
+         'bf29a2f8d524a88c5cddbeb99ea16401')
+
 
 build() {
-  /bin/sh ./ati-driver-installer-${pkgver/./-}-x86.x86_64.run --extract archive_files
+/bin/sh ./ati-driver-installer-${pkgver/./-}-x86.x86_64.run --extract archive_files
 
-  # Fix 2.6.30 kernel
-  cd ${srcdir}/archive_files/common/lib/modules/fglrx/build_mod
-  patch -p0 <${srcdir}/2.6.30.diff || return 1
-  patch -p0 <${srcdir}/config_x86_32.patch || return 1
+# Fix 2.6.30 kernel
+cd ${srcdir}/archive_files/common
+patch -p0 <${srcdir}/2.6.29-cat9.7.patch|| return 1
 
-  if [ "${CARCH}" = "x86_64" ]; then
-    BUILDARCH=x86_64
-    _archdir=x86_64
-  fi
-  if [ "${CARCH}" = "i686" ]; then
-    BUILDARCH=i386
-    _archdir=x86
-  fi
+cd ${srcdir}/archive_files
+patch -p1 <${srcdir}/fglrx-2.6.30-irqreturn_t.patch || return 1
+patch -p1 <${srcdir}/fglrx-missing-pci_enable_msi.patch || return 1
+patch -p1 <${srcdir}/fglrx-rt-compat.patch || return 1
+patch -p1 <${srcdir}/fglrx-smp-problem.patch || return 1
+patch -p0 <${srcdir}/config_x86_32.patch || return 1
 
-  cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
-  cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a.GCC4" . || return 1
-  cp 2.6.x/Makefile . || return 1
+if [ "${CARCH}" = "x86_64" ]; then
+BUILDARCH=x86_64
+_archdir=x86_64
+fi
+if [ "${CARCH}" = "i686" ]; then
+BUILDARCH=i386
+_archdir=x86
+fi
 
-  make -C /lib/modules/${_kernver}/build SUBDIRS="`pwd`" ARCH=${BUILDARCH} modules || return 1
+cd "${srcdir}/archive_files/common/lib/modules/fglrx/build_mod"
+cp "${srcdir}/archive_files/arch/${_archdir}/lib/modules/fglrx/build_mod/libfglrx_ip.a.GCC4" . || return 1
+cp 2.6.x/Makefile . || return 1
 
-  install -m755 -d "${pkgdir}/lib/modules/${_kernver}/video/"
-  install -m644 fglrx.ko "${pkgdir}/lib/modules/${_kernver}/video/" || return 1
-  install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
+make -C /lib/modules/${_kernver}/build SUBDIRS="`pwd`" ARCH=${BUILDARCH} modules || return 1
 
-  # License
-  install -m644 "${srcdir}/archive_files/ATI_LICENSE.TXT" "${pkgdir}/usr/share/licenses/${pkgname}/" || return 1
+install -m755 -d "${pkgdir}/lib/modules/${_kernver}/video/"
+install -m644 fglrx.ko "${pkgdir}/lib/modules/${_kernver}/video/" || return 1
+install -m755 -d "${pkgdir}/usr/share/licenses/${pkgname}"
 
-  sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" $startdir/*.install
-}
+# License
+install -m644 "${srcdir}/archive_files/ATI_LICENSE.TXT" "${pkgdir}/usr/share/licenses/${pkgname}/" || return 1
+
+sed -i -e "s/KERNEL_VERSION=.*/KERNEL_VERSION=${_kernver}/" $startdir/*.install
+} 
