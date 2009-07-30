@@ -35,8 +35,14 @@ This should update your build scripts.
 	- cdrkit
 	- aufs2-util
 	- kernel26-2.6.29 or higher
+	- sqlzma 3.4
 Mksquashfs and mkinitcpio are in archiso-live folder. You should have
 mkinitcpio installed anyway but my mkinitcpio is custom made for Archiso-Live.
+You will have to do a force install of sqlzma package from my local repo. 
+
+You must add this before core repo into /etc/pacman.conf file:
+[archiso-live] 
+Server = http://arch-live.isawsome.net/packages/
 
 -How do I build my own Archiso-Live iso?
 
