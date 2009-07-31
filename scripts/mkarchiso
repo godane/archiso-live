@@ -170,6 +170,23 @@ remove()
 	return
 }
 
+check()
+{
+	if [ ! "$(pacman -Q sqlzma)" ]; then
+		error "Sqlzma needs to be installed."
+		exit 1
+	elif [ ! "$(pacman -Q aufs2-util)" ]; then
+		error "Aufs2-util needs to be installed."
+		exit 1
+	elif [ ! "$(pacman -Q cdrkit)" ]; then
+		error "Cdrkit needs to be installed."
+		exit 1
+	elif [ ! "$(pacman -Q syslinux)" ]; then
+		error "Syslinux needs to be installed."
+		exit 1
+	fi
+}
+
 # mksquash - make squashfs files of modules folder
 # mksquash <root folder where modules folders are> <squashfs options>
 # ex. mksquash / -keep-as-directory -noappend -ef exclude
@@ -599,9 +616,9 @@ command_img () {
 			cp -f "${INSTROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
 		fi
 		
-		if [ -f "${IMGROOT}/boot/vmlinuz26" ]; then
-			mv -f "${IMGROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
-		fi
+		#if [ -f "${IMGROOT}/boot/vmlinuz26" ]; then
+		#	mv -f "${IMGROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
+		#fi
 		
 		bootflags="-b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat"
 	else
@@ -636,32 +653,39 @@ command_img () {
 }
 
 if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
+	check
 	command_install
 fi
 
 if [ "${command_name}" = "overlay" -o "${command_name}" = "all" ]; then
+	check
 	command_overlay
 fi
 
 if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
+	check
 	command_squash
 fi
 
 if [ "${command_name}" = "imgprepare" -o "${command_name}" = "all" ]; then
+	check
 	command_imgprepare
 fi
 
 if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
+	check
 	command_img
 fi
 
 if [ "${command_name}" = "livebackup" ]; then
+	check
 	command_livebackup
 	command_livebackup_imgprepare
 	command_img
 fi
 
 if [ "${command_name}" = "liveimg" ]; then
+	check
 	command_livebackup_imgprepare
 	command_img
 fi

@@ -35,6 +35,7 @@ This should update your build scripts.
 	- cdrkit
 	- aufs2-util
 	- kernel26-2.6.29 or higher
+	- syslinux
 	- sqlzma 3.4
 Mksquashfs and mkinitcpio are in archiso-live folder. You should have
 mkinitcpio installed anyway but my mkinitcpio is custom made for Archiso-Live.
