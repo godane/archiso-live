@@ -612,13 +612,13 @@ command_img () {
 		mkdir -p "${IMGROOT}/boot/isolinux"
 		cp /usr/lib/syslinux/* "${IMGROOT}/boot/isolinux"
 		
-		if [ -f "${INSTROOT}/boot/vmlinuz26" ]; then
-			cp -f "${INSTROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
-		fi
-		
-		#if [ -f "${IMGROOT}/boot/vmlinuz26" ]; then
-		#	mv -f "${IMGROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
+		#if [ -f "${INSTROOT}/boot/vmlinuz26" ]; then
+		#	cp -f "${INSTROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
 		#fi
+		
+		if [ -f "${IMGROOT}/boot/vmlinuz26" ]; then
+			mv -f "${IMGROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
+		fi
 		
 		bootflags="-b boot/isolinux/isolinux.bin -c boot/isolinux/boot.cat"
 	else
