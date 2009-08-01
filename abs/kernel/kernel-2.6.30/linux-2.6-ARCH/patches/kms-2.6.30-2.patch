@@ -1,0 +1,54 @@
+From: Ma Ling <ling.ma@intel.com>
+Date: Sun, 31 May 2009 08:58:32 +0000 (+0800)
+Subject: drm/i915: Set correct TV detection voltage level override values
+X-Git-Url: http://git.kernel.org/?p=linux%2Fkernel%2Fgit%2Fanholt%2Fdrm-intel.git;a=commitdiff_plain;h=cb66c692d1ae257f32dc7f6085cf9cb9f2f6bab8
+
+drm/i915: Set correct TV detection voltage level override values
+
+We detect TV connect status by setting DAC voltage level override
+values as 0.7 voltage for DAC_A/B/C. The corresponding 2-bits shold be 0x2,
+In order correctly to set last bit as 0, at first we must clean it.
+
+It fixed freedesktop.org bug #21204
+
+Signed-off-by: Ma Ling <ling.ma@intel.com>
+Signed-off-by: Eric Anholt <eric@anholt.net>
+---
+
+diff --git a/drivers/gpu/drm/i915/i915_reg.h b/drivers/gpu/drm/i915/i915_reg.h
+index 99681cf..79df9e9 100644
+--- a/drivers/gpu/drm/i915/i915_reg.h
++++ b/drivers/gpu/drm/i915/i915_reg.h
+@@ -958,15 +958,15 @@
+ # define DAC_A_1_3_V			(0 << 4)
+ # define DAC_A_1_1_V			(1 << 4)
+ # define DAC_A_0_7_V			(2 << 4)
+-# define DAC_A_OFF			(3 << 4)
++# define DAC_A_MASK			(3 << 4)
+ # define DAC_B_1_3_V			(0 << 2)
+ # define DAC_B_1_1_V			(1 << 2)
+ # define DAC_B_0_7_V			(2 << 2)
+-# define DAC_B_OFF			(3 << 2)
++# define DAC_B_MASK			(3 << 2)
+ # define DAC_C_1_3_V			(0 << 0)
+ # define DAC_C_1_1_V			(1 << 0)
+ # define DAC_C_0_7_V			(2 << 0)
+-# define DAC_C_OFF			(3 << 0)
++# define DAC_C_MASK			(3 << 0)
+ 
+ /**
+  * CSC coefficients are stored in a floating point format with 9 bits of
+diff --git a/drivers/gpu/drm/i915/intel_tv.c b/drivers/gpu/drm/i915/intel_tv.c
+index d2c3298..c7d9ef0 100644
+--- a/drivers/gpu/drm/i915/intel_tv.c
++++ b/drivers/gpu/drm/i915/intel_tv.c
+@@ -1392,6 +1392,9 @@ intel_tv_detect_type (struct drm_crtc *crtc, struct intel_output *intel_output)
+ 		tv_ctl &= ~TV_TEST_MODE_MASK;
+ 		tv_ctl |= TV_TEST_MODE_MONITOR_DETECT;
+ 		tv_dac &= ~TVDAC_SENSE_MASK;
++		tv_dac &= ~DAC_A_MASK;
++		tv_dac &= ~DAC_B_MASK;
++		tv_dac &= ~DAC_C_MASK;
+ 		tv_dac |= (TVDAC_STATE_CHG_EN |
+ 			   TVDAC_A_SENSE_CTL |
+ 			   TVDAC_B_SENSE_CTL |

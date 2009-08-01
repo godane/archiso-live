@@ -1,5 +1,5 @@
---- firegl_public.c
-+++ firegl_public.c
+--- common/lib/modules/fglrx/build_mod/firegl_public.c
++++ common/lib/modules/fglrx/build_mod/firegl_public.c
 @@ -41,6 +41,7 @@
  #if !defined(CONFIG_X86_BIGSMP)
  #if !defined(CONFIG_X86_VISWS)

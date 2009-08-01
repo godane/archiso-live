@@ -1,6 +1,6 @@
-diff -Naurp 2.6.x/Makefile 2.6.x/Makefile
---- 2.6.x/Makefile	2009-02-28 21:53:58.000000000 +0100
-+++ 2.6.x/Makefile	2009-02-28 22:24:38.000000000 +0100
+diff -Naurp lib/modules/fglrx/build_mod/common/lib/common/lib/modules/fglrx/build_mod/modules/fglrx/build_mod/2.6.x/Makefile lib/modules/fglrx/build_mod/2.6.x/Makefile
+--- lib/modules/fglrx/build_mod/2.6.x/Makefile	2009-02-28 21:53:58.000000000 +0100
++++ lib/modules/fglrx/build_mod/2.6.x/Makefile	2009-02-28 22:24:38.000000000 +0100
 @@ -55,7 +55,10 @@ fglrx-hdrs      += firegl_public.h      
                     kcl_pci.h            \
                     kcl_str.h            \
@@ -13,9 +13,9 @@ diff -Naurp 2.6.x/Makefile 2.6.x/Makefile
                     
  drm-hdrs        += drm.h drmP.h drm_os_linux.h drm_proc.h drm_compat.h
  
-diff -Naurp acpica-acconfig.h acpica-acconfig.h
---- acpica-acconfig.h	1970-01-01 01:00:00.000000000 +0100
-+++ acpica-acconfig.h	2009-02-28 22:24:01.000000000 +0100
+diff -Naurp lib/modules/fglrx/build_mod/common/lib/common/lib/modules/fglrx/build_mod/modules/fglrx/build_mod/acpica-acconfig.h lib/modules/fglrx/build_mod/acpica-acconfig.h
+--- lib/modules/fglrx/build_mod/acpica-acconfig.h	1970-01-01 01:00:00.000000000 +0100
++++ lib/modules/fglrx/build_mod/acpica-acconfig.h	2009-02-28 22:24:01.000000000 +0100
 @@ -0,0 +1,217 @@
 +/******************************************************************************
 + *
@@ -234,9 +234,9 @@ diff -Naurp acpica-acconfig.h acpica-acconfig.h
 +#define ACPI_DEBUGGER_EXECUTE_PROMPT    '%'
 +
 +#endif				/* _ACCONFIG_H */
-diff -Naurp acpica-aclocal.h acpica-aclocal.h
---- acpica-aclocal.h	1970-01-01 01:00:00.000000000 +0100
-+++ acpica-aclocal.h	2009-02-28 21:35:32.000000000 +0100
+diff -Naurp lib/modules/fglrx/build_mod/common/lib/common/lib/modules/fglrx/build_mod/modules/fglrx/build_mod/acpica-aclocal.h lib/modules/fglrx/build_mod/acpica-aclocal.h
+--- lib/modules/fglrx/build_mod/acpica-aclocal.h	1970-01-01 01:00:00.000000000 +0100
++++ lib/modules/fglrx/build_mod/acpica-aclocal.h	2009-02-28 21:35:32.000000000 +0100
 @@ -0,0 +1,990 @@
 +/******************************************************************************
 + *
@@ -1228,9 +1228,9 @@ diff -Naurp acpica-aclocal.h acpica-aclocal.h
 +#define ACPI_NUM_MEM_LISTS              2
 +
 +#endif				/* __ACLOCAL_H__ */
-diff -Naurp acpica-acobject.h acpica-acobject.h
---- acpica-acobject.h	1970-01-01 01:00:00.000000000 +0100
-+++ acpica-acobject.h	2009-02-28 22:24:01.000000000 +0100
+diff -Naurp lib/modules/fglrx/build_mod/common/lib/common/lib/modules/fglrx/build_mod/modules/fglrx/build_mod/acpica-acobject.h lib/modules/fglrx/build_mod/acpica-acobject.h
+--- lib/modules/fglrx/build_mod/acpica-acobject.h	1970-01-01 01:00:00.000000000 +0100
++++ lib/modules/fglrx/build_mod/acpica-acobject.h	2009-02-28 22:24:01.000000000 +0100
 @@ -0,0 +1,446 @@
 +
 +/******************************************************************************
@@ -1678,61 +1678,9 @@ diff -Naurp acpica-acobject.h acpica-acobject.h
 +#pragma pack()
 +
 +#endif				/* _ACOBJECT_H */
-diff -Naurp firegl_public.c firegl_public.c
---- firegl_public.c	2009-02-28 22:31:33.000000000 +0100
-+++ firegl_public.c	2009-02-28 22:30:23.000000000 +0100
-@@ -1402,7 +1402,7 @@ KCL_TYPE_Pid ATI_API_CALL KCL_GetTgid(vo
-  */
- KCL_TYPE_Uid ATI_API_CALL KCL_GetEffectiveUid(void)
- {
--    return current->euid;
-+    return current->cred->euid;
- }
- 
- /** /brief Delay execution for the specified number of microseconds
-@@ -1774,14 +1774,15 @@ int ATI_API_CALL KCL_PosixSecurityCapChe
-  */
- void ATI_API_CALL KCL_PosixSecurityCapSetIPCLock(unsigned int lock)
- {
-+    struct cred* currentCred = (struct cred*)get_current_cred();
-     if (lock == 0 )
-     {
--        cap_lower(current->cap_effective, CAP_IPC_LOCK);
-+        cap_lower(currentCred->cap_effective, CAP_IPC_LOCK);
-     }
-     else
-     {
--        cap_raise(current->cap_effective, CAP_IPC_LOCK);
--    }    
-+        cap_raise(currentCred->cap_effective, CAP_IPC_LOCK);
-+    }
-     return; 
- }
- 
-diff -Naurp firegl_public.h firegl_public.h
---- firegl_public.h	2009-03-01 00:21:56.000000000 +0100
-+++ firegl_public.h	2009-03-01 00:21:17.000000000 +0100
-@@ -589,13 +589,13 @@ extern unsigned long        KCL_SYSINFO_
- #define cpu_has_pge test_bit(X86_FEATURE_PGE, &boot_cpu_data.x86_capability)
- #endif
- 
--#ifndef pgprot_writecombine
-+/* #ifndef pgprot_writecombine */
- #define pgprot_writecombine(prot) __pgprot((pgprot_val(prot) & ~(_PAGE_PCD)) | _PAGE_PWT)
--#endif
-+/* #endif */
- 
--#ifndef pgprot_noncached
-+/* #ifndef pgprot_noncached */
- #define pgprot_noncached(prot) __pgprot(pgprot_val(prot) | _PAGE_PCD | _PAGE_PWT)
--#endif
-+/* #endif */
- 
- #endif //FIREGL_USWC_SUPPORT
- 
-diff -Naurp kcl_acpi.c kcl_acpi.c
---- kcl_acpi.c	2009-02-28 21:39:21.000000000 +0100
-+++ kcl_acpi.c	2009-02-28 22:25:29.000000000 +0100
+diff -Naurp lib/modules/fglrx/build_mod/common/lib/common/lib/modules/fglrx/build_mod/modules/fglrx/build_mod/kcl_acpi.c lib/modules/fglrx/build_mod/kcl_acpi.c
+--- lib/modules/fglrx/build_mod/kcl_acpi.c	2009-02-28 21:39:21.000000000 +0100
++++ lib/modules/fglrx/build_mod/kcl_acpi.c	2009-02-28 22:25:29.000000000 +0100
 @@ -17,6 +17,9 @@
  #include <linux/version.h>
  #include <linux/autoconf.h>
@@ -1743,31 +1691,82 @@ diff -Naurp kcl_acpi.c kcl_acpi.c
 
  #include "kcl_config.h"
  #include "kcl_type.h"
-diff -Naur kcl_pci.c kcl_pci.c
---- kcl_pci.c	2009-05-31 12:05:01.115508741 -0500
-+++ kcl_pci.c	2009-05-31 12:06:15.871506492 -0500
-@@ -310,3 +310,8 @@
- }
- #endif //__x86_64__
- 
-+#undef pci_enable_msi
-+int pci_enable_msi(struct pci_dev *pdev)
-+{
-+return pci_enable_msi_block(pdev, 1);
-+}
-diff -Naur drm_os_linux.h drm_os_linux.h
---- drm_os_linux.h	2009-05-27 19:24:11.944421623 -0500
-+++ drm_os_linux.h	2009-05-27 19:28:12.424780164 -0500
-@@ -42,10 +42,12 @@
- #define DRM_IRQ_ARGS		int irq, void *arg, struct pt_regs *regs
- /** backwards compatibility with old irq return values */
- #ifndef IRQ_HANDLED
-+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,30)
- typedef void irqreturn_t;
- #define IRQ_HANDLED   /* nothing */
- #define IRQ_NONE      /* nothing */
- #endif
+diff -Nparu catalyst-9.7/common/lib/modules/fglrx/build_mod/firegl_public.c catalyst-9.7-2.6.29/common/lib/modules/fglrx/build_mod/firegl_public.c
+--- lib/modules/fglrx/build_mod/firegl_public.c     2009-07-11 01:02:14.000000000 +0200
++++ lib/modules/fglrx/build_mod/firegl_public.c      2009-07-24 15:51:30.946052492 +0200
+@@ -1448,7 +1448,11 @@ KCL_TYPE_Pid ATI_API_CALL KCL_GetTgid(vo
+  */
+ KCL_TYPE_Uid ATI_API_CALL KCL_GetEffectiveUid(void)
+ {
++#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,28)
++    return current->cred->euid;
++#else
+     return current->euid;
 +#endif
+ }
  
- /** AGP types */
- #if LINUX_VERSION_CODE < KERNEL_VERSION(2,5,70)
+ /** /brief Delay execution for the specified number of microseconds
+@@ -1820,15 +1824,30 @@ int ATI_API_CALL KCL_PosixSecurityCapChe
+  */
+ void ATI_API_CALL KCL_PosixSecurityCapSetIPCLock(unsigned int lock)
+ {
++
++#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,28)
++    struct cred *new = prepare_creds();
++    if (!new) {
++           printk(KERN_ERR "fglrx: could not allocate memory\n");
++           return;
++    }
++#else
++#define new current
++#endif
+     if (lock == 0 )
+     {
+-        cap_lower(current->cap_effective, CAP_IPC_LOCK);
++        cap_lower(new->cap_effective, CAP_IPC_LOCK);
+     }
+     else
+     {
+-        cap_raise(current->cap_effective, CAP_IPC_LOCK);
++        cap_raise(new->cap_effective, CAP_IPC_LOCK);
+     }    
+-    return; 
++
++#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,28)
++    commit_creds(new);
++#else
++#undef new
++#endif
+ }
+ 
+ /** \brief Get number of available RAM pages
+diff -Nparu catalyst-9.7/common/lib/modules/fglrx/build_mod/firegl_public.h catalyst-9.7-2.6.29/common/lib/modules/fglrx/build_mod/firegl_public.h
+--- lib/modules/fglrx/build_mod/firegl_public.h     2009-07-11 01:02:14.000000000 +0200
++++ lib/modules/fglrx/build_mod/firegl_public.h      2009-07-24 15:51:30.946052492 +0200
+@@ -18,6 +18,7 @@
+ #define _FIREGL_PUBLIC_H_
+
+ #include <stdarg.h>
++#include <asm/pgtable.h>
+ #include "kcl_pci.h"
+ #include "kcl_io.h"
+
+@@ -603,6 +604,11 @@ extern unsigned long        KCL_SYSINFO_
+ #define cpu_has_pge test_bit(X86_FEATURE_PGE, &boot_cpu_data.x86_capability)
+ #endif
+
++#if LINUX_VERSION_CODE > KERNEL_VERSION(2,6,28)
++#undef pgprot_writecombine
++#undef pgprot_noncached
++#endif
++
+ #ifndef pgprot_writecombine
+ #define pgprot_writecombine(prot) __pgprot((pgprot_val(prot) & ~(_PAGE_PCD)) | _PAGE_PWT)
+ #endif
+@@ -611,6 +617,7 @@ extern unsigned long        KCL_SYSINFO_
+ #define pgprot_noncached(prot) __pgprot(pgprot_val(prot) | _PAGE_PCD | _PAGE_PWT)
+ #endif
+
++
+ #endif //FIREGL_USWC_SUPPORT
+

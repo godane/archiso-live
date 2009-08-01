@@ -35,8 +35,15 @@ This should update your build scripts.
 	- cdrkit
 	- aufs2-util
 	- kernel26-2.6.29 or higher
+	- syslinux
+	- sqlzma 3.4
 Mksquashfs and mkinitcpio are in archiso-live folder. You should have
 mkinitcpio installed anyway but my mkinitcpio is custom made for Archiso-Live.
+You will have to do a force install of sqlzma package from my local repo. 
+
+You must add this before core repo into /etc/pacman.conf file:
+[archiso-live] 
+Server = http://arch-live.isawsome.net/packages/
 
 -How do I build my own Archiso-Live iso?
 
@@ -77,6 +84,9 @@ List of varibles that can be change for your Archiso-Live iso:
 	DELDIR is for deleting folders that are not need in your livecd iso.
 
 	KERNEL is to be change only if your use a custom kernel that is not kernel26. Makes it 
+	easyer to build the iso with custom kernel.
+
+	VMLINUZ is to be change only if your use a custom kernel that is not kernel26. Makes it 
 	easyer to build the iso with custom kernel.
 
 	CDLABEL is for change volume iso name. 
