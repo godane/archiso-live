@@ -870,7 +870,9 @@ modprobe_essential_modules()
    echolog "Loading filesystems modules ..."
    modprobe_module loop
    modprobe_module isofs
+   modprobe_module sqlzma
    modprobe_module squashfs
+   modprobe_module unlzma
    modprobe_module aufs brs=1
    modprobe_module ext2
    modprobe_module ext3
