@@ -86,6 +86,9 @@ List of varibles that can be change for your Archiso-Live iso:
 	KERNEL is to be change only if your use a custom kernel that is not kernel26. Makes it 
 	easyer to build the iso with custom kernel.
 
+	VMLINUZ is to be change only if your use a custom kernel that is not kernel26. Makes it 
+	easyer to build the iso with custom kernel.
+
 	CDLABEL is for change volume iso name. 
 
 	PUBLISHER is for the website you would be releasing it from. This is put into
