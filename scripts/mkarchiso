@@ -1,9 +1,9 @@
 #!/bin/bash
 
-CPIOCONFIG="$(pwd)/archiso-mkinitcpio.conf"
-OVERLAY="$(pwd)/overlay"
+CPIOCONFIG="${PROFILE}/archiso-mkinitcpio.conf"
+OVERLAY="${PROFILE}/overlay"
 CACHE="/var/cache/pacman/pkg"
-PKGFILE="$(pwd)/packages.list"
+#PKGFILE="$(pwd)/packages.list"
 PKGLIST=""
 QUIET="n"
 FORCE="y"
@@ -16,24 +16,25 @@ CDLABEL="Livecd"
 PUBLISHER=""
 AUTHOR=""
 MOVE_MODULES=""
-EXCLUDE="$(pwd)/exclude"
+EXCLUDE="${PROFILE}/exclude"
 VMLINUZ="boot/vmlinuz26"
+PROFILE=$(pwd)
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
 info () { echo -e "\033[1;32;40m>>> \033[1;37;40m$@\033[1;0m"; }
 
 KERNEL="/etc/mkinitcpio.d/kernel26.kver"
-ROOT_MOD="$(ls -1 $(pwd)/list | head -1)"
+ROOT_MOD="$(ls -1 ${PROFILE}/list | head -1)"
 CDNAME="livecd"
 LIVELINUX="../../linux-live/initrd"
 
-if [ -f $(pwd)/config ]; then
-	. $(pwd)/config
+if [ -f "${PROFILE}/config" ]; then
+	. ${PROFILE}/config
 fi
 
-if [ -f "$(pwd)/pacman.conf" ]; then
-	PACMANCONF="$(pwd)/pacman.conf"
+if [ -f "${PROFILE}/pacman.conf" ]; then
+	PACMANCONF="${PROFILE}/pacman.conf"
 else
 	PACMANCONF="/etc/pacman.conf"
 fi
@@ -46,15 +47,15 @@ usage ()
 	echo "usage ${APPNAME} [options] command <command options>"
 	echo " general options:"
 	echo "    -f               Force overwrite of working files/squashfs image/bootable image"
-	echo "    -i CPIO_CONFIG   Use CONFIG file for mkinitcpio. default: ${CPIOCONFIG}"
-	#echo "    -P PKGFILE       File with list of packages to install. default: ${PKGFILE}"
+	echo "    -i CPIO_CONFIG   Use CONFIG file for mkinitcpio. Default: ${CPIOCONFIG}"
+	echo "    -P PROFILE       Used to select the folder of the profile for the livecd. Defualt: $PROFILE "
 	#echo "    -p PACKAGE       Additional package to install, can be used multiple times"
 	echo "    -n NOLZMA        Use plain squashfs instead of squashfs+lzma."
 	echo "    -c CDNAME        The name of the data folder for liblinuxlibe script to look for. Default: ${CDNAME}"
 	echo "    -b BOOT		Boot option (syslinux,grub,grub-gfx)"
-	echo "    -M MODULES       Modules for livecd. default: ${MODULES}"
-	echo "    -m MODULESCOPY   Copy modules from a folder to modules place in IMGROOT. default: none"
-	echo "    -a ADDON_DIR     Use addons from DIR. default: none"
+	echo "    -M MODULES       Modules for livecd. Default: ${MODULES}"
+	echo "    -m MODULESCOPY   Copy modules from a folder to modules place in IMGROOT. Default: none"
+	echo "    -a ADDON_DIR     Use addons from DIR. Default: none"
 	echo "    -t <iso,disk>    Type of image to create. Defaults to iso."
 	echo "    -v               Enable verbose output."
 	echo "    -h               This message."
@@ -73,7 +74,7 @@ usage ()
 while getopts 'i:P:b:M:m:a:t:c:nfvh' arg; do
 	case "${arg}" in
 		i) CPIOCONFIG="${OPTARG}" ;;
-		#P) PKGFILE="${OPTARG}" ;;
+		P) PROFILE="${OPTARG}" ;;
 		#p) PKGLIST="${PKGLIST} ${OPTARG}" ;;
 		b) BOOT="${OPTARG}" ;;
 		M) MODULES="${OPTARG}" ;;
@@ -132,9 +133,11 @@ else
 	OPTION=""
 fi
 
+
 info "${APPNAME} : Configuration Settings"
 echo "   mkinitcpio config file:   ${CPIOCONFIG}"
 #echo "   mount description file:   ${MOUNTFILE}"
+echo "           profile folder:   ${PROFILE}"
 echo "         pacman.conf file:   ${PACMANCONF}"
 echo "                boot menu:   ${BOOT}"
 echo "        working directory:   ${work_dir}"
@@ -149,9 +152,9 @@ lastbr="${work_dir}/empty"
 moduleplace="${IMGROOT}/${CDNAME}/base"
 moduledir="${work_dir}/modules"
 INSTROOT="${moduledir}/$(basename ${ROOT_MOD} .list)"
-CDROOT="$(pwd)/cd-root"
-buildlog="$(pwd)/${work_dir}/log"
-packlist="$(pwd)/${work_dir}/packlist"
+CDROOT="${PROFILE}/cd-root"
+buildlog="${work_dir}/log"
+packlist="${work_dir}/packlist"
 PKGFILE="${IMGROOT}/packages.list"
 
 _kversion ()
@@ -305,6 +308,7 @@ command_livebackup_imgprepare()
 
 
 }
+
 # Go through the main commands in order. If 'all' was specified, then we want
 # to do everything. Start with 'install'.
 #if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
