@@ -1,7 +1,5 @@
 #!/bin/bash
 
-CPIOCONFIG="${PROFILE}/archiso-mkinitcpio.conf"
-OVERLAY="${PROFILE}/overlay"
 CACHE="/var/cache/pacman/pkg"
 #PKGFILE="$(pwd)/packages.list"
 PKGLIST=""
@@ -16,9 +14,11 @@ CDLABEL="Livecd"
 PUBLISHER=""
 AUTHOR=""
 MOVE_MODULES=""
-EXCLUDE="${PROFILE}/exclude"
 VMLINUZ="boot/vmlinuz26"
 PROFILE=$(pwd)
+CPIOCONFIG="${PROFILE}/archiso-mkinitcpio.conf"
+OVERLAY="${PROFILE}/overlay"
+EXCLUDE="${PROFILE}/exclude"
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
