@@ -4,7 +4,8 @@ xf86-input-mouse
 xf86-input-evdev
 xf86-video-vesa
 xorg-res-utils
-xorg-server-catalyst-maximize-fix
+#xorg-server-catalyst-maximize-fix
+xorg-server
 xorg-twm
 xorg-xinit
 xterm
