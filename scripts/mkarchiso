@@ -619,9 +619,11 @@ command_img () {
 		mkdir -p "${IMGROOT}/boot/isolinux"
 		cp /usr/lib/syslinux/* "${IMGROOT}/boot/isolinux"
 		
-		#if [ -f "${INSTROOT}/boot/vmlinuz26" ]; then
-		#	cp -f "${INSTROOT}/boot/vmlinuz26" "${IMGROOT}/boot/vmlinuz"
-		#fi
+		# DO NOT REMOVE
+		# Its used for livebackup option even though INSTROOT will be null
+		if [ -f "${INSTROOT}/${VMLINUZ}" ]; then
+			cp -f "${INSTROOT}/${VMLINUZ}" "${IMGROOT}/boot/vmlinuz"
+		fi
 		
 		if [ -f "${IMGROOT}/${VMLINUZ}" ]; then
 			mv -f "${IMGROOT}/${VMLINUZ}" "${IMGROOT}/boot/vmlinuz"
