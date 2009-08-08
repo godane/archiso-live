@@ -4,13 +4,21 @@ xf86-input-mouse
 xf86-input-evdev
 xf86-video-vesa
 xorg-res-utils
-xorg-server-catalyst-maximize-fix
+#xorg-server-catalyst-maximize-fix
+xorg-server
 xorg-twm
 xorg-xinit
 xterm
 dmxproto
 libdmx
 xorg-utils
+xorg-utils-macros
+xorg-xfs
+# Xorg devel
+libxtrap
+xcmiscproto
+resourceproto
+libxss
 # Xorg Drivers
 xf86-video-apm
 xf86-video-ark

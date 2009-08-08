@@ -8,29 +8,20 @@
 
 /usr/bin/clear
 echo " "
-printf " ${C_OTHER}>${C_H1} Arch Linux (${C_H2}http://www.archlinux.org${C_H1})${C_CLEAR}\n\n"
-printf " ${C_OTHER}>${C_H1} Copyright 2002-2007 Judd Vinet ${C_CLEAR}\n"
-printf " ${C_OTHER}>${C_H1} Copyright 2007-2009 Aaron Griffin ${C_CLEAR}\n"
-printf " ${C_OTHER}>${C_H1} Distributed under the GNU General Public License (GPL)${C_CLEAR}\n\n"
+printhl "Arch Linux\n"
+printhl "${C_H2}http://www.archlinux.org"
+printhl "Copyright 2002-2007 Judd Vinet"
+printhl "Copyright 2007-2009 Aaron Griffin"
+printhl "Distributed under the GNU General Public License (GPL)"
+printsep
 
 # mount /proc, /sys and our RAM /dev
 /bin/mount -n -t ramfs none /dev
 /bin/mount -n -t proc none /proc
 /bin/mount -n -t sysfs none /sys
 
-# Create our default nodes that minilogd may need
-/bin/mknod /dev/null c 1 3
-/bin/mknod /dev/zero c 1 5
-/bin/mknod /dev/console c 5 1
-
-# More initial /dev setup that udev doesn't do
-/bin/ln -snf /proc/self/fd /dev/fd
-/bin/ln -snf /proc/self/fd/0 /dev/stdin
-/bin/ln -snf /proc/self/fd/1 /dev/stdout
-/bin/ln -snf /proc/self/fd/2 /dev/stderr
-/bin/ln -snf /proc/kcore /dev/core
-/bin/mkdir /dev/pts
-/bin/mkdir /dev/shm
+# Copy static device nodes to /dev
+/bin/cp -a /lib/udev/devices/* /dev/
 
 # start up our mini logger until syslog takes over
 /sbin/minilogd
@@ -47,9 +38,8 @@ fi
 /sbin/modprobe rtc-cmos >/dev/null 2>&1
 RTC_MAJOR=$(/bin/grep -w rtc /proc/devices 2>/dev/null); RTC_MAJOR="${RTC_MAJOR%% *}"
 if [ -n "$RTC_MAJOR" ]; then
-	/bin/mkdir /dev/misc/
-	/bin/mknod /dev/misc/rtc0 c $RTC_MAJOR 0
-	/bin/ln -s /dev/misc/rtc0 /dev/rtc
+	/bin/mknod /dev/rtc0 c $RTC_MAJOR 0
+	/bin/ln -s /dev/rtc0 /dev/rtc
 fi
 
 HWCLOCK_PARAMS="--hctosys"
@@ -70,14 +60,20 @@ fi
 
 echo > /proc/sys/kernel/hotplug
 
-if [ -x /sbin/udevadm -a -d /sys/block ]; then
-	# We have udev and /sys appears to be mounted, use UDev
+if [ -x /sbin/udevadm ]; then
 	stat_busy "Starting UDev Daemon"
 	/sbin/udevd --daemon
 	stat_done
 else
 	# Static /dev, our last resort
 	status "Using static /dev filesystem" true
+fi
+
+# Trigger udev uevents
+if /bin/pidof -o %PPID /sbin/udevd >/dev/null; then
+  stat_busy "Triggering UDev uevents"
+  /sbin/udevadm trigger &
+  stat_done
 fi
 
 # Load modules from the MODULES array defined in rc.conf
@@ -111,15 +107,14 @@ if ! [ "$load_modules" = "off" ]; then
 	fi
 fi
 
-# run udev uevents
+# Wait for udev uevents
 if /bin/pidof -o %PPID /sbin/udevd >/dev/null; then
-	stat_busy "Loading UDev uevents"
+	stat_busy "Waiting for UDev uevents to be processed"
 	udevstart="$(/bin/date +%s%0N)"
-	/sbin/udevadm trigger
 	/sbin/udevadm settle
 	stat_done
 	udevend="$(/bin/date +%s%0N)"
-	printhl "UDev uevent processing time: $((($udevend-$udevstart)/1000000))ms"
+	printhl "   UDev uevent processing time: $((($udevend-$udevstart)/1000000))ms"
 fi
 
 # bring up the loopback interface
@@ -241,44 +236,48 @@ FORCEFSCK=
 [ -f /forcefsck ] && FORCEFSCK="-- -f"
 NETFS="nonfs,nonfs4,nosmbfs,nocifs,nocodafs,noncpfs,nosysfs,noshfs,nofuse,nofuseblk"
 
+fsck_reboot() {
+	echo "Automatic reboot in progress..."
+	/bin/umount -a
+	/bin/mount -n -o remount,ro /
+	/sbin/reboot -f
+	exit 0
+}
+
 if [ -x /sbin/fsck ]; then
 	stat_busy "Checking Filesystems"
-	if /bin/grep -qw quiet /proc/cmdline; then
-		/sbin/fsck -A -T -C -a -t $NETFS $FORCEFSCK >/dev/null 2>&1
-	else
-		/sbin/fsck -A -T -C -a -t $NETFS $FORCEFSCK 2>/dev/null
-	fi
+	FSCK_OUT=/dev/stdout
+	FSCK_ERR=/dev/null
+	/sbin/fsck -A -T -C -a -t $NETFS $FORCEFSCK >$FSCK_OUT 2>$FSCK_ERR
 	fsckret=$?
 	if [ ${fsckret} -gt 1 ]; then
 		stat_fail
-		if [ $((${fsckret}&2)) -eq 2 ]; then
-			echo
-			echo "********************** REBOOT REQUIRED *********************"
-			echo "*                                                          *"
-			echo "* The system will be rebooted automatically in 15 seconds. *"
-			echo "*                                                          *"
-			echo "************************************************************"
-			echo
-			/bin/sleep 15
-		else
-			echo
-			echo "*****************  FILESYSTEM CHECK FAILED  ****************"
-			echo "*                                                          *"
-			echo "*  Please repair manually and reboot. Note that the root   *"
-			echo "*  file system is currently mounted read-only. To remount  *"
-			echo "*  it read-write type: mount -n -o remount,rw /            *"
-			echo "*  When you exit the maintenance shell the system will     *"
-			echo "*  reboot automatically.                                   *"
-			echo "*                                                          *"
-			echo "************************************************************"
-			echo
-			/sbin/sulogin -p
-		fi
-		echo "Automatic reboot in progress..."
-		/bin/umount -a
-		/bin/mount -n -o remount,ro /
-		/sbin/reboot -f
-		exit 0
+	fi
+	if [ $((${fsckret}&2)) -eq 2 ]; then
+		echo
+		echo "********************** REBOOT REQUIRED *********************"
+		echo "*                                                          *"
+		echo "* The system will be rebooted automatically in 15 seconds. *"
+		echo "*                                                          *"
+		echo "************************************************************"
+		echo
+		/bin/sleep 15
+		fsck_reboot
+	fi
+	if [ ${fsckret} -gt 1 -a ${fsckret} -ne 32 ]; then
+		echo
+		echo "*****************  FILESYSTEM CHECK FAILED  ****************"
+		echo "*                                                          *"
+		echo "*  Please repair manually and reboot. Note that the root   *"
+		echo "*  file system is currently mounted read-only. To remount  *"
+		echo "*  it read-write type: mount -n -o remount,rw /            *"
+		echo "*  When you exit the maintenance shell the system will     *"
+		echo "*  reboot automatically.                                   *"
+		echo "*                                                          *"
+		echo "************************************************************"
+		echo
+		/sbin/sulogin -p
+		fsck_reboot
 	fi
 	stat_done
 fi
@@ -307,12 +306,14 @@ if [ "$TIMEZONE" != "" -a -e "/usr/share/zoneinfo/$TIMEZONE" ]; then
 	/bin/cp "/usr/share/zoneinfo/$TIMEZONE" /etc/localtime
 fi
 
+/sbin/hwclock --adjust #Adjust for system drift
 /sbin/hwclock $HWCLOCK_PARAMS
 stat_done
 
-if [ -f /var/run/random-seed ]; then
+RANDOM_SEED=/var/lib/misc/random-seed
+if [ -f $RANDOM_SEED ]; then
 	stat_busy "Initializing Random Seed"
-	/bin/cat /var/run/random-seed >/dev/urandom
+	/bin/cat $RANDOM_SEED > /dev/urandom
 	stat_done
 fi
 
@@ -358,9 +359,9 @@ if echo "$LOCALE" | /bin/grep -qi utf ; then
 	# UTF-8 consoles are default since 2.6.24 kernel
 	# this code is needed not only for older kernels,
 	# but also when user has set vt.default_utf8=0 but LOCALE is *.UTF-8.
-	for i in $(/usr/bin/seq 0 63); do
-		/usr/bin/kbd_mode -u < /dev/vc/${i}
-		printf "\e%%G" > /dev/vc/${i}
+	for i in /dev/tty[0-9]*; do
+			/usr/bin/kbd_mode -u < ${i}
+			printf "\e%%G" > ${i}
 	done
 	# the $CONSOLE check helps us avoid this when running scripts from cron
 	echo 'if [ "$CONSOLE" = "" -a "$TERM" = "linux" -a -t 1 ]; then printf "\e%%G"; fi' >>/etc/profile.d/locale.sh
@@ -369,9 +370,9 @@ if echo "$LOCALE" | /bin/grep -qi utf ; then
 else
 	stat_busy "Setting Consoles to legacy mode"
 	# make non-UTF-8 consoles work on 2.6.24 and newer kernels
-	for i in $(/usr/bin/seq 0 63); do
-		/usr/bin/kbd_mode -a < /dev/vc/${i}
-		printf "\e%%@" > /dev/vc/${i}
+	for i in /dev/tty[0-9]*; do
+			/usr/bin/kbd_mode -u < ${i}
+			printf "\e%%@" > ${i}
 	done
 	# the $CONSOLE check helps us avoid this when running scripts from cron
 	echo 'if [ "$CONSOLE" = "" -a "$TERM" = "linux" -a -t 1 ]; then printf "\e%%@"; fi' >>/etc/profile.d/locale.sh
@@ -385,18 +386,18 @@ if [ -n "$CONSOLEFONT" ]; then
 	if [ -n "$CONSOLEMAP" ] && echo "$LOCALE" | /bin/grep -qi utf ; then
 		CONSOLEMAP=""
 	fi
-	for i in $(/usr/bin/seq 0 63); do
+	for i in /dev/tty[0-9]*; do
 		if [ -n "$CONSOLEMAP" ]; then
-			/usr/bin/setfont -m $CONSOLEMAP $CONSOLEFONT -C /dev/vc/${i} >/dev/null 2>&1
+			/usr/bin/setfont -m $CONSOLEMAP $CONSOLEFONT -C ${i} >/dev/null 2>&1
 		else
-			/usr/bin/setfont $CONSOLEFONT -C /dev/vc/${i} >/dev/null 2>&1
+			/usr/bin/setfont $CONSOLEFONT -C ${i} >/dev/null 2>&1
 		fi
 	done
 	if [ $? -ne 0 ]; then
 		stat_fail
 	else
-		for i in $(/usr/bin/seq 0 63); do
-			printf "\e(K" > /dev/vc/${i}
+		for i in /dev/tty[0-9]*; do
+			printf "\e(K" > ${i}
 		done
 		# the $CONSOLE check helps us avoid this when running scripts from cron
 		echo 'if [ "$CONSOLE" = "" -a "$TERM" = "linux" -a -t 1 ]; then printf "\e(K"; fi' >>/etc/profile.d/locale.sh
@@ -416,11 +417,7 @@ if [ -f "/dev/.udev/tmp-rules--70-persistent-net.rules" ]; then
 	stat_done
 fi
 
-# Save our dmesg output from this boot
-if [ -f /var/log/dmesg.log ]; then
-	/bin/rm /var/log/dmesg.log
-fi
-/bin/dmesg > /var/log/dmesg.log
+/bin/dmesg >| /var/log/dmesg.log
 
 # End of file
 # vim: set ts=2 noet:

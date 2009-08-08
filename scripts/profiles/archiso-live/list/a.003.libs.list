@@ -21,8 +21,8 @@ gpodder
 audacious
 audacious-plugins
 claws-mail
-shaman
-geany
+#shaman
+#geany
 mplayer
 gnome-mplayer
 gecko-mediaplayer
@@ -72,3 +72,5 @@ lm_sensors
 exiv2
 libtar
 gnome-common
+redland
+rarian
