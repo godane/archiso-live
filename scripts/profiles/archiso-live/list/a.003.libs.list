@@ -21,8 +21,8 @@ gpodder
 audacious
 audacious-plugins
 claws-mail
-shaman
-geany
+#shaman
+#geany
 mplayer
 gnome-mplayer
 gecko-mediaplayer

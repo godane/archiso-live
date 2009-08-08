@@ -12,6 +12,13 @@ xterm
 dmxproto
 libdmx
 xorg-utils
+xorg-utils-macros
+xorg-xfs
+# Xorg devel
+libxtrap
+xcmiscproto
+resourceproto
+libxss
 # Xorg Drivers
 xf86-video-apm
 xf86-video-ark
