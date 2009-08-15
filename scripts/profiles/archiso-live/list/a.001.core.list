@@ -69,6 +69,7 @@ rpcbind
 mysql-clients
 mysql-python
 espeak
+aspell-en
 #server
 apache
 lighttpd

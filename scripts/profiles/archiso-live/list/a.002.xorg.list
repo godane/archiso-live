@@ -92,14 +92,13 @@ gtkdialog
 conky
 feh
 # Desktop
-openbox
-awesome
-icewm
 fluxbox
-lxde
-obconf
-obmenu
 usbview
 xarchiver
 cups
 tightvnc
+tcl
+libexif
+lm_sensors
+taglib
+vte
