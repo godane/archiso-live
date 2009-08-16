@@ -7,6 +7,7 @@
 -d ndiswrapper
 -d madwifi
 -d virtualbox-modules
+-d nouveau-drm
 -d aufs2-util
 # Firmware
 -d rt2x00-rt61-fw
