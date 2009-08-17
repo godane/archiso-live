@@ -9,6 +9,8 @@
 -d virtualbox-modules
 -d nouveau-drm
 -d aufs2-util
+-d speakup
+-d speakup-utils
 # Firmware
 -d rt2x00-rt61-fw
 -d rt2x00-rt71w-fw

@@ -1,3 +1,4 @@
+-d musicbrainz
 abiword
 gnumeric
 gimp
@@ -7,23 +8,19 @@ gecko-mediaplayer
 wicd
 audacious
 audacious-plugins
-geany
-urlgfe
-gftp
 transmission-gtk
-asunder
 brasero
-xarchiver
 unetbootin
 larchin
 gparted
 pidgin
 shaman
-virtualbox-ose
-arista
-gtkpod
 epdfview
-gpicview
-isomaster
-comix
 hardinfo
+gpodder
+meld
+backintime
+#libs
+pil
+libcddb
+libstdc++5
