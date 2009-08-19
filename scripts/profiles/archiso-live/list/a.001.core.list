@@ -63,6 +63,8 @@ magicrescue
 #server
 apache
 lighttpd
+gnump3d
+cherokee
 #pentesting
 aesfix
 aeskeyfind
@@ -71,6 +73,9 @@ asleap
 bcwipe
 cowpatty
 amap
+aircrack-ng
+john
+dsniff
 #base-devel-deps
 neon
 perl-error
