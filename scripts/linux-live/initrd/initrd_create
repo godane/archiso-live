@@ -11,11 +11,11 @@ if [ "$1" != "" ]; then
 fi
 
 if [ "$2" != "" ]; then
-   ADDLOCALE="$2"
+   ROOT="$2"
 fi
 
 if [ "$3" != "" ]; then
-   ROOT="$3"
+   ADDLOCALE="$3"
 fi
 
 # rcopy is a recursive cp, which copies also symlink's real source

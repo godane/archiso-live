@@ -8,9 +8,7 @@ pacbuilder-svn
 abs
 yaourt
 devtools
-aurtools
 pkgtools
 gdb
 distcc
 ruby
-vala

@@ -1,8 +1,8 @@
 _kernver=2.6.30-ARCH
 
 pkgname=catalyst
-pkgver=9.7
-pkgrel=3
+pkgver=9.8
+pkgrel=1
 pkgdesc="AMD/ATI kernel drivers for Radeon brand cards. Stock kernel"
 arch=('i686' 'x86_64')
 url="http://www.ati.amd.com"
@@ -12,36 +12,14 @@ replaces=('ati-fglrx' 'fglrx') # Yay rebranding
 conflicts=('catalyst')
 provides=('catalyst')
 install=catalyst.install
-source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run \
-2.6.29-cat9.7.patch \
-fglrx-2.6.30-irqreturn_t.patch \
-fglrx-rt-compat.patch \
-fglrx-missing-pci_enable_msi.patch \
-config_x86_32.patch \
-fglrx-smp-problem.patch)
+source=(#http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
+https://a248.e.akamai.net/f/674/9206/0/www2.ati.com/drivers/linux/ati-driver-installer-9-8-x86.x86_64.run)
 
-md5sums=('33ab7b3152de35e49b4db95a19821c47'
-         '36522e2dbbd75225f1241752443ab62c'
-         '84241d492acbfaf6b8cbd55dcfa99c68'
-         '4517addc6576a1b46a30e2c1043de5a2'
-         '498e5b935f02970321f76271961e0335'
-         'ea52a55f5e143d46c6106344f6ee682d'
-         'bf29a2f8d524a88c5cddbeb99ea16401')
+md5sums=('fc08593edd2d4eff51f893a9292b58f9')
 
 
 build() {
 /bin/sh ./ati-driver-installer-${pkgver/./-}-x86.x86_64.run --extract archive_files
-
-# Fix 2.6.30 kernel
-cd ${srcdir}/archive_files/common
-patch -p0 <${srcdir}/2.6.29-cat9.7.patch|| return 1
-
-cd ${srcdir}/archive_files
-patch -p1 <${srcdir}/fglrx-2.6.30-irqreturn_t.patch || return 1
-patch -p1 <${srcdir}/fglrx-missing-pci_enable_msi.patch || return 1
-patch -p1 <${srcdir}/fglrx-rt-compat.patch || return 1
-patch -p1 <${srcdir}/fglrx-smp-problem.patch || return 1
-patch -p0 <${srcdir}/config_x86_32.patch || return 1
 
 if [ "${CARCH}" = "x86_64" ]; then
 BUILDARCH=x86_64

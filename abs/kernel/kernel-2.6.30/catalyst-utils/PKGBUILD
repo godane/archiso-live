@@ -1,5 +1,5 @@
 pkgname=catalyst-utils
-pkgver=9.7
+pkgver=9.8
 pkgrel=1
 pkgdesc="AMD/ATI kernel drivers for Radeon brand cards."
 arch=('i686' 'x86_64')
@@ -13,12 +13,13 @@ conflicts=('libgl' 'ati-drivers-module' 'ati-drivers' 'nvidia' 'catalyst-utils')
 provides=('libgl' 'catalyst-utils')
 options=('!strip')
 install=catalyst-utils.install
-source=(http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
+source=(#http://www2.ati.com/drivers/linux/ati-driver-installer-${pkgver/./-}-x86.x86_64.run
+https://a248.e.akamai.net/f/674/9206/0/www2.ati.com/drivers/linux/ati-driver-installer-9-8-x86.x86_64.run
 catalyst.sh amdcccle.desktop atieventsd.sh)
-md5sums=('33ab7b3152de35e49b4db95a19821c47'
-'bdafe749e046bfddee2d1c5e90eabd83'
-'4efa8414a8fe9eeb50da38b5522ef81d'
-'f729bf913613f49b0b9759c246058a87')
+md5sums=('fc08593edd2d4eff51f893a9292b58f9'
+         'bdafe749e046bfddee2d1c5e90eabd83'
+         '4efa8414a8fe9eeb50da38b5522ef81d'
+         'f729bf913613f49b0b9759c246058a87')
 
 build() {
 # Extract it

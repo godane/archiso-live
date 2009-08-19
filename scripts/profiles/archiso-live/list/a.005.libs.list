@@ -1,0 +1,27 @@
+-d musicbrainz
+abiword
+gnumeric
+gimp
+mplayer
+gnome-mplayer
+gecko-mediaplayer
+wicd
+audacious
+audacious-plugins
+transmission-gtk
+claws-mail
+brasero
+unetbootin
+larchin
+gparted
+pidgin
+shaman
+epdfview
+hardinfo
+gpodder
+meld
+backintime
+#libs
+pil
+libcddb
+libstdc++5
