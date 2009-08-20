@@ -41,7 +41,7 @@ _mnt_squashfs()
 mount_tmpfs () 
 {
     #if [ "x${ramdisk_size}" = "x" ]; then
-        ramdisk_size="20M"
+        ramdisk_size="3M"
     #fi
     info -n "Mounting tmpfs, size=${ramdisk_size}... "
     /bin/mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
@@ -172,8 +172,8 @@ run_hook ()
     udevpid=$(/bin/minips -C udevd -o pid=)
     [ "x${udevpid}" != "x" ] && /bin/kill -9 $udevpid 2>&1 >/dev/null
     #Yep, we're bailing out here.  We don't need kinit.
-    /bin/umount /sys
-    /bin/umount /proc
+    /bin/umount -l /sys
+    /bin/umount -l /proc
     exec /bin/run-init -c /dev/console /real_root /sbin/init
 }
 
