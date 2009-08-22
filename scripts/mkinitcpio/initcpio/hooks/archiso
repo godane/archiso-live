@@ -6,6 +6,27 @@ _mnt_bind()
     /bin/mount -o bind ${1} /real_root${2}
 }
 
+_mnt_iso()
+{
+	img="${1}"
+	
+	info "Mounting ${img}"
+	/bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
+	
+	#/bin/mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
+	/bin/mkdir -p "/tmpfs/mnt/findiso"
+    while [ ! -e "/dev/loop${LOOP_NUM}" ]; do
+        sleep 1
+    done
+    if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${img} > /dev/null 2>&1; then
+        error "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
+        break
+    fi
+    /bin/mount -t iso9660 "/dev/loop${LOOP_NUM}" "/tmpfs/mnt/findiso"
+
+    export LOOP_NUM=$(( $LOOP_NUM + 1 ))
+}
+
 # args: image file
 _mnt_squashfs()
 {
@@ -76,7 +97,12 @@ run_hook ()
         bootcdmnt="$(device_mountdir ${cdrom})"
         /bin/mkdir -p "${bootcdmnt}"
     	if /bin/mount -r -t iso9660 "${cdrom}" "${bootcdmnt}" >/dev/null 2>&1; then
-            if [ -f "${bootcdmnt}/base.lzm" ]; then
+    	    if [ -f "${bootcdmnt}/${findiso}" ]; then
+                found=1
+                info "${cdrom}"; echo
+                BOOT_MOUNT="${bootcdmnt}"
+                break
+            elif [ -f "${bootcdmnt}/base.lzm" ]; then
                 found=1
                 hl "${cdrom}"; echo
                 BOOT_MOUNT="${bootcdmnt}"
@@ -97,7 +123,12 @@ run_hook ()
             /bin/mkdir -p "${bootusbmnt}"
             if /bin/mount -t vfat "${usb}" "${bootusbmnt}" >/dev/null 2>&1 ||\
                /bin/mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
-                if [ "x${from}" != "x" ]; then
+                if [ -f "${bootusbmnt}/${findiso}" ]; then
+                        found=1
+                        info "${usb}"; echo
+                        BOOT_MOUNT="${bootusbmnt}"
+                        break
+                elif [ "x${from}" != "x" ]; then
                     from=$(/usr/bin/basename ${from})
                     if [ -f "${bootusbmnt}/${from}/base.lzm" ]; then
                         found=1
@@ -143,11 +174,19 @@ run_hook ()
     	/bin/mkdir -p $XINO
     	/bin/mount -n -t tmpfs tmpfs $XINO
     fi
-    
 
     /bin/mount -t aufs -o nowarn_perm,xino=$XINO/.aufs.xino,br:/tmpfs=rw aufs /real_root
 
-    if [ "x${from}" != "x" ]; then
+	if [ "x${findiso}" != "x" ]; then
+			if [ -f "${BOOT_MOUNT}/${findiso}" ]; then
+				_mnt_iso "${BOOT_MOUNT}/${findiso}"
+				BOOT_MOUNT="/tmpfs/mnt/findiso"
+			fi
+			
+			if [ -f "${BOOT_MOUNT}/base.lzm" ]; then
+				_mnt_squashfs "${BOOT_MOUNT}/base.lzm"
+			fi
+    elif [ "x${from}" != "x" ]; then
         _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm"
     else
     	_mnt_squashfs "${BOOT_MOUNT}/base.lzm"
