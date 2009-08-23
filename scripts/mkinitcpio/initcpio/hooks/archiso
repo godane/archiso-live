@@ -180,6 +180,7 @@ run_hook ()
 	if [ "x${findiso}" != "x" ]; then
 			if [ -f "${BOOT_MOUNT}/${findiso}" ]; then
 				_mnt_iso "${BOOT_MOUNT}/${findiso}"
+				BOOT_ORIG="${BOOT_MOUNT}"
 				BOOT_MOUNT="/tmpfs/mnt/findiso"
 			fi
 			
@@ -194,6 +195,9 @@ run_hook ()
 
     echo "aufs / aufs defaults 0 0" > /real_root/etc/fstab
     /bin/mount -o move ${BOOT_MOUNT} /real_root/mnt/$(/usr/bin/basename ${BOOT_MOUNT})
+    if [ "x${findiso}" != x ]; then
+		/bin/mount -o move ${BOOT_ORIG} /real_root/mnt/$(/usr/bin/basename ${BOOT_ORIG})
+    fi
 
     if [ "${break}" = "y" ]; then
         warn ":: Break requested, type 'exit' to resume operation"
