@@ -186,6 +186,12 @@ fi
 
 debug_shell
 
+MODPATH=$(cmdline_value modpath)
+if [ "$MODPATH" != "" ]; then
+	MODPATH=$(find_in_computer $MODPATH)
+	mount -n -o rbind $MODPATH $(dirname $DATA)/$LIVECDNAME/tmp 2>/dev/null
+fi
+
 # DATA contains path to the base directory of all fs modules which need
 # to be mounted and inserted into live filesystem. Do it now.
 echolog "Loading modules:"

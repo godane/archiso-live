@@ -236,6 +236,7 @@ command_livebackup ()
 	mkdir -p ${IMGROOT}/${CDNAME}/{modules,optional,rootcopy}
 	touch ${IMGROOT}/${CDNAME}/livecd.sgn
 	cp -af ${CDROOT}/* "${IMGROOT}"
+	mkdir -p ${IMGROOT}/${CDNAME}/tmp
 	
 	if [ ! "$(pacman -Qs fbsplash-themes-arch-banner)" ]; then
 		error "Fbsplash is not installed. Continuing without it."
@@ -329,10 +330,11 @@ command_install () {
 	mkdir -p ${IMGROOT}/${CDNAME}/{modules,optional,rootcopy}
 	touch ${IMGROOT}/${CDNAME}/livecd.sgn
 	cp -af ${CDROOT}/* "${IMGROOT}"
+	mkdir -p ${IMGROOT}/${CDNAME}/tmp
 
-    modprobe aufs
-    if [ $? -ne 0 ]; then
-       	error "Error loading Union filesystem module. (aufs)"
+	modprobe aufs
+	if [ $? -ne 0 ]; then
+		error "Error loading Union filesystem module. (aufs)"
 		exit 1
 	fi
 
