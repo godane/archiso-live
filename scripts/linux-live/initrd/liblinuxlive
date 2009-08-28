@@ -22,6 +22,7 @@ COPY2RAM=$MEMORY/copy2ram
 IMAGES=$MEMORY/images
 INITRAMDISK=$MOUNTDIR/live
 LOOPMOUNT=$MOUNTDIR/tmp
+FINDISO=$MOUNTDIR/findiso
 
 # this will be replaced by build script, so never change the following line!
 LIVECDNAME="archiso-live"

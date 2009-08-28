@@ -189,7 +189,11 @@ debug_shell
 MODPATH=$(cmdline_value modpath)
 if [ "$MODPATH" != "" ]; then
 	MODPATH=$(find_in_computer $MODPATH)
-	mount -n -o rbind $MODPATH $(dirname $DATA)/$LIVECDNAME/tmp 2>/dev/null
+	if [ $(cmdline_value findiso) ]; then
+		mount_device $MODPATH $FINDISO/$LIVECDNAME/tmp rbind
+	else
+		mount_device $MODPATH $DATA/tmp rbind
+	fi
 fi
 
 # DATA contains path to the base directory of all fs modules which need
