@@ -22,6 +22,7 @@ COPY2RAM=$MEMORY/copy2ram
 IMAGES=$MEMORY/images
 INITRAMDISK=$MOUNTDIR/live
 LOOPMOUNT=$MOUNTDIR/tmp
+FINDISO=$MOUNTDIR/findiso
 
 # this will be replaced by build script, so never change the following line!
 LIVECDNAME="archiso-live"
@@ -522,6 +523,9 @@ find_modules()
    if [ "$(cmdline_parameter baseonly)" ]; then
    	find "$1/base" "$1/optional" -name "*.sqfs" 2>/dev/null | sort
    	find "$1/base" "$1/optional" -name "*.lzm" 2>/dev/null | sort
+   elif [ "$(cmdline_value modpath)" ]; then
+	find "$1/base" "$1/modules" "$1/optional" "$1/tmp" -name "*.sqfs" 2>/dev/null | sort
+   	find "$1/base" "$1/modules" "$1/optional" "$1/tmp" -name "*.lzm" 2>/dev/null | sort
    else
    	find "$1/base" "$1/modules" "$1/optional" -name "*.sqfs" 2>/dev/null | sort
    	find "$1/base" "$1/modules" "$1/optional" -name "*.lzm" 2>/dev/null | sort

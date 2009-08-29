@@ -1,4 +1,5 @@
 base
+nfs-utils
 xinetd
 netkit-bsd-finger
 bc

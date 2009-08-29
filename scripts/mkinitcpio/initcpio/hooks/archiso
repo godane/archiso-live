@@ -6,6 +6,27 @@ _mnt_bind()
     /bin/mount -o bind ${1} /real_root${2}
 }
 
+_mnt_iso()
+{
+	img="${1}"
+	
+	info "Mounting ${img}"
+	/bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
+	
+	#/bin/mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
+	/bin/mkdir -p "/tmpfs/mnt/findiso"
+    while [ ! -e "/dev/loop${LOOP_NUM}" ]; do
+        sleep 1
+    done
+    if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${img} > /dev/null 2>&1; then
+        error "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
+        break
+    fi
+    /bin/mount -t iso9660 "/dev/loop${LOOP_NUM}" "/tmpfs/mnt/findiso"
+
+    export LOOP_NUM=$(( $LOOP_NUM + 1 ))
+}
+
 # args: image file
 _mnt_squashfs()
 {
@@ -41,7 +62,7 @@ _mnt_squashfs()
 mount_tmpfs () 
 {
     #if [ "x${ramdisk_size}" = "x" ]; then
-        ramdisk_size="20M"
+        ramdisk_size="3M"
     #fi
     info -n "Mounting tmpfs, size=${ramdisk_size}... "
     /bin/mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
@@ -76,7 +97,12 @@ run_hook ()
         bootcdmnt="$(device_mountdir ${cdrom})"
         /bin/mkdir -p "${bootcdmnt}"
     	if /bin/mount -r -t iso9660 "${cdrom}" "${bootcdmnt}" >/dev/null 2>&1; then
-            if [ -f "${bootcdmnt}/base.lzm" ]; then
+    	    if [ -f "${bootcdmnt}/${findiso}" ]; then
+                found=1
+                info "${cdrom}"; echo
+                BOOT_MOUNT="${bootcdmnt}"
+                break
+            elif [ -f "${bootcdmnt}/base.lzm" ]; then
                 found=1
                 hl "${cdrom}"; echo
                 BOOT_MOUNT="${bootcdmnt}"
@@ -97,7 +123,12 @@ run_hook ()
             /bin/mkdir -p "${bootusbmnt}"
             if /bin/mount -t vfat "${usb}" "${bootusbmnt}" >/dev/null 2>&1 ||\
                /bin/mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
-                if [ "x${from}" != "x" ]; then
+                if [ -f "${bootusbmnt}/${findiso}" ]; then
+                        found=1
+                        info "${usb}"; echo
+                        BOOT_MOUNT="${bootusbmnt}"
+                        break
+                elif [ "x${from}" != "x" ]; then
                     from=$(/usr/bin/basename ${from})
                     if [ -f "${bootusbmnt}/${from}/base.lzm" ]; then
                         found=1
@@ -143,11 +174,22 @@ run_hook ()
     	/bin/mkdir -p $XINO
     	/bin/mount -n -t tmpfs tmpfs $XINO
     fi
-    
 
     /bin/mount -t aufs -o nowarn_perm,xino=$XINO/.aufs.xino,br:/tmpfs=rw aufs /real_root
 
-    if [ "x${from}" != "x" ]; then
+	if [ "x${findiso}" != "x" ]; then
+			if [ -f "${BOOT_MOUNT}/${findiso}" ]; then
+				_mnt_iso "${BOOT_MOUNT}/${findiso}"
+				BOOT_ORIG="${BOOT_MOUNT}"
+				BOOT_MOUNT="/tmpfs/mnt/findiso"
+			fi
+			
+			if [ -f "${BOOT_MOUNT}/base.lzm" ]; then
+				_mnt_squashfs "${BOOT_MOUNT}/base.lzm"
+			elif [ -f "${BOOT_MOUNT}/initrd.lzm" ]; then
+				_mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
+			fi
+    elif [ "x${from}" != "x" ]; then
         _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm"
     else
     	_mnt_squashfs "${BOOT_MOUNT}/base.lzm"
@@ -155,6 +197,9 @@ run_hook ()
 
     echo "aufs / aufs defaults 0 0" > /real_root/etc/fstab
     /bin/mount -o move ${BOOT_MOUNT} /real_root/mnt/$(/usr/bin/basename ${BOOT_MOUNT})
+    if [ "x${findiso}" != x ]; then
+		/bin/mount -o move ${BOOT_ORIG} /real_root/mnt/$(/usr/bin/basename ${BOOT_ORIG})
+    fi
 
     if [ "${break}" = "y" ]; then
         warn ":: Break requested, type 'exit' to resume operation"
@@ -163,7 +208,6 @@ run_hook ()
     fi
 		
     ROOT=/real_root
-    #cp -Rf /lib/modules/* /real_root/lib/modules/
     /bin/mkdir -p $ROOT/dev 2>&1 >/dev/null
     /bin/mknod $ROOT/dev/console c 5 1 2>&1 >/dev/null
     /bin/mknod $ROOT/dev/null c 1 3 2>&1 >/dev/null
@@ -172,8 +216,9 @@ run_hook ()
     udevpid=$(/bin/minips -C udevd -o pid=)
     [ "x${udevpid}" != "x" ] && /bin/kill -9 $udevpid 2>&1 >/dev/null
     #Yep, we're bailing out here.  We don't need kinit.
-    /bin/umount /sys
-    /bin/umount /proc
+    /bin/umount -l /sys
+    /bin/umount -l /proc
+    sleep 2
     exec /bin/run-init -c /dev/console /real_root /sbin/init
 }
 
