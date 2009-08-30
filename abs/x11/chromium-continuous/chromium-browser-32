@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd /opt/chromium-browser
+./chrome --enable-plugins "$@"
