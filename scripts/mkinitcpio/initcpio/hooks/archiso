@@ -15,16 +15,16 @@ _mnt_iso()
 	
 	#/bin/mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
 	/bin/mkdir -p "/tmpfs/mnt/findiso"
-    while [ ! -e "/dev/loop${LOOP_NUM}" ]; do
+    while [ ! -e "/dev/loop10" ]; do
         sleep 1
     done
-    if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${img} > /dev/null 2>&1; then
+    if ! /bin/losetup "/dev/loop10" ${img} > /dev/null 2>&1; then
         error "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
         break
     fi
-    /bin/mount -t iso9660 "/dev/loop${LOOP_NUM}" "/tmpfs/mnt/findiso"
+    /bin/mount -t iso9660 "/dev/loop10" "/tmpfs/mnt/findiso"
 
-    export LOOP_NUM=$(( $LOOP_NUM + 1 ))
+    #export LOOP_NUM=$(( $LOOP_NUM + 1 ))
 }
 
 # args: image file
