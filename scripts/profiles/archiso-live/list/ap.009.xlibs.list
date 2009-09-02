@@ -22,3 +22,11 @@ pulseaudio
 physfs
 quesoglc
 gtkglext
+gtkglextmm
+fltk
+libglademm
+libgdiplus
+libwpd
+postgresql-libs
+libmysqlclient
+redland
