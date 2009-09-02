@@ -94,6 +94,10 @@ if [ -x /usr/bin/update-desktop-database ]; then
 	update-desktop-database -q
 fi
 
+if [ -x /usr/bin/update-mime-database ]; then
+	update-mime-database /usr/share/mime
+fi
+
 #chown arch:users -R /home/arch
 #chown root:root -R /root
 
