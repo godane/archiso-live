@@ -207,8 +207,15 @@ union_insert_modules $UNION $MEMORY $IMAGES
 
 debug_shell
 
+ROOTCOPY=$(cmdline_value rootcopy)
 if [ $(cmdline_parameter norootcopy) ]; then
 	echolog "Not using rootcopy"
+elif [ "$ROOTCOPY" ]; then
+	echolog "Mounting content of rootcopy directory"
+	ROOTCOPY=$(find_in_computer $ROOTCOPY)
+    mount_device $ROOTCOPY $DATA/rootcopy rbind
+    echolog "Copying content of rootcopy directory"
+	cp -af $DATA/rootcopy/* $UNION 2>/dev/null # may be empty
 else
 	echolog "Copying content of rootcopy directory"
 	cp -af $DATA/rootcopy/* $UNION 2>/dev/null # may be empty
