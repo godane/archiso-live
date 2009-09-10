@@ -256,7 +256,7 @@ slax_initrd()
 
 	ln -sf ${LIVELINUX} initrd
 	cd initrd
-	./initrd_create ${CDNAME} $1
+	./initrd_create ${CDNAME} $1 $2
 	cd ../
 	mv -f initrd/base.lzm "${IMGROOT}"
 	chmod 0755 "${IMGROOT}/base.lzm"
@@ -575,9 +575,9 @@ command_squash () {
 # Finally, make the image.
 command_imgprepare () {
 	
-	slax_initrd ${PROFILE}/${INSTROOT}
-
 	kernelver=$(_kversion)
+	slax_initrd ${PROFILE}/${INSTROOT} ${kernelver}
+
 	basedir=${INSTROOT}
 	[ "${INSTROOT:0:1}" != "/" ] && basedir="$(pwd)/${INSTROOT}"
 	mkinitramfs -c "${CPIOCONFIG}" -b "${basedir}" -k "${kernelver}" -g "${IMGROOT}/boot/initrd.img"

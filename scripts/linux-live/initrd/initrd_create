@@ -15,7 +15,12 @@ if [ "$2" != "" ]; then
 fi
 
 if [ "$3" != "" ]; then
-   ADDLOCALE="$3"
+	KERNEL="$3"
+	LMK="lib/modules/$KERNEL"
+fi
+
+if [ "$4" != "" ]; then
+   ADDLOCALE="$4"
 fi
 
 # rcopy is a recursive cp, which copies also symlink's real source
