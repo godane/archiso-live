@@ -55,6 +55,10 @@ lsof
 sshfs
 ntfs-3g
 espeakup
+irssi
+weechat
+rtorrent
+dvd+rw-tools
 #recoverly-tools
 ddrescue
 testdisk

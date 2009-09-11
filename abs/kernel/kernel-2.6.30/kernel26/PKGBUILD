@@ -5,7 +5,7 @@ pkgname=kernel26                # Build stock -ARCH kernel
 # pkgname=kernel26-custom       # Build kernel with a different name
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.30
-pkgver=${_basekernel}.5
+pkgver=${_basekernel}.6
 pkgrel=1live
 _patchname="patch-${pkgver}-1-ARCH"
 pkgdesc="The Linux Kernel and modules"
@@ -18,7 +18,6 @@ depends=('coreutils' 'kernel26-firmware>=2.6.30' 'module-init-tools' 'mkinitcpio
 # pwc, ieee80211 and hostap-driver26 modules are included in kernel26 now
 # nforce package support was abandoned by nvidia, kernel modules should cover everything now.
 # kernel24 support is dropped since glibc24
-makedepends=("git")
 replaces=('kernel24' 'kernel24-scsi' 'kernel26-scsi'
           'alsa-driver' 'ieee80211' 'hostap-driver26'
           'pwc' 'nforce' 'squashfs' 'unionfs' 'ivtv'
@@ -31,15 +30,13 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
 	# the main kernel config files
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
-        kernel26.preset
-        fglrx.patch)
+        kernel26.preset)
 optdepends=('crda: to set the correct wireless channels of your country')
 md5sums=('7a80058a6382e5108cdb5554d1609615'
-         'bbde9b1fc9f807bd80da4d845a81e46e'
-         '733c4738cdd2c53d8bec723acbc42681'
-         '6dbb37b69056513f3e6b87fcee0aede1'
-         '25584700a0a679542929c4bed31433b6'
-         '24c054b6ebe942742f110c10886a3d49')
+         '597d365097b0ccb095d31631b7c6b61c'
+         '3d560a761c7105b7f8d2277d5df9be36'
+         '4abf05d83fe8bb6ea4dd6f5d10ee56b6'
+         '25584700a0a679542929c4bed31433b6')
 
 build() {
   KARCH=x86
@@ -48,7 +45,6 @@ build() {
   # Add -ARCH patches
   # See http://projects.archlinux.org/git/?p=linux-2.6-ARCH.git;a=summary
   patch -Np1 -i ${srcdir}/${_patchname} || return 1
-  patch -Np1 -i ${srcdir}/fglrx.patch || return 1
 
   if [ "$CARCH" = "x86_64" ]; then
     cat ../config.x86_64 >./.config
