@@ -1,0 +1,16 @@
+--- archive_files/common/lib/modules/fglrx/build_mod/firegl_public.c.orig	2009-08-31 18:35:41.000000000 +0200
++++ archive_files/common/lib/modules/fglrx/build_mod/firegl_public.c	2009-09-12 22:15:21.577925585 +0200
+@@ -1308,8 +1308,12 @@ unsigned int ATI_API_CALL KCL_ProcessIsT
+ #endif   
+ #if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,26)  
+    p = find_task_by_pid( pid );
+-#else   
++#else 
++#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,30)
+    p = find_task_by_vpid( pid );
++#else
++   p = pid_task( pid, PIDTYPE_PID );
++#endif   
+ #endif   
+    if (p) 
+    {
