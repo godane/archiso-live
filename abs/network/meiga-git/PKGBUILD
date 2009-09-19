@@ -1,6 +1,6 @@
 # Contributor: Christopher Rogers <slaxemulator@gmail.com>
 pkgname=meiga-git
-pkgver=20090625
+pkgver=20090918
 pkgrel=1
 pkgdesc="Meiga is lightweight, easy to use, network friendly and also application friendly."
 arch=(i686 x86_64)
