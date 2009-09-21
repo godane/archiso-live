@@ -15,6 +15,7 @@ xorg-video-drivers
 synaptics
 mesa
 freeglut
+xaw3d
 enca
 #fonts
 ttf-dejavu
