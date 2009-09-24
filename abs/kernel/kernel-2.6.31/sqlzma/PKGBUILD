@@ -6,10 +6,10 @@ pkgname=sqlzma
 _realname=squashfs
 pkgver=3.4
 lzmaver=457
-pkgrel=9
+pkgrel=10
 url="http://www.squashfs-lzma.org"
 pkgdesc="A highly compressed read-only filesystem for Linux."
-depends=('kernel26>=2.6.30' 'kernel26<2.6.31' 'zlib')
+depends=('kernel26>=2.6.31' 'kernel26<2.6.32' 'zlib')
 license=('GPL')
 arch=('i686' 'x86_64')
 source=(#http://frugalware.org/~janny/source_pkgs/lzma${lzmaver}.tar.bz2 \
@@ -24,7 +24,7 @@ md5sums=('fc7a12a396ade1772e959604d6eb31e1'
          '2a4d2995ad5aa6840c95a95ffa6b1da6'
          '0e7201a040fa9372e9b33f3abdbe19c9'
          'd7c53db305d77701cd2298e2845adb13'
-		 '2ed00248c56672a6664864084011e85a')
+	 '2ed00248c56672a6664864084011e85a')
 _kernver='2.6.31-ARCH'
 _kdir="${pkgdir}"/lib/modules/${_kernver}/kernel/fs/${_realname}
 

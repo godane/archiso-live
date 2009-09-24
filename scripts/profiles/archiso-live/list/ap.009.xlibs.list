@@ -30,3 +30,8 @@ libwpd
 postgresql-libs
 libmysqlclient
 redland
+glew
+tre
+gnome-common
+gupnp
+yasm
