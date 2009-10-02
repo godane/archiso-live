@@ -16,7 +16,6 @@ sudo
 parted
 archiso-installer
 chakra-hardware-detection
-chakra-xakra
 # Network
 netcfg
 openssl

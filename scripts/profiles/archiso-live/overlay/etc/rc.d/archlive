@@ -42,21 +42,10 @@ if [ "`cmdline_parameter ldconfig`" ]; then
     [[ -x /sbin/ldconfig ]] && /sbin/ldconfig
 fi
 
-if [ "`cmdline_parameter nonfree`" ]; then
-	if [ -e "/etc/X11/xorg.conf" ]; then
-    		/etc/rc.d/xakra-nonfree start
-	else
-		/etc/rc.d/xakra start
-    		/etc/rc.d/xakra-nonfree start
-	fi
-elif [ ! "`cmdline_parameter noxconf`" ]; then
-	if [ -e "/etc/rc.d/xorg.conf" ]; then
-		echo "no auto config needed"
-	else
-		/etc/rc.d/xakra start
-		sed -i 's|"vga"|"vesa"|g' /etc/X11/xorg.conf
-	fi
-fi
+	/etc/rc.d/hwdetect start
+	/etc/rc.d/xorg-detect start
+	/etc/rc.d/xorg-config start
+	sed -i 's|"vga"|"vesa"|g' /etc/X11/xorg.conf
 
 # lang: Override default language
 lang="`cmdline_value lang`"
