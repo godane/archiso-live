@@ -31,7 +31,9 @@ case "$1" in
 		
 	if [ "`cmdline_parameter nonfree`" ]; then
 		stat_busy "Inspecting graphics hardware"
+		/etc/rc.d/xorg-detect start
 		hwdetect_graphics
+		/etc/rc.d/xorg-config start
 		stat_done
 	fi
 		stat_busy "Setting up audio volume levels"
