@@ -5,7 +5,7 @@ pkgname=kernel26                # Build stock -ARCH kernel
 # pkgname=kernel26-custom       # Build kernel with a different name
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.31
-pkgver=${_basekernel}.1
+pkgver=${_basekernel}.2
 pkgrel=1live
 _patchname="patch-${pkgver}-1-ARCH"
 pkgdesc="The Linux Kernel and modules"
@@ -32,9 +32,9 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         kernel26.preset)
 optdepends=('crda: to set the correct wireless channels of your country')
 md5sums=('84c077a37684e4cbfa67b18154390d8a'
-         '14aedb4478d74547587d07c8884f812a'
-         'caf20712f8c6bb64fb82b7cd6946850b'
-         'f40dd5ddf67bfe764d14cce459f01d6e'
+         'd459cd474239364fe3aa0351a36f5d87'
+         '6873cd3e974eb187bb39d571daa74c8c'
+         '180191b3f98252a14c371aa3196a8d06'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
