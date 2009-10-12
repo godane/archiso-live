@@ -7,26 +7,26 @@ modprobe ath5k
 /etc/rc.d/laptop-mode start
 /etc/rc.d/cpufreq start
 
- # Change CPU governors and writeback-time (as suggested by powertop)
- echo ondemand > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
- echo ondemand > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
- echo 1500 > /proc/sys/vm/dirty_writeback_centisecs
- # Make the right SD-slot visible, as suggested by the Debian wiki
- setpci -d 197b:2381 AE=47
- # Set up the wifi-key
- /usr/bin/setkeycodes e055 159
- /usr/bin/setkeycodes e056 158
- # Set up the function keys
- /usr/bin/setkeycodes e025 130
- /usr/bin/setkeycodes e026 131
- /usr/bin/setkeycodes e027 132
- /usr/bin/setkeycodes e029 122
- /usr/bin/setkeycodes e071 134
- /usr/bin/setkeycodes e072 135
+# Change CPU governors and writeback-time (as suggested by powertop)
+echo ondemand > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+echo ondemand > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+echo 1500 > /proc/sys/vm/dirty_writeback_centisecs
+# Make the right SD-slot visible, as suggested by the Debian wiki
+setpci -d 197b:2381 AE=47
+# Set up the wifi-key
+/usr/bin/setkeycodes e055 159
+/usr/bin/setkeycodes e056 158
+# Set up the function keys
+/usr/bin/setkeycodes e025 130
+/usr/bin/setkeycodes e026 131
+/usr/bin/setkeycodes e027 132
+/usr/bin/setkeycodes e029 122
+/usr/bin/setkeycodes e071 134
+/usr/bin/setkeycodes e072 135
 
- echo "options snd-hda-intel model=acer-aspire" >> /etc/modprobe.d/sound
+echo "options snd-hda-intel model=acer-aspire" >> /etc/modprobe.d/sound.conf
 
-cat >> /etc/modprobe.d/acerone_blacklist << "EOF"
+cat >> /etc/modprobe.d/acerone_blacklist.conf << "EOF"
 blacklist wlan
 blacklist ath_hal
 blacklist ath_pci
@@ -36,8 +36,8 @@ blacklist uvcvideo
 blacklist videodev
 blacklist v4l1_compat
 blacklist video
-blacklist memstick
 EOF
+
 
 #MODULES=(r8169 acpi_cpufreq ath5k !wlan !ath_hal !ath_pci snd-mixer-oss snd-pcm-oss snd-hwdep snd-page-alloc snd-pcm snd-timer snd snd-hda-intel soundcore !pcspkr !uvcvideo !videodev !v4l1_compat !video !memstick pciehp acer-wmi)
 #NETWORKS=(wpa.example)

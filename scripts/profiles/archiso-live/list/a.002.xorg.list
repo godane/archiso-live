@@ -58,6 +58,7 @@ nss
 scrot
 cups
 zenity
+xbindkeys
 #window manager
 awesome
 fluxbox
