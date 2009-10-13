@@ -8,9 +8,17 @@ modprobe ath5k
 /etc/rc.d/cpufreq start
 
 # Change CPU governors and writeback-time (as suggested by powertop)
-echo ondemand > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-echo ondemand > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
-echo 1500 > /proc/sys/vm/dirty_writeback_centisecs
+if [ -f /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor ]; then
+	echo ondemand > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+fi
+
+if [ -f /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor ]; then
+	echo ondemand > /sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+fi
+
+if [ -f /proc/sys/vm/dirty_writeback_centisecs ]; then
+	echo 1500 > /proc/sys/vm/dirty_writeback_centisecs
+fi
 # Make the right SD-slot visible, as suggested by the Debian wiki
 setpci -d 197b:2381 AE=47
 # Set up the wifi-key
@@ -38,7 +46,7 @@ blacklist v4l1_compat
 blacklist video
 EOF
 
-
+cp -f /etc/X11/xorg.conf.acerone /etc/X11/xorg.conf
 #MODULES=(r8169 acpi_cpufreq ath5k !wlan !ath_hal !ath_pci snd-mixer-oss snd-pcm-oss snd-hwdep snd-page-alloc snd-pcm snd-timer snd snd-hda-intel soundcore !pcspkr !uvcvideo !videodev !v4l1_compat !video !memstick pciehp acer-wmi)
 #NETWORKS=(wpa.example)
 #DAEMONS=(@acpid @laptop-mode cpufreq syslog-ng !netfs !crond dbus @hal @network @net-profiles archlive slim)
