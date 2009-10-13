@@ -3,7 +3,6 @@
 modprobe r8169
 modprobe acpi_cpufreq
 modprobe ath5k
-/etc/rc.d/acpid start
 /etc/rc.d/laptop-mode start
 /etc/rc.d/cpufreq start
 
