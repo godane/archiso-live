@@ -48,7 +48,7 @@ if [ ! $(cmdline_parameter noxconf) ]; then
 	else
 		/etc/rc.d/hwdetect start
 		/etc/rc.d/xorg-detect start
-		sed -i 's|"vga"|"vesa"|g' /etc/X11/xorg.conf
+		sed -i 's|"fbdev"|"vesa"|g' /etc/X11/xorg.conf
 	fi
 fi
 
