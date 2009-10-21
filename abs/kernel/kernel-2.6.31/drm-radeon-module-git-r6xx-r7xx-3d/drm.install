@@ -1,0 +1,15 @@
+post_install() {
+	echo "<<< Running depmod >>>"
+	depmod
+	echo "If you are using more than one kernel put these lines in your /etc/rc.local:"
+	echo "insmod /lib/modules/\`uname -r\`/updates/drm.ko"
+	echo "insmod /lib/modules/\`uname -r\`/updates/radeon.ko"
+}
+
+post_upgrade() {
+	post_install
+}
+post_remove() {
+	echo "<<< Running depmod >>>"
+	depmod
+}
