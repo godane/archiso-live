@@ -7,7 +7,16 @@
 -d ndiswrapper
 -d madwifi
 -d virtualbox-modules
+-d nouveau-drm
+-d aufs2
 -d aufs2-util
+-d tiacx
+-d intel-536ep
+-d intel-536ep-utils
+-d intel-537
+-d intel-537-utils
+#-d speakup
+#-d speakup-utils
 # Firmware
 -d rt2x00-rt61-fw
 -d rt2x00-rt71w-fw
@@ -17,6 +26,5 @@
 -d b43-fwcutter
 -d ipw2100-fw
 -d ipw2200-fw
--d tiacx
 -d tiacx-firmware
 -d zd1211-firmware
