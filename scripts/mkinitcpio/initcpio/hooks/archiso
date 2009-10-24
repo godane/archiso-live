@@ -165,8 +165,8 @@ run_hook ()
     fi
 
     /bin/modprobe -q squashfs >/dev/null 2>&1
-    /bin/modprobe -q sqlzma >/dev/null 2>&1
-    /bin/modprobe -q unlzma >/dev/null 2>&1
+    #/bin/modprobe -q sqlzma >/dev/null 2>&1
+    #/bin/modprobe -q unlzma >/dev/null 2>&1
     /bin/modprobe -q aufs brs=1 >/dev/null 2>&1
     XINO=xino
     MEMORY=memory
