@@ -1,7 +1,7 @@
 -d kernel26
 -d kernel26-firmware
--d sqlzma
--d sqlzma-tools
+#-d sqlzma
+-d squashfs-tools
 -d ndiswrapper-utils
 -d madwifi-utils
 -d ndiswrapper
