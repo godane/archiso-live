@@ -1,13 +1,13 @@
 -d kernel26
 -d kernel26-firmware
--d sqlzma
--d sqlzma-tools
+#-d sqlzma
+-d squashfs-tools
 -d ndiswrapper-utils
 -d madwifi-utils
 -d ndiswrapper
 -d madwifi
 -d virtualbox-modules
--d nouveau-drm
+#-d nouveau-drm
 -d aufs2
 -d aufs2-util
 -d tiacx
@@ -28,3 +28,4 @@
 -d ipw2200-fw
 -d tiacx-firmware
 -d zd1211-firmware
+-d drm-radeon-module-git-r6xx-r7xx-3d

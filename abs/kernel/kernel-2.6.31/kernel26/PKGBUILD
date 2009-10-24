@@ -1,11 +1,11 @@
-# $Id: PKGBUILD 51690 2009-09-10 14:58:42Z tpowa $
+# $Id: PKGBUILD 55498 2009-10-13 10:59:39Z thomas $
 # Maintainer: Tobias Powalowski <tpowa@archlinux.org>
 # Maintainer: Thomas Baechler <thomas@archlinux.org>
 pkgname=kernel26                # Build stock -ARCH kernel
 # pkgname=kernel26-custom       # Build kernel with a different name
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.31
-pkgver=${_basekernel}.2
+pkgver=${_basekernel}.5
 pkgrel=1live
 _patchname="patch-${pkgver}-1-ARCH"
 pkgdesc="The Linux Kernel and modules"
@@ -25,16 +25,17 @@ replaces=('kernel24' 'kernel24-scsi' 'kernel26-scsi'
           'gspcav1' 'atl2' 'wlan-ng26' 'rt2500')
 install=kernel26.install
 source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
-        ftp://ftp.archlinux.org/other/kernel26/${_patchname}.bz2
+        #ftp://ftp.archlinux.org/other/kernel26/${_patchname}.bz2
+	${_patchname}.bz2
 	# the main kernel config files
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
         kernel26.preset)
 optdepends=('crda: to set the correct wireless channels of your country')
 md5sums=('84c077a37684e4cbfa67b18154390d8a'
-         'd459cd474239364fe3aa0351a36f5d87'
-         '6873cd3e974eb187bb39d571daa74c8c'
-         '180191b3f98252a14c371aa3196a8d06'
+         '0b2f31e3c1296950aa73830184c248cb'
+         '07ceb97ba958bb99792a5edabe65629a'
+         '604e3014eff40b0304422c53129d6de7'
          '25584700a0a679542929c4bed31433b6')
 
 build() {

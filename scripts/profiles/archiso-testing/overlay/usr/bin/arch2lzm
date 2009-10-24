@@ -268,7 +268,7 @@ pkg()
 {
 	TMPDIR="$(pwd)/pkg2lzm$$"
 	mkdir -p $TMPDIR/var/lib/pacman/local
-	sync
+	#sync
 
 	pacman -Sw "$1" --noconfirm
 	PKG=$(ls /var/cache/pacman/pkg/$1-[0-9]*.pkg.tar.gz | tail -1)

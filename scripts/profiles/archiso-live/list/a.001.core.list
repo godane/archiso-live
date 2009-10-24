@@ -58,6 +58,10 @@ irssi
 weechat
 rtorrent
 dvd+rw-tools
+acpid
+cpufreqd
+tor
+privoxy
 #recoverly-tools
 ddrescue
 testdisk

@@ -1,0 +1,7 @@
+ keycode 160 = XF86AudioMute
+ keycode 174 = XF86AudioLowerVolume
+ keycode 176 = XF86AudioRaiseVolume
+ keycode 223 = XF86Standby
+ keycode 239 = XF86KbdBrightnessDown
+ keycode 123 = XF86KbdBrightnessUp
+ keycode 210 = XF86Display

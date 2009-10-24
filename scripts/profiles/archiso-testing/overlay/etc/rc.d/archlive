@@ -42,19 +42,13 @@ if [ "`cmdline_parameter ldconfig`" ]; then
     [[ -x /sbin/ldconfig ]] && /sbin/ldconfig
 fi
 
-if [ "`cmdline_parameter nonfree`" ]; then
-	if [ -e "/etc/X11/xorg.conf" ]; then
-    		/etc/rc.d/xakra-nonfree start
+if [ ! $(cmdline_parameter noxconf) ]; then
+	if [ $(cmdline_parameter nonfree) ]; then
+		/etc/rc.d/hwdetect start
 	else
-		/etc/rc.d/xakra start
-    		/etc/rc.d/xakra-nonfree start
-	fi
-elif [ ! "`cmdline_parameter noxconf`" ]; then
-	if [ -e "/etc/rc.d/xorg.conf" ]; then
-		echo "no auto config needed"
-	else
-		/etc/rc.d/xakra start
-		sed -i 's|"vga"|"vesa"|g' /etc/X11/xorg.conf
+		/etc/rc.d/hwdetect start
+		/etc/rc.d/xorg-detect start
+		sed -i 's|"fbdev"|"vesa"|g' /etc/X11/xorg.conf
 	fi
 fi
 
@@ -92,6 +86,10 @@ chmod 0440 /etc/sudoers
 
 if [ -x /usr/bin/update-desktop-database ]; then
 	update-desktop-database -q
+fi
+
+if [ -x /usr/bin/update-mime-database ]; then
+	update-mime-database /usr/share/mime
 fi
 
 #chown arch:users -R /home/arch

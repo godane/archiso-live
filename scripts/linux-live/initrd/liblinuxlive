@@ -474,7 +474,7 @@ create_module()
 {
    debug_log "create_module" "$*"
    rm -f "$2" # overwrite, never append to existing file
-   mksquashfs "$1" "$2" -b 256K -lzmadic 256K $3 $4 $5 $6 $7 $8 $9>/dev/null
+   mksquashfs "$1" "$2" -b 256K $3 $4 $5 $6 $7 $8 $9>/dev/null
    if [ $? -ne 0 ]; then return 1; fi
    chmod a-wx "$2" # remove execute and write attrib
    chmod a+r "$2" # add read for everyone
@@ -871,9 +871,9 @@ modprobe_essential_modules()
    echolog "Loading filesystems modules ..."
    modprobe_module loop
    modprobe_module isofs
-   modprobe_module sqlzma
+   #modprobe_module sqlzma
    modprobe_module squashfs
-   modprobe_module unlzma
+   #modprobe_module unlzma
    modprobe_module aufs brs=1
    modprobe_module ext2
    modprobe_module ext3
