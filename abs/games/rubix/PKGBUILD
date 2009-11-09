@@ -1,0 +1,19 @@
+# Contributor: T - rttommy@gmail.com
+pkgname=rubix
+pkgver=1.0.5
+pkgrel=1
+pkgdesc="Rubik's cube system for the Linux/X11 operating system."
+url="http://sed.free.fr/rubix/"
+license=(GPL)
+arch=('i686' 'x86_64')
+source=(http://sed.free.fr/rubix/rubix-1.0.5.tar.bz2 rubix.desktop)
+md5sums=('cb5c672eb9dd6286c292d0408dbec26d'
+         'd48c848df8e8c22c85b2c9e4213d6c7a')
+build() {
+	cd "${srcdir}/${pkgname}-${pkgver}"
+	make
+	mkdir -p "${pkgdir}/usr/bin" "${pkgdir}/usr/share/doc/${pkgname}" "${pkgdir}/usr/share/applications"
+	cp ${srcdir}/${pkgname}-${pkgver}/{BUGS,TODO,README,AUTHORS,INSTALL,LICENCE} "${pkgdir}/usr/share/doc/${pkgname}"
+	cp "${srcdir}/${pkgname}-${pkgver}/${pkgname}" "${pkgdir}/usr/bin"
+	cp "${srcdir}/${pkgname}.desktop" "${pkgdir}/usr/share/applications"
+	}

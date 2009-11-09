@@ -31,6 +31,7 @@ vboxusers:x:108:arch
 dbus:x:81:arch
 policykit:x:109:
 hal:x:82:arch
-cherokee:x:106:
 avahi:x:84:
 camera:x:97:
+tor:x:43:
+privoxy:x:42:

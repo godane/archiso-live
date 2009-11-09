@@ -1,0 +1,7 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Rubix cube
+Type=Application
+Comment=Rubix cube
+Exec=rubix
+Categories=Application;Game;
