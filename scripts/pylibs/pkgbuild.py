@@ -29,6 +29,8 @@ class Scope(ConsoleP):
         self.scopes.append({"pkgdir" : "", "srcdir" : "", "startdir" : ""})
         self.current = 0
 
+        ConsoleP.__init__(self, 'pkgbuild')
+
     def allocate_var(self, token):
         self.debug("Allocating variable `%s`" % token)
         return (self.cscope, token)
@@ -109,12 +111,12 @@ class Scope(ConsoleP):
 
         self.debug("Parsed `%s` => `%s`" % (txt, ret))
         return ret
-    
+
     def increase_level(self):
         pass
     def decrease_level(self):
         pass
-    
+
     def dump(self):
         for k, v in self.cscope.items():
             self.debug("%s => %s" % (k, v))
@@ -137,6 +139,8 @@ class Interpreter(ConsoleP):
     ST_ERR = range(5)
 
     def __init__(self, path, data=None):
+        ConsoleP.__init__(self, 'pkgbuild')
+
         if path is None:
             self.eval = shlex.shlex(data, posix=True)
         else:
@@ -186,7 +190,7 @@ class Interpreter(ConsoleP):
                 if token == '(' or \
                    token == ')':
                     continue
-                
+
                 if token == '{':
                     self.state = self.ST_FNC
                     continue
@@ -217,7 +221,7 @@ class Interpreter(ConsoleP):
                         if token != '\n':
                             arr_val.append(self.scope.escape(token))
                         token = self.eval.get_token()
-                    
+
                     self.scope.parse_assign(var, operator, tuple(arr_val))
                 else:
                     self.scope.parse_assign(var, operator, self.scope.escape(token))

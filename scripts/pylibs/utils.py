@@ -23,6 +23,7 @@ import os.path
 
 import sys
 
+import logging.config
 from logging import Logger, StreamHandler, Formatter, addLevelName
 
 if os.name == 'posix':
@@ -31,7 +32,7 @@ if os.name == 'posix':
     green = "\033[1;32m"
     brown = "\033[0;33m"
     red = "\033[1;31m"
-else:                    
+else:
     reset = yellow = green = brown = red = ''
 
 addLevelName(10, '%sDBG%s' % (brown, reset))
@@ -40,49 +41,21 @@ addLevelName(30, '%s***%s' % (yellow, reset))
 addLevelName(40, '%s!!!%s' % (red, reset))
 addLevelName(50, '%s###%s' % (red, reset))
 
-class UtilLogger(Logger, object):
-    def __init__(self, name, level):
-        Logger.__init__(self, name, level)
-        self.formatter = self.format
-
-        handler = StreamHandler()
-        handler.setFormatter(self.formatter)
-
-        self.addHandler(handler)
-
-    def get_formatter(self):
-        return self.__formatter
-
-    def set_formatter(self, fmt):
-        self.__formatter = Formatter(fmt)
-
-    format = "%(levelname)s %(message)s"
-    formatter = property(get_formatter, set_formatter, doc="")
-    __formatter = Formatter(format)
-
-log = UtilLogger("Util", 10)
+logging.config.fileConfig(os.path.join(os.path.dirname(__file__), 'logging.ini'))
 
 def foreach_pkgbuild(pdir):
-    srcdir = pdir
-    category = None
-
     for root, dirs, files in os.walk(pdir):
-        if os.path.isfile(os.path.join(srcdir, root, "group-overlay")):
-            # Assume a category
-            category = os.path.basename(root)
-
-        for dir in (dir for dir in dirs if os.path.isfile(
-                    os.path.join(srcdir, root, dir, "PKGBUILD"))):
-            yield (os.path.join(srcdir, root, dir), category)
-
-        category = None
+        if 'PKGBUILD' in files:
+            yield root
 
 class ConsoleP(object):
+    def __init__(self, name):
+        self.log = logging.getLogger(name)
     def write(self, txt): print txt
-    def info(self, txt): log.info(txt)
-    def error(self, txt): log.error(txt)
-    def warning(self, txt): pass#log.warning(txt)
-    def debug(self, txt): pass#log.debug(txt)
+    def info(self, txt): self.log.info(txt)
+    def error(self, txt): self.log.error(txt)
+    def warning(self, txt): self.log.warning(txt)
+    def debug(self, txt): self.log.debug(txt)
 
 class Singleton(object):
     """
@@ -141,19 +114,19 @@ class Node(object):
     def add_dep(self, node):
         if node not in self.deps:
             self.deps.append(node)
-        
+
         node.root = self
 
     def get_depth(self):
         idx = 0
         root = self.root
-        
+
         while root:
             root = root.root
             idx += 1
 
         return idx
-    
+
     def __iter__(self):
         yield self
 
