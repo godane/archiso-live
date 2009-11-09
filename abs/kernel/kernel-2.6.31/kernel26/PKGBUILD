@@ -6,7 +6,7 @@ pkgname=kernel26                # Build stock -ARCH kernel
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.31
 pkgver=${_basekernel}.5
-pkgrel=1live
+pkgrel=2live
 _patchname="patch-${pkgver}-1-ARCH"
 pkgdesc="The Linux Kernel and modules"
 arch=(i686 x86_64)
@@ -34,8 +34,8 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
 optdepends=('crda: to set the correct wireless channels of your country')
 md5sums=('84c077a37684e4cbfa67b18154390d8a'
          '0b2f31e3c1296950aa73830184c248cb'
-         '07ceb97ba958bb99792a5edabe65629a'
-         '604e3014eff40b0304422c53129d6de7'
+         'cd57fb673c9bc6f37e8a0df730d6ea68'
+         'c392cb005d770bf08d845882c83d1227'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
