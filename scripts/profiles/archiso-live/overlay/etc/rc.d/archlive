@@ -56,6 +56,11 @@ if [ ! $(cmdline_parameter noxconf) ]; then
 	fi
 fi
 
+XRES=$(cmdline_value xres)
+if [ "${XRES}" != "" ]; then
+	xrandr --size "${XRES}"
+fi
+
 # lang: Override default language
 lang="`cmdline_value lang`"
 if [ "$lang" ]; then
