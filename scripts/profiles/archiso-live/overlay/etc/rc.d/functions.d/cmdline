@@ -42,5 +42,11 @@ get_nonfree()
 	echo $NONFREE
 }
 
+get_xdriver()
+{
+	local XDRIVER=`get_bootparam_value xdriver`
+	echo $XDRIVER
+}
+
 # End of file
 # vim: set ts=2 noet: 
