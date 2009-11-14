@@ -9,7 +9,6 @@ pkgconfig
 hal
 dbus
 dbus-python
-policykit
 gamin
 htop
 sudo

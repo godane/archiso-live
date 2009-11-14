@@ -15,12 +15,12 @@ vlc
 mixxx
 pitivi
 moovida
+rawstudio
 #libs
 sdl_perl
 sdl_pango
 smpeg
 perl-locale-gettext
-pulseaudio
 physfs
 quesoglc
 gtkglext
