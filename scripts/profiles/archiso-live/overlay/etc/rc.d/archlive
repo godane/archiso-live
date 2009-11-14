@@ -96,4 +96,5 @@ if [ "$fah" ]; then
 	/etc/rc.d/foldingathome start
 fi
 
+sed -i 's/^.*DAEMONS.*/DAEMONS=(syslog-ng hal wicd slim)/' /etc/rc.conf 
 chmod -x /etc/rc.d/archlive
