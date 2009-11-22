@@ -13,6 +13,7 @@ _mnt_iso()
 	info "Mounting ${img}"
 	/bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
 	
+	#/bin/mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
 	/bin/mkdir -p "/tmpfs/mnt/findiso"
     while [ ! -e "/dev/loop10" ]; do
         sleep 1
@@ -90,46 +91,65 @@ run_hook ()
     found=0
     
     /bin/modprobe -q isofs >/dev/null 2>&1
-    /bin/modprobe -q vfat >/dev/null 2>&1
-    /bin/modprobe -q ext2 >/dev/null 2>&1
-    /bin/modprobe -q ext3 >/dev/null 2>&1
-    /bin/modprobe -q ext4 >/dev/null 2>&1
-    /bin/modprobe -q xfs >/dev/null 2>&1
-    info -n "Scanning drives: "
-    for device in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sg[0-9]* /dev/sd[a-z][0-9]; do
-    	[ ! -e "${device}" ] && continue
-        bootmnt="$(device_mountdir ${device})"
-        /bin/mkdir -p "${bootmnt}"
-        for TYPE in iso9660 vfat ext[2-4] xfs;  do
-		    if /bin/mount -r -t ${TYPE} "${device}" "${bootmnt}" >/dev/null 2>&1; then
-    	        if [ -f "${bootmnt}/${findiso}" ]; then
-                    found=1
-                    info "${device}"; echo
-                    BOOT_MOUNT="${bootmnt}"
-                    break
+    info -n "Scanning cd drives: "
+    for cdrom in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sg[0-9]*; do
+    	[ ! -e "${cdrom}" ] && continue
+        bootcdmnt="$(device_mountdir ${cdrom})"
+        /bin/mkdir -p "${bootcdmnt}"
+    	if /bin/mount -r -t iso9660 "${cdrom}" "${bootcdmnt}" >/dev/null 2>&1; then
+    	    if [ -f "${bootcdmnt}/${findiso}" ]; then
+                found=1
+                info "${cdrom}"; echo
+                BOOT_MOUNT="${bootcdmnt}"
+                break
+            elif [ -f "${bootcdmnt}/base.lzm" ]; then
+                found=1
+                hl "${cdrom}"; echo
+                BOOT_MOUNT="${bootcdmnt}"
+                break
+            fi
+        else
+            hl "uhm"; echo
+            error "Failed to mount ${cdrom}"
+        fi
+        [ ${found} -eq 0 ] && /bin/umount "${bootcdmnt}" >/dev/null 2>&1
+    done
+
+    if [ ${found} -eq 0 ]; then
+        info -n "Scanning usb drivers: "
+        for usb in /dev/sd[a-z][0-9]; do
+            [ ! -e "${usb}" ] && continue
+            bootusbmnt="$(device_mountdir ${usb})"
+            /bin/mkdir -p "${bootusbmnt}"
+            if /bin/mount -t vfat "${usb}" "${bootusbmnt}" >/dev/null 2>&1 ||\
+               /bin/mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
+                if [ -f "${bootusbmnt}/${findiso}" ]; then
+                        found=1
+                        info "${usb}"; echo
+                        BOOT_MOUNT="${bootusbmnt}"
+                        break
                 elif [ "x${from}" != "x" ]; then
                     from=$(/usr/bin/basename ${from})
-                    if [ -f "${bootmnt}/${from}/base.lzm" ]; then
+                    if [ -f "${bootusbmnt}/${from}/base.lzm" ]; then
                         found=1
-                        info "${device}"; echo
-                        BOOT_MOUNT="${bootmnt}"
+                        info "${usb}"; echo
+                        BOOT_MOUNT="${bootusbmnt}"
                         break
                     fi
-                else 
-				    if [ -f "${bootmnt}/base.lzm" ]; then
-				        found=1
-                        hl "${device}"; echo
-                        BOOT_MOUNT="${bootmnt}"
+                else
+                    if [ -f "${bootusbmnt}/base.lzm" ]; then
+                        found=1
+                        hl "${usb}"; echo
+                        BOOT_MOUNT="${bootusbmnt}"
                         break
                     fi
                 fi
             else
-                hl "uhm"; echo
-                error "Failed to mount ${device}"
+                error "Failed to mount ${usb}"
             fi
+            [ ${found} -eq 0 ] && /bin/umount "${bootusbmnt}" >/dev/null 2>&1
         done
-        [ ${found} -eq 0 ] && /bin/umount "${bootmnt}" >/dev/null 2>&1
-    done
+    fi
 
     if [ ${found} -eq 0 ]; then
         error "ERROR: cannot find boot device, cannot continue..."
@@ -158,17 +178,17 @@ run_hook ()
     /bin/mount -t aufs -o nowarn_perm,xino=$XINO/.aufs.xino,br:/tmpfs=rw aufs /real_root
 
 	if [ "x${findiso}" != "x" ]; then
-		if [ -f "${BOOT_MOUNT}/${findiso}" ]; then
-			_mnt_iso "${BOOT_MOUNT}/${findiso}"
-			BOOT_ORIG="${BOOT_MOUNT}"
-			BOOT_MOUNT="/tmpfs/mnt/findiso"
-		fi
-	
-		if [ -f "${BOOT_MOUNT}/base.lzm" ]; then
-			_mnt_squashfs "${BOOT_MOUNT}/base.lzm"
-		elif [ -f "${BOOT_MOUNT}/initrd.lzm" ]; then
-			_mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
-		fi
+			if [ -f "${BOOT_MOUNT}/${findiso}" ]; then
+				_mnt_iso "${BOOT_MOUNT}/${findiso}"
+				BOOT_ORIG="${BOOT_MOUNT}"
+				BOOT_MOUNT="/tmpfs/mnt/findiso"
+			fi
+			
+			if [ -f "${BOOT_MOUNT}/base.lzm" ]; then
+				_mnt_squashfs "${BOOT_MOUNT}/base.lzm"
+			elif [ -f "${BOOT_MOUNT}/initrd.lzm" ]; then
+				_mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
+			fi
     elif [ "x${from}" != "x" ]; then
         _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm"
     else
