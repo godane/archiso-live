@@ -42,20 +42,6 @@ if [ "`cmdline_parameter ldconfig`" ]; then
     [[ -x /sbin/ldconfig ]] && /sbin/ldconfig
 fi
 
-if [ $(cmdline_parameter noxconf) ]; then
-	cp -f /etc/X11/xorg.conf.vesa /etc/X11/xorg.conf
-fi
-
-if [ ! $(cmdline_parameter noxconf) ]; then
-	if [ $(cmdline_parameter nonfree) ]; then
-		/etc/rc.d/hwdetect start
-	else
-		/etc/rc.d/hwdetect start
-		/etc/rc.d/xorg-detect start
-		sed -i 's|"fbdev"|"vesa"|g' /etc/X11/xorg.conf
-	fi
-fi
-
 # lang: Override default language
 lang="`cmdline_value lang`"
 if [ "$lang" ]; then
@@ -71,6 +57,7 @@ fi
 #    sed -i -e 's/pref("intl.locale.matchOS",                 false);/pref("intl.locale.matchOS",                 true);/g' /usr/lib/thunderbird/greprefs/all.js
 #fi
 
+depmod -a
 
 # keyb: Override default keyboard layout
 keyb="`cmdline_value keyb`"
@@ -109,4 +96,5 @@ if [ "$fah" ]; then
 	/etc/rc.d/foldingathome start
 fi
 
+sed -i 's/^.*DAEMONS.*/DAEMONS=(syslog-ng hal wicd slim)/' /etc/rc.conf 
 chmod -x /etc/rc.d/archlive
