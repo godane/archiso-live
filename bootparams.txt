@@ -17,3 +17,4 @@ bootparam value: scantimeout= ... how many seconds to wait for USB/PCMCIA device
 bootparam value: findiso= ... to boot from iso on hard drive or usb stick. Default: none
 bootparam value: modpath= ... to add another module folder to be search and added to union. This is good when booting from cd or iso file. Default: none
 bootparam value: rootcopy= ... this is to added a different rootcopy folder to your cd or iso folder. Default: cdname/rootcopy
+bootparam value: xres= ... this is to set the resolution that you want. (ex. xres=1024x768)
