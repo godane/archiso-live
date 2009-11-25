@@ -127,7 +127,7 @@ if [ "x${BOOT}" = "x" ]; then BOOT="syslinux"; fi
 
 if [ "${NOLZMA}" = "y" ]; then
 	EXT="sqfs"
-	OPTION="-nolzma"
+	OPTION="-comp gzip"
 else
 	EXT="lzm"
 	OPTION=""
