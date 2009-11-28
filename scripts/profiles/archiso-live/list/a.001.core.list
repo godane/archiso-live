@@ -61,6 +61,7 @@ acpid
 cpufreqd
 tor
 privoxy
+whois
 #recoverly-tools
 ddrescue
 testdisk
