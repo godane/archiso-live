@@ -24,6 +24,12 @@ unetbootin
 gparted
 larchin
 rawstudio
+virtualbox-ose
+backintime
+xchm
+#games
+gnome-games
+gnome-games-extra-data
 #libs
 pil
 libcddb
