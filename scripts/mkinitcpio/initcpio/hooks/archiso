@@ -176,6 +176,10 @@ run_hook ()
     fi
 
     /bin/mount -t aufs -o nowarn_perm,xino=$XINO/.aufs.xino,br:/tmpfs=rw aufs /real_root
+    if [ $? -ne 0 ]; then
+        echo "Error: while mounting root (aufs) fileystem."
+        exit 1
+    fi
 
 	if [ "x${findiso}" != "x" ]; then
 			if [ -f "${BOOT_MOUNT}/${findiso}" ]; then
