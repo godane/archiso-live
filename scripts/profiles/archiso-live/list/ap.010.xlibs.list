@@ -1,3 +1,4 @@
+audacity
 arista
 vlc
 inkscape
@@ -10,10 +11,10 @@ tuxguitar
 devede
 miro
 pitivi
+xchm
 #libs
 sdl_perl
 sdl_pango
-smpeg
 perl-locale-gettext
 physfs
 quesoglc
