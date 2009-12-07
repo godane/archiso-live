@@ -36,7 +36,13 @@ laptop-mode-tools
 nmap
 rsync
 setuptools
+bcwipe
+tor
+privoxy
+#recoverly-tools
 ddrescue
+testdesk
+#server
 apache
 lighttpd
 #base-devel-deps

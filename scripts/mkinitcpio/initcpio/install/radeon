@@ -1,0 +1,17 @@
+# vim: set ft=sh:
+
+install ()
+{
+	MODULES=" radeon "
+	BINARIES=""
+	FILES=""
+	SCRIPT=""
+	add_full_dir /lib/firmware/radeon
+}
+
+help ()
+{
+	cat<<HELPEOF
+This hook adds the radeon to the image.
+HELPEOF
+}

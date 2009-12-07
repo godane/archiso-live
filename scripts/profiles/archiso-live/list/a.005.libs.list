@@ -31,6 +31,9 @@ gnome-ppp
 gtkpod
 xsane
 gtk-recordmydesktop
+pan
 #games
 gnome-games
 gnome-games-extra-data
+libdvdcss
+ca-certificates-java
