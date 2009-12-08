@@ -5,6 +5,7 @@ audacious-plugins
 asunder
 transmission-gtk
 grsync
+urlgfe
 wicd
 gftp
 xarchiver
@@ -32,3 +33,7 @@ gtkpod
 xsane
 gtk-recordmydesktop
 pan
+shaman
+homebank
+vym
+gpodder

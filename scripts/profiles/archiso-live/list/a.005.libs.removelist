@@ -5,6 +5,7 @@ audacious-plugins
 asunder
 transmission-gtk
 grsync
+urlgfe
 wicd
 gftp
 xarchiver
@@ -32,6 +33,10 @@ gtkpod
 xsane
 gtk-recordmydesktop
 pan
+shaman
+homebank
+vym
+gpodder
 #games
 gnome-games
 gnome-games-extra-data
