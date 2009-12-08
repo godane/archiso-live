@@ -1,0 +1,1115 @@
+From c415802e12563ea1f1ef3cd46a004ce6cc2300ff Mon Sep 17 00:00:00 2001
+From: Alex Deucher <alexdeucher@gmail.com>
+Date: Mon, 30 Nov 2009 13:45:31 -0500
+Subject: [PATCH] drm/radeon/kms: Add support for interrupts on r6xx/r7xx chips
+
+This enabled the use of interrupts on r6xx/r7xx hardware.
+Interrupts are implemented via a ring buffer.  The GPU adds
+interrupts vectors to the ring and the host reads them off
+in the interrupt handler.  The interrupt controller requires
+firmware like the CP.  This firmware must be installed and
+accessble to the firmware loader for interrupts to function.
+
+Signed-off-by: Alex Deucher <alexdeucher@gmail.com>
+---
+ drivers/gpu/drm/radeon/r600.c           |  542 +++++++++++++++++++++++++++++--
+ drivers/gpu/drm/radeon/r600_blit_kms.c  |    4 +-
+ drivers/gpu/drm/radeon/r600d.h          |  159 +++++++++-
+ drivers/gpu/drm/radeon/radeon.h         |   26 ++-
+ drivers/gpu/drm/radeon/radeon_asic.h    |    2 +
+ drivers/gpu/drm/radeon/radeon_device.c  |    2 +
+ drivers/gpu/drm/radeon/radeon_drv.h     |    1 -
+ drivers/gpu/drm/radeon/radeon_fence.c   |   38 ---
+ drivers/gpu/drm/radeon/radeon_irq_kms.c |   12 +-
+ drivers/gpu/drm/radeon/rv770.c          |   23 ++-
+ 10 files changed, 734 insertions(+), 75 deletions(-)
+
+diff --git a/drivers/gpu/drm/radeon/r600.c b/drivers/gpu/drm/radeon/r600.c
+index 8d6bc12..2004cf1 100644
+--- a/drivers/gpu/drm/radeon/r600.c
++++ b/drivers/gpu/drm/radeon/r600.c
+@@ -38,8 +38,10 @@
+ 
+ #define PFP_UCODE_SIZE 576
+ #define PM4_UCODE_SIZE 1792
++#define RLC_UCODE_SIZE 768
+ #define R700_PFP_UCODE_SIZE 848
+ #define R700_PM4_UCODE_SIZE 1360
++#define R700_RLC_UCODE_SIZE 1024
+ 
+ /* Firmware Names */
+ MODULE_FIRMWARE("radeon/R600_pfp.bin");
+@@ -62,6 +64,8 @@ MODULE_FIRMWARE("radeon/RV730_pfp.bin");
+ MODULE_FIRMWARE("radeon/RV730_me.bin");
+ MODULE_FIRMWARE("radeon/RV710_pfp.bin");
+ MODULE_FIRMWARE("radeon/RV710_me.bin");
++MODULE_FIRMWARE("radeon/R600_rlc.bin");
++MODULE_FIRMWARE("radeon/R700_rlc.bin");
+ 
+ int r600_debugfs_mc_info_init(struct radeon_device *rdev);
+ 
+@@ -69,6 +73,8 @@ int r600_debugfs_mc_info_init(struct radeon_device *rdev);
+ int r600_mc_wait_for_idle(struct radeon_device *rdev);
+ void r600_gpu_init(struct radeon_device *rdev);
+ void r600_fini(struct radeon_device *rdev);
++int r600_irq_init(struct radeon_device *rdev);
++void r600_irq_fini(struct radeon_device *rdev);
+ 
+ /*
+  * R600 PCIE GART
+@@ -1110,11 +1116,12 @@ void r600_cp_stop(struct radeon_device *rdev)
+ 	WREG32(R_0086D8_CP_ME_CNTL, S_0086D8_CP_ME_HALT(1));
+ }
+ 
+-int r600_cp_init_microcode(struct radeon_device *rdev)
++int r600_init_microcode(struct radeon_device *rdev)
+ {
+ 	struct platform_device *pdev;
+ 	const char *chip_name;
+-	size_t pfp_req_size, me_req_size;
++	const char *rlc_chip_name;
++	size_t pfp_req_size, me_req_size, rlc_req_size;
+ 	char fw_name[30];
+ 	int err;
+ 
+@@ -1128,30 +1135,62 @@ int r600_cp_init_microcode(struct radeon_device *rdev)
+ 	}
+ 
+ 	switch (rdev->family) {
+-	case CHIP_R600: chip_name = "R600"; break;
+-	case CHIP_RV610: chip_name = "RV610"; break;
+-	case CHIP_RV630: chip_name = "RV630"; break;
+-	case CHIP_RV620: chip_name = "RV620"; break;
+-	case CHIP_RV635: chip_name = "RV635"; break;
+-	case CHIP_RV670: chip_name = "RV670"; break;
++	case CHIP_R600:
++		chip_name = "R600";
++		rlc_chip_name = "R600";
++		break;
++	case CHIP_RV610:
++		chip_name = "RV610";
++		rlc_chip_name = "R600";
++		break;
++	case CHIP_RV630:
++		chip_name = "RV630";
++		rlc_chip_name = "R600";
++		break;
++	case CHIP_RV620:
++		chip_name = "RV620";
++		rlc_chip_name = "R600";
++		break;
++	case CHIP_RV635:
++		chip_name = "RV635";
++		rlc_chip_name = "R600";
++		break;
++	case CHIP_RV670:
++		chip_name = "RV670";
++		rlc_chip_name = "R600";
++		break;
+ 	case CHIP_RS780:
+-	case CHIP_RS880: chip_name = "RS780"; break;
+-	case CHIP_RV770: chip_name = "RV770"; break;
++	case CHIP_RS880:
++		chip_name = "RS780";
++		rlc_chip_name = "R600";
++		break;
++	case CHIP_RV770:
++		chip_name = "RV770";
++		rlc_chip_name = "R700";
++		break;
+ 	case CHIP_RV730:
+-	case CHIP_RV740: chip_name = "RV730"; break;
+-	case CHIP_RV710: chip_name = "RV710"; break;
++	case CHIP_RV740:
++		chip_name = "RV730";
++		rlc_chip_name = "R700";
++		break;
++	case CHIP_RV710:
++		chip_name = "RV710";
++		rlc_chip_name = "R700";
++		break;
+ 	default: BUG();
+ 	}
+ 
+ 	if (rdev->family >= CHIP_RV770) {
+ 		pfp_req_size = R700_PFP_UCODE_SIZE * 4;
+ 		me_req_size = R700_PM4_UCODE_SIZE * 4;
++		rlc_req_size = R700_RLC_UCODE_SIZE * 4;
+ 	} else {
+ 		pfp_req_size = PFP_UCODE_SIZE * 4;
+ 		me_req_size = PM4_UCODE_SIZE * 12;
++		rlc_req_size = RLC_UCODE_SIZE * 4;
+ 	}
+ 
+-	DRM_INFO("Loading %s CP Microcode\n", chip_name);
++	DRM_INFO("Loading %s Microcode\n", chip_name);
+ 
+ 	snprintf(fw_name, sizeof(fw_name), "radeon/%s_pfp.bin", chip_name);
+ 	err = request_firmware(&rdev->pfp_fw, fw_name, &pdev->dev);
+@@ -1175,6 +1214,18 @@ int r600_cp_init_microcode(struct radeon_device *rdev)
+ 		       rdev->me_fw->size, fw_name);
+ 		err = -EINVAL;
+ 	}
++
++	snprintf(fw_name, sizeof(fw_name), "radeon/%s_rlc.bin", rlc_chip_name);
++	err = request_firmware(&rdev->rlc_fw, fw_name, &pdev->dev);
++	if (err)
++		goto out;
++	if (rdev->rlc_fw->size != rlc_req_size) {
++		printk(KERN_ERR
++		       "r600_rlc: Bogus length %zu in firmware \"%s\"\n",
++		       rdev->rlc_fw->size, fw_name);
++		err = -EINVAL;
++	}
++
+ out:
+ 	platform_device_unregister(pdev);
+ 
+@@ -1187,6 +1238,8 @@ out:
+ 		rdev->pfp_fw = NULL;
+ 		release_firmware(rdev->me_fw);
+ 		rdev->me_fw = NULL;
++		release_firmware(rdev->rlc_fw);
++		rdev->rlc_fw = NULL;
+ 	}
+ 	return err;
+ }
+@@ -1433,10 +1486,14 @@ int r600_wb_enable(struct radeon_device *rdev)
+ void r600_fence_ring_emit(struct radeon_device *rdev,
+ 			  struct radeon_fence *fence)
+ {
++	/* Also consider EVENT_WRITE_EOP.  it handles the interrupts + timestamps + events */
+ 	/* Emit fence sequence & fire IRQ */
+ 	radeon_ring_write(rdev, PACKET3(PACKET3_SET_CONFIG_REG, 1));
+ 	radeon_ring_write(rdev, ((rdev->fence_drv.scratch_reg - PACKET3_SET_CONFIG_REG_OFFSET) >> 2));
+ 	radeon_ring_write(rdev, fence->seq);
++	/* CP_INTERRUPT packet 3 no longer exists, use packet 0 */
++	radeon_ring_write(rdev, PACKET0(CP_INT_STATUS, 0));
++	radeon_ring_write(rdev, RB_INT_STAT);
+ }
+ 
+ int r600_copy_dma(struct radeon_device *rdev,
+@@ -1459,18 +1516,6 @@ int r600_copy_blit(struct radeon_device *rdev,
+ 	return 0;
+ }
+ 
+-int r600_irq_process(struct radeon_device *rdev)
+-{
+-	/* FIXME: implement */
+-	return 0;
+-}
+-
+-int r600_irq_set(struct radeon_device *rdev)
+-{
+-	/* FIXME: implement */
+-	return 0;
+-}
+-
+ int r600_set_surface_reg(struct radeon_device *rdev, int reg,
+ 			 uint32_t tiling_flags, uint32_t pitch,
+ 			 uint32_t offset, uint32_t obj_size)
+@@ -1523,6 +1568,15 @@ int r600_startup(struct radeon_device *rdev)
+ 		return r;
+ 	}
+ 
++	/* Enable IRQ */
++	rdev->irq.sw_int = true;
++ 	r = r600_irq_init(rdev);
++ 	if (r) {
++ 		DRM_ERROR("radeon: IH init failed (%d).\n", r);
++		return r;
++ 	}
++	r600_irq_set(rdev);
++
+ 	r = radeon_ring_init(rdev, rdev->cp.ring_size);
+ 	if (r)
+ 		return r;
+@@ -1639,11 +1693,19 @@ int r600_init(struct radeon_device *rdev)
+ 	r = radeon_object_init(rdev);
+ 	if (r)
+ 		return r;
++
++	r = radeon_irq_kms_init(rdev);
++	if (r)
++		return r;
++
+ 	rdev->cp.ring_obj = NULL;
+ 	r600_ring_init(rdev, 1024 * 1024);
+ 
+-	if (!rdev->me_fw || !rdev->pfp_fw) {
+-		r = r600_cp_init_microcode(rdev);
++	rdev->ih.ring_obj = NULL;
++	r600_ih_ring_init(rdev, 64 * 1024);
++
++	if (!rdev->me_fw || !rdev->pfp_fw || !rdev->rlc_fw) {
++		r = r600_init_microcode(rdev);
+ 		if (r) {
+ 			DRM_ERROR("Failed to load firmware!\n");
+ 			return r;
+@@ -1690,6 +1752,8 @@ void r600_fini(struct radeon_device *rdev)
+ 	r600_suspend(rdev);
+ 
+ 	r600_blit_fini(rdev);
++	r600_irq_fini(rdev);
++	radeon_irq_kms_fini(rdev);
+ 	radeon_ring_fini(rdev);
+ 	r600_wb_fini(rdev);
+ 	r600_pcie_gart_fini(rdev);
+@@ -1784,8 +1848,432 @@ int r600_ib_test(struct radeon_device *rdev)
+ 	return r;
+ }
+ 
++/*
++ * Interrupts
++ *
++ * Interrupts use a ring buffer on r6xx/r7xx hardware.  It works pretty
++ * the same as the CP ring buffer, but in reverse.  Rather than the CPU
++ * writing to the ring and the GPU consuming, the GPU writes to the ring
++ * and host consumes.  As the host irq handler processes interrupts, it
++ * increments the rptr.  When the rptr catches up with the wptr, all the
++ * current interrupts have been processed.
++ */
++
++void r600_ih_ring_init(struct radeon_device *rdev, unsigned ring_size)
++{
++	u32 rb_bufsz;
++
++	/* Align ring size */
++	rb_bufsz = drm_order(ring_size / 4);
++	ring_size = (1 << rb_bufsz) * 4;
++	rdev->ih.ring_size = ring_size;
++	rdev->ih.align_mask = 4 - 1;
++}
++
++static int r600_ih_ring_alloc(struct radeon_device *rdev, unsigned ring_size)
++{
++	int r;
++
++	rdev->ih.ring_size = ring_size;
++	/* Allocate ring buffer */
++	if (rdev->ih.ring_obj == NULL) {
++		r = radeon_object_create(rdev, NULL, rdev->ih.ring_size,
++					 true,
++					 RADEON_GEM_DOMAIN_GTT,
++					 false,
++					 &rdev->ih.ring_obj);
++		if (r) {
++			DRM_ERROR("radeon: failed to create ih ring buffer (%d).\n", r);
++			return r;
++		}
++		r = radeon_object_pin(rdev->ih.ring_obj,
++				      RADEON_GEM_DOMAIN_GTT,
++				      &rdev->ih.gpu_addr);
++		if (r) {
++			DRM_ERROR("radeon: failed to pin ih ring buffer (%d).\n", r);
++			return r;
++		}
++		r = radeon_object_kmap(rdev->ih.ring_obj,
++				       (void **)&rdev->ih.ring);
++		if (r) {
++			DRM_ERROR("radeon: failed to map ih ring buffer (%d).\n", r);
++			return r;
++		}
++	}
++	rdev->ih.ptr_mask = (rdev->cp.ring_size / 4) - 1;
++	rdev->ih.rptr = 0;
++
++	return 0;
++}
++
++static void r600_ih_ring_fini(struct radeon_device *rdev)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&rdev->ih.lock, flags);
++	if (rdev->ih.ring_obj) {
++		radeon_object_kunmap(rdev->ih.ring_obj);
++		radeon_object_unpin(rdev->ih.ring_obj);
++		radeon_object_unref(&rdev->ih.ring_obj);
++		rdev->ih.ring = NULL;
++		rdev->ih.ring_obj = NULL;
++	}
++	spin_unlock_irqrestore(&rdev->ih.lock, flags);
++}
++
++static void r600_rlc_stop(struct radeon_device *rdev)
++{
++
++	if (rdev->family >= CHIP_RV770) {
++		/* r7xx asics need to soft reset RLC before halting */
++		WREG32(SRBM_SOFT_RESET, SOFT_RESET_RLC);
++		RREG32(SRBM_SOFT_RESET);
++		udelay(15000);
++		WREG32(SRBM_SOFT_RESET, 0);
++		RREG32(SRBM_SOFT_RESET);
++	}
++
++	WREG32(RLC_CNTL, 0);
++}
++
++static void r600_rlc_start(struct radeon_device *rdev)
++{
++	WREG32(RLC_CNTL, RLC_ENABLE);
++}
++
++static int r600_rlc_init(struct radeon_device *rdev)
++{
++	u32 i;
++	const __be32 *fw_data;
++
++	if (!rdev->rlc_fw)
++		return -EINVAL;
++
++	r600_rlc_stop(rdev);
++
++	WREG32(RLC_HB_BASE, 0);
++	WREG32(RLC_HB_CNTL, 0);
++	WREG32(RLC_HB_RPTR, 0);
++	WREG32(RLC_HB_WPTR, 0);
++	WREG32(RLC_HB_WPTR_LSB_ADDR, 0);
++	WREG32(RLC_HB_WPTR_MSB_ADDR, 0);
++	WREG32(RLC_MC_CNTL, 0);
++	WREG32(RLC_UCODE_CNTL, 0);
++
++	fw_data = (const __be32 *)rdev->rlc_fw->data;
++	if (rdev->family >= CHIP_RV770) {
++		for (i = 0; i < R700_RLC_UCODE_SIZE; i++) {
++			WREG32(RLC_UCODE_ADDR, i);
++			WREG32(RLC_UCODE_DATA, be32_to_cpup(fw_data++));
++		}
++	} else {
++		for (i = 0; i < RLC_UCODE_SIZE; i++) {
++			WREG32(RLC_UCODE_ADDR, i);
++			WREG32(RLC_UCODE_DATA, be32_to_cpup(fw_data++));
++		}
++	}
++	WREG32(RLC_UCODE_ADDR, 0);
++
++	r600_rlc_start(rdev);
++
++	return 0;
++}
++
++static void r600_enable_interrupts(struct radeon_device *rdev)
++{
++	u32 ih_cntl = RREG32(IH_CNTL);
++	u32 ih_rb_cntl = RREG32(IH_RB_CNTL);
++
++	ih_cntl |= ENABLE_INTR;
++	ih_rb_cntl |= IH_RB_ENABLE;
++	WREG32(IH_CNTL, ih_cntl);
++	WREG32(IH_RB_CNTL, ih_rb_cntl);
++	rdev->ih.enabled = true;
++}
++
++static void r600_disable_interrupts(struct radeon_device *rdev)
++{
++	u32 ih_rb_cntl = RREG32(IH_RB_CNTL);
++	u32 ih_cntl = RREG32(IH_CNTL);
++
++	ih_rb_cntl &= ~IH_RB_ENABLE;
++	ih_cntl &= ~ENABLE_INTR;
++	WREG32(IH_RB_CNTL, ih_rb_cntl);
++	WREG32(IH_CNTL, ih_cntl);
++	/* set rptr, wptr to 0 */
++	WREG32(IH_RB_RPTR, 0);
++	WREG32(IH_RB_WPTR, 0);
++	rdev->ih.enabled = false;
++	rdev->ih.wptr = 0;
++	rdev->ih.rptr = 0;
++}
++
++int r600_irq_init(struct radeon_device *rdev)
++{
++	int ret = 0;
++	int rb_bufsz;
++	u32 interrupt_cntl, ih_cntl, ih_rb_cntl;
++
++	/* allocate ring */
++	ret = r600_ih_ring_alloc(rdev, rdev->ih.ring_size);
++	if (ret)
++		return ret;
++
++	/* disable irqs */
++	r600_disable_interrupts(rdev);
++
++	/* init rlc */
++	ret = r600_rlc_init(rdev);
++	if (ret) {
++		r600_ih_ring_fini(rdev);
++		return ret;
++	}
++
++	/* setup interrupt control */
++	/* set dummy read address to ring address */
++	WREG32(INTERRUPT_CNTL2, rdev->ih.gpu_addr >> 8);
++	interrupt_cntl = RREG32(INTERRUPT_CNTL);
++	/* IH_DUMMY_RD_OVERRIDE=0 - dummy read disabled with msi, enabled without msi
++	 * IH_DUMMY_RD_OVERRIDE=1 - dummy read controlled by IH_DUMMY_RD_EN
++	 */
++	interrupt_cntl &= ~IH_DUMMY_RD_OVERRIDE;
++	/* IH_REQ_NONSNOOP_EN=1 if ring is in non-cacheable memory, e.g., vram */
++	interrupt_cntl &= ~IH_REQ_NONSNOOP_EN;
++	WREG32(INTERRUPT_CNTL, interrupt_cntl);
++
++	WREG32(IH_RB_BASE, rdev->ih.gpu_addr >> 8);
++	rb_bufsz = drm_order(rdev->ih.ring_size / 4);
++
++	ih_rb_cntl = (IH_WPTR_OVERFLOW_ENABLE |
++		      IH_WPTR_OVERFLOW_CLEAR |
++		      (rb_bufsz << 1));
++        /* WPTR writeback, not yet */
++	/*ih_rb_cntl |= IH_WPTR_WRITEBACK_ENABLE;*/
++	WREG32(IH_RB_WPTR_ADDR_LO, 0);
++	WREG32(IH_RB_WPTR_ADDR_HI, 0);
++
++	WREG32(IH_RB_CNTL, ih_rb_cntl);
++
++	/* set rptr, wptr to 0 */
++	WREG32(IH_RB_RPTR, 0);
++	WREG32(IH_RB_WPTR, 0);
++
++	/* Default settings for IH_CNTL (disabled at first) */
++	ih_cntl = MC_WRREQ_CREDIT(0x10) | MC_WR_CLEAN_CNT(0x10);
++	/* RPTR_REARM only works if msi's are enabled */
++	if (rdev->msi_enabled)
++		ih_cntl |= RPTR_REARM;
++
++#ifdef __BIG_ENDIAN
++	ih_cntl |= IH_MC_SWAP(IH_MC_SWAP_32BIT);
++#endif
++	WREG32(IH_CNTL, ih_cntl);
++
++        /* force the active interrupt state to all disabled */
++	WREG32(CP_INT_CNTL, 0);
++	WREG32(GRBM_INT_CNTL, 0);
++	WREG32(DxMODE_INT_MASK, 0);
++
++	/* enable irqs */
++	r600_enable_interrupts(rdev);
++
++	return ret;
++}
++
++void r600_irq_fini(struct radeon_device *rdev)
++{
++	r600_disable_interrupts(rdev);
++	r600_rlc_stop(rdev);
++	r600_ih_ring_fini(rdev);
++}
++
++int r600_irq_set(struct radeon_device *rdev)
++{
++	uint32_t cp_int_cntl = CNTX_BUSY_INT_ENABLE | CNTX_EMPTY_INT_ENABLE;
++	uint32_t mode_int = 0;
++
++	/* don't enable anything if the ih is disabled */
++	if (!rdev->ih.enabled)
++		return 0;
++
++	if (rdev->irq.sw_int) {
++		DRM_DEBUG("r600_irq_set: sw int\n");
++		cp_int_cntl |= RB_INT_ENABLE;
++	}
++	if (rdev->irq.crtc_vblank_int[0]) {
++		DRM_DEBUG("r600_irq_set: vblank 0\n");
++		mode_int |= D1MODE_VBLANK_INT_MASK;
++	}
++	if (rdev->irq.crtc_vblank_int[1]) {
++		DRM_DEBUG("r600_irq_set: vblank 1\n");
++		mode_int |= D2MODE_VBLANK_INT_MASK;
++	}
++
++	WREG32(CP_INT_CNTL, cp_int_cntl);
++	WREG32(DxMODE_INT_MASK, mode_int);
+ 
++	return 0;
++}
++
++void r600_irq_disable(struct radeon_device *rdev)
++{
++	r600_disable_interrupts(rdev);
++	/* Wait and acknowledge irq */
++}
+ 
++static inline u32 r600_get_ih_wptr(struct radeon_device *rdev)
++{
++	/* XXX use writeback */
++	return RREG32(IH_RB_WPTR);
++}
++
++/*        r600 IV Ring
++ * Each IV ring entry is 128 bits:
++ * [7:0]    - interrupt source id
++ * [31:8]   - reserved
++ * [59:32]  - interrupt source data
++ * [127:60]  - reserved
++ *
++ * The basic interrupt vector entries
++ * are decoded as follows:
++ * src_id  src_data  description
++ *      1         0  D1 Vblank
++ *      1         1  D1 Vline
++ *      5         0  D2 Vblank
++ *      5         1  D2 Vline
++ *     19         0  FP Hot plug detection A
++ *     19         1  FP Hot plug detection B
++ *     19         2  DAC A auto-detection
++ *     19         3  DAC B auto-detection
++ *    176         -  CP_INT RB
++ *    177         -  CP_INT IB1
++ *    178         -  CP_INT IB2
++ *    181         -  EOP Interrupt
++ *    233         -  GUI Idle
++ *
++ * Note, these are based on r600 and may need to be
++ * adjusted or added to on newer asics
++ */
++
++int r600_irq_process(struct radeon_device *rdev)
++{
++	u32 wptr = r600_get_ih_wptr(rdev);
++	u32 rptr = rdev->ih.rptr;
++	u32 src_id, src_data;
++	u32 last_entry = rdev->ih.ring_size - 16;
++	u32 tmp, ring_index, disp_int;
++	unsigned long flags;
++
++	DRM_DEBUG("r600_irq_process start: rptr %d, wptr %d\n", rptr, wptr);
++
++	spin_lock_irqsave(&rdev->ih.lock, flags);
++	if (wptr & RB_OVERFLOW) {
++		WARN_ON(1);
++		/* XXX deal with overflow */
++		DRM_ERROR("IH RB overflow\n");
++		tmp = RREG32(IH_RB_CNTL);
++		tmp |= IH_WPTR_OVERFLOW_CLEAR;
++		WREG32(IH_RB_CNTL, tmp);
++	}
++	wptr = wptr & WPTR_OFFSET_MASK;
++
++	if (rptr == wptr) {
++		spin_unlock_irqrestore(&rdev->ih.lock, flags);
++		return IRQ_NONE;
++	}
++	if (rdev->shutdown) {
++		spin_unlock_irqrestore(&rdev->ih.lock, flags);
++		return IRQ_NONE;
++	}
++
++	/* display interrupts */
++	if (ASIC_IS_DCE3(rdev))
++		disp_int = RREG32(DCE3_DISP_INTERRUPT_STATUS);
++	else
++		disp_int = RREG32(DISP_INTERRUPT_STATUS);
++
++restart_ih:
++	rdev->ih.wptr = wptr;
++	while (rptr != wptr) {
++		/* wptr/rptr are in bytes! */
++		ring_index = rptr / 4;
++		src_id =  rdev->ih.ring[ring_index] & 0xff;
++		src_data = rdev->ih.ring[ring_index + 1] & 0xfffffff;
++
++		switch (src_id) {
++		case 1: /* D1 vblank/vline */
++			switch (src_data) {
++			case 0: /* D1 vblank */
++				if (disp_int & LB_D1_VBLANK_INTERRUPT) {
++					WREG32(D1MODE_VBLANK_STATUS, DxMODE_VBLANK_ACK);
++					drm_handle_vblank(rdev->ddev, 0);
++					disp_int &= ~LB_D1_VBLANK_INTERRUPT;
++					DRM_DEBUG("IH: D1 vblank\n");
++				}
++				break;
++			case 1: /* D1 vline */
++				if (disp_int & LB_D1_VLINE_INTERRUPT) {
++					WREG32(D1MODE_VLINE_STATUS, DxMODE_VLINE_ACK);
++					disp_int &= ~LB_D1_VLINE_INTERRUPT;
++					DRM_DEBUG("IH: D1 vline\n");
++				}
++				break;
++			default:
++				DRM_ERROR("Unhandled interrupt: %d %d\n", src_id, src_data);
++				break;
++			}
++			break;
++		case 5: /* D2 vblank/vline */
++			switch (src_data) {
++			case 0: /* D2 vblank */
++				if (disp_int & LB_D2_VBLANK_INTERRUPT) {
++					WREG32(D2MODE_VBLANK_STATUS, DxMODE_VBLANK_ACK);
++					drm_handle_vblank(rdev->ddev, 1);
++					disp_int &= ~LB_D2_VBLANK_INTERRUPT;
++					DRM_DEBUG("IH: D2 vblank\n");
++				}
++				break;
++			case 1: /* D1 vline */
++				if (disp_int & LB_D2_VLINE_INTERRUPT) {
++					WREG32(D2MODE_VLINE_STATUS, DxMODE_VLINE_ACK);
++					disp_int &= ~LB_D2_VLINE_INTERRUPT;
++					DRM_DEBUG("IH: D2 vline\n");
++				}
++				break;
++			default:
++				DRM_ERROR("Unhandled interrupt: %d %d\n", src_id, src_data);
++				break;
++			}
++			break;
++		case 176: /* CP_INT in ring buffer */
++		case 177: /* CP_INT in IB1 */
++		case 178: /* CP_INT in IB2 */
++			DRM_DEBUG("IH: CP int: 0x%08x\n", src_data);
++			radeon_fence_process(rdev);
++			break;
++		case 181: /* CP EOP event */
++			DRM_DEBUG("IH: CP EOP\n");
++			break;
++		default:
++			DRM_ERROR("Unhandled interrupt: %d %d\n", src_id, src_data);
++			break;
++		}
++
++		/* wptr/rptr are in bytes! */
++		if (rptr == last_entry)
++			rptr = 0;
++		else
++			rptr += 16;
++	}
++	/* make sure wptr hasn't changed while processing */
++	wptr = r600_get_ih_wptr(rdev);
++	if (wptr != rdev->ih.wptr)
++		goto restart_ih;
++	rdev->ih.rptr = rptr;
++	WREG32(IH_RB_RPTR, rdev->ih.rptr);
++	spin_unlock_irqrestore(&rdev->ih.lock, flags);
++	return IRQ_HANDLED;
++}
+ 
+ /*
+  * Debugfs info
+diff --git a/drivers/gpu/drm/radeon/r600_blit_kms.c b/drivers/gpu/drm/radeon/r600_blit_kms.c
+index dbf716e..c20909c 100644
+--- a/drivers/gpu/drm/radeon/r600_blit_kms.c
++++ b/drivers/gpu/drm/radeon/r600_blit_kms.c
+@@ -569,9 +569,9 @@ int r600_blit_prepare_copy(struct radeon_device *rdev, int size_bytes)
+ 	ring_size = num_loops * dwords_per_loop;
+ 	/* set default  + shaders */
+ 	ring_size += 40; /* shaders + def state */
+-	ring_size += 3; /* fence emit for VB IB */
++	ring_size += 5; /* fence emit for VB IB */
+ 	ring_size += 5; /* done copy */
+-	ring_size += 3; /* fence emit for done copy */
++	ring_size += 5; /* fence emit for done copy */
+ 	r = radeon_ring_lock(rdev, ring_size);
+ 	WARN_ON(r);
+ 
+diff --git a/drivers/gpu/drm/radeon/r600d.h b/drivers/gpu/drm/radeon/r600d.h
+index b99f45d..cf066de 100644
+--- a/drivers/gpu/drm/radeon/r600d.h
++++ b/drivers/gpu/drm/radeon/r600d.h
+@@ -455,7 +455,163 @@
+ #define         WAIT_2D_IDLECLEAN_bit                           (1 << 16)
+ #define         WAIT_3D_IDLECLEAN_bit                           (1 << 17)
+ 
+-
++#define IH_RB_CNTL                                        0x3e00
++#       define IH_RB_ENABLE                               (1 << 0)
++#       define IH_IB_SIZE(x)                              ((x) << 1) /* log2 */
++#       define IH_RB_FULL_DRAIN_ENABLE                    (1 << 6)
++#       define IH_WPTR_WRITEBACK_ENABLE                   (1 << 8)
++#       define IH_WPTR_WRITEBACK_TIMER(x)                 ((x) << 9) /* log2 */
++#       define IH_WPTR_OVERFLOW_ENABLE                    (1 << 16)
++#       define IH_WPTR_OVERFLOW_CLEAR                     (1 << 31)
++#define IH_RB_BASE                                        0x3e04
++#define IH_RB_RPTR                                        0x3e08
++#define IH_RB_WPTR                                        0x3e0c
++#       define RB_OVERFLOW                                (1 << 0)
++#       define WPTR_OFFSET_MASK                           0x3fffc
++#define IH_RB_WPTR_ADDR_HI                                0x3e10
++#define IH_RB_WPTR_ADDR_LO                                0x3e14
++#define IH_CNTL                                           0x3e18
++#       define ENABLE_INTR                                (1 << 0)
++#       define IH_MC_SWAP(x)                              ((x) << 2)
++#       define IH_MC_SWAP_NONE                            0
++#       define IH_MC_SWAP_16BIT                           1
++#       define IH_MC_SWAP_32BIT                           2
++#       define IH_MC_SWAP_64BIT                           3
++#       define RPTR_REARM                                 (1 << 4)
++#       define MC_WRREQ_CREDIT(x)                         ((x) << 15)
++#       define MC_WR_CLEAN_CNT(x)                         ((x) << 20)
++
++#define RLC_CNTL                                          0x3f00
++#       define RLC_ENABLE                                 (1 << 0)
++#define RLC_HB_BASE                                       0x3f10
++#define RLC_HB_CNTL                                       0x3f0c
++#define RLC_HB_RPTR                                       0x3f20
++#define RLC_HB_WPTR                                       0x3f1c
++#define RLC_HB_WPTR_LSB_ADDR                              0x3f14
++#define RLC_HB_WPTR_MSB_ADDR                              0x3f18
++#define RLC_MC_CNTL                                       0x3f44
++#define RLC_UCODE_CNTL                                    0x3f48
++#define RLC_UCODE_ADDR                                    0x3f2c
++#define RLC_UCODE_DATA                                    0x3f30
++
++#define SRBM_SOFT_RESET                                   0xe60
++#       define SOFT_RESET_RLC                             (1 << 13)
++
++#define CP_INT_CNTL                                       0xc124
++#       define CNTX_BUSY_INT_ENABLE                       (1 << 19)
++#       define CNTX_EMPTY_INT_ENABLE                      (1 << 20)
++#       define SCRATCH_INT_ENABLE                         (1 << 25)
++#       define TIME_STAMP_INT_ENABLE                      (1 << 26)
++#       define IB2_INT_ENABLE                             (1 << 29)
++#       define IB1_INT_ENABLE                             (1 << 30)
++#       define RB_INT_ENABLE                              (1 << 31)
++#define CP_INT_STATUS                                     0xc128
++#       define SCRATCH_INT_STAT                           (1 << 25)
++#       define TIME_STAMP_INT_STAT                        (1 << 26)
++#       define IB2_INT_STAT                               (1 << 29)
++#       define IB1_INT_STAT                               (1 << 30)
++#       define RB_INT_STAT                                (1 << 31)
++
++#define GRBM_INT_CNTL                                     0x8060
++#       define RDERR_INT_ENABLE                           (1 << 0)
++#       define WAIT_COUNT_TIMEOUT_INT_ENABLE              (1 << 1)
++#       define GUI_IDLE_INT_ENABLE                        (1 << 19)
++
++#define INTERRUPT_CNTL                                    0x5468
++#       define IH_DUMMY_RD_OVERRIDE                       (1 << 0)
++#       define IH_DUMMY_RD_EN                             (1 << 1)
++#       define IH_REQ_NONSNOOP_EN                         (1 << 3)
++#       define GEN_IH_INT_EN                              (1 << 8)
++#define INTERRUPT_CNTL2                                   0x546c
++
++#define D1MODE_VBLANK_STATUS                              0x6534
++#define D2MODE_VBLANK_STATUS                              0x6d34
++#       define DxMODE_VBLANK_OCCURRED                     (1 << 0)
++#       define DxMODE_VBLANK_ACK                          (1 << 4)
++#       define DxMODE_VBLANK_STAT                         (1 << 12)
++#       define DxMODE_VBLANK_INTERRUPT                    (1 << 16)
++#       define DxMODE_VBLANK_INTERRUPT_TYPE               (1 << 17)
++#define D1MODE_VLINE_STATUS                               0x653c
++#define D2MODE_VLINE_STATUS                               0x6d3c
++#       define DxMODE_VLINE_OCCURRED                      (1 << 0)
++#       define DxMODE_VLINE_ACK                           (1 << 4)
++#       define DxMODE_VLINE_STAT                          (1 << 12)
++#       define DxMODE_VLINE_INTERRUPT                     (1 << 16)
++#       define DxMODE_VLINE_INTERRUPT_TYPE                (1 << 17)
++#define DxMODE_INT_MASK                                   0x6540
++#       define D1MODE_VBLANK_INT_MASK                     (1 << 0)
++#       define D1MODE_VLINE_INT_MASK                      (1 << 4)
++#       define D2MODE_VBLANK_INT_MASK                     (1 << 8)
++#       define D2MODE_VLINE_INT_MASK                      (1 << 12)
++#define DCE3_DISP_INTERRUPT_STATUS                        0x7ddc
++#       define DC_HPD1_INTERRUPT                          (1 << 18)
++#       define DC_HPD2_INTERRUPT                          (1 << 19)
++#define DISP_INTERRUPT_STATUS                             0x7edc
++#       define LB_D1_VLINE_INTERRUPT                      (1 << 2)
++#       define LB_D2_VLINE_INTERRUPT                      (1 << 3)
++#       define LB_D1_VBLANK_INTERRUPT                     (1 << 4)
++#       define LB_D2_VBLANK_INTERRUPT                     (1 << 5)
++#       define DACA_AUTODETECT_INTERRUPT                  (1 << 16)
++#       define DACB_AUTODETECT_INTERRUPT                  (1 << 17)
++#       define DC_HOT_PLUG_DETECT1_INTERRUPT              (1 << 18)
++#       define DC_HOT_PLUG_DETECT2_INTERRUPT              (1 << 19)
++#       define DC_I2C_SW_DONE_INTERRUPT                   (1 << 20)
++#       define DC_I2C_HW_DONE_INTERRUPT                   (1 << 21)
++#define DCE3_DISP_INTERRUPT_STATUS_CONTINUE               0x7de8
++#       define DC_HPD4_INTERRUPT                          (1 << 14)
++#       define DC_HPD4_RX_INTERRUPT                       (1 << 15)
++#       define DC_HPD3_INTERRUPT                          (1 << 28)
++#       define DC_HPD1_RX_INTERRUPT                       (1 << 29)
++#       define DC_HPD2_RX_INTERRUPT                       (1 << 30)
++#define DCE3_DISP_INTERRUPT_STATUS_CONTINUE2              0x7dec
++#       define DC_HPD3_RX_INTERRUPT                       (1 << 0)
++#       define DIGA_DP_VID_STREAM_DISABLE_INTERRUPT       (1 << 1)
++#       define DIGA_DP_STEER_FIFO_OVERFLOW_INTERRUPT      (1 << 2)
++#       define DIGB_DP_VID_STREAM_DISABLE_INTERRUPT       (1 << 3)
++#       define DIGB_DP_STEER_FIFO_OVERFLOW_INTERRUPT      (1 << 4)
++#       define AUX1_SW_DONE_INTERRUPT                     (1 << 5)
++#       define AUX1_LS_DONE_INTERRUPT                     (1 << 6)
++#       define AUX2_SW_DONE_INTERRUPT                     (1 << 7)
++#       define AUX2_LS_DONE_INTERRUPT                     (1 << 8)
++#       define AUX3_SW_DONE_INTERRUPT                     (1 << 9)
++#       define AUX3_LS_DONE_INTERRUPT                     (1 << 10)
++#       define AUX4_SW_DONE_INTERRUPT                     (1 << 11)
++#       define AUX4_LS_DONE_INTERRUPT                     (1 << 12)
++#       define DIGA_DP_FAST_TRAINING_COMPLETE_INTERRUPT   (1 << 13)
++#       define DIGB_DP_FAST_TRAINING_COMPLETE_INTERRUPT   (1 << 14)
++        /* DCE 3.2 */
++#       define AUX5_SW_DONE_INTERRUPT                     (1 << 15)
++#       define AUX5_LS_DONE_INTERRUPT                     (1 << 16)
++#       define AUX6_SW_DONE_INTERRUPT                     (1 << 17)
++#       define AUX6_LS_DONE_INTERRUPT                     (1 << 18)
++#       define DC_HPD5_INTERRUPT                          (1 << 19)
++#       define DC_HPD5_RX_INTERRUPT                       (1 << 20)
++#       define DC_HPD6_INTERRUPT                          (1 << 21)
++#       define DC_HPD6_RX_INTERRUPT                       (1 << 22)
++
++#define DCE3_DACA_AUTODETECT_INT_CONTROL                  0x7038
++#define DCE3_DACB_AUTODETECT_INT_CONTROL                  0x7138
++#define DACA_AUTODETECT_INT_CONTROL                       0x7838
++#define DACB_AUTODETECT_INT_CONTROL                       0x7a38
++#       define DACx_AUTODETECT_ACK                        (1 << 0)
++#       define DACx_AUTODETECT_INT_ENABLE                 (1 << 16)
++
++#define DC_HOT_PLUG_DETECT1_INT_CONTROL                   0x7d08
++#define DC_HOT_PLUG_DETECT2_INT_CONTROL                   0x7d18
++#define DC_HOT_PLUG_DETECT3_INT_CONTROL                   0x7d2c
++#       define DC_HOT_PLUG_DETECTx_INT_ACK                (1 << 0)
++#       define DC_HOT_PLUG_DETECTx_INT_POLARITY           (1 << 8)
++#       define DC_HOT_PLUG_DETECTx_INT_EN                 (1 << 16)
++/* DCE 3.2 */
++#define DC_HPD1_INT_CONTROL                               0x7d04
++#define DC_HPD2_INT_CONTROL                               0x7d10
++#define DC_HPD3_INT_CONTROL                               0x7d1c
++#define DC_HPD4_INT_CONTROL                               0x7d28
++#       define DC_HPDx_INT_ACK                            (1 << 0)
++#       define DC_HPDx_INT_POLARITY                       (1 << 8)
++#       define DC_HPDx_INT_EN                             (1 << 16)
++#       define DC_HPDx_RX_INT_ACK                         (1 << 20)
++#       define DC_HPDx_RX_INT_EN                          (1 << 24)
+ 
+ /*
+  * PM4
+@@ -499,7 +655,6 @@
+ #define	PACKET3_WAIT_REG_MEM				0x3C
+ #define	PACKET3_MEM_WRITE				0x3D
+ #define	PACKET3_INDIRECT_BUFFER				0x32
+-#define	PACKET3_CP_INTERRUPT				0x40
+ #define	PACKET3_SURFACE_SYNC				0x43
+ #              define PACKET3_CB0_DEST_BASE_ENA    (1 << 6)
+ #              define PACKET3_TC_ACTION_ENA        (1 << 23)
+diff --git a/drivers/gpu/drm/radeon/radeon.h b/drivers/gpu/drm/radeon/radeon.h
+index 27c8b38..e6e8de7 100644
+--- a/drivers/gpu/drm/radeon/radeon.h
++++ b/drivers/gpu/drm/radeon/radeon.h
+@@ -399,6 +399,23 @@ struct radeon_cp {
+ 	bool			ready;
+ };
+ 
++/*
++ * R6xx+ IH ring
++ */
++struct r600_ih {
++	struct radeon_object	*ring_obj;
++	volatile uint32_t	*ring;
++	unsigned		rptr;
++	unsigned		wptr;
++	unsigned		wptr_old;
++	unsigned		ring_size;
++	uint64_t		gpu_addr;
++	uint32_t		align_mask;
++	uint32_t		ptr_mask;
++	spinlock_t              lock;
++	bool                    enabled;
++};
++
+ struct r600_blit {
+ 	struct radeon_object	*shader_obj;
+ 	u64 shader_gpu_addr;
+@@ -790,8 +807,10 @@ struct radeon_device {
+ 	struct radeon_surface_reg surface_regs[RADEON_GEM_MAX_SURFACES];
+ 	const struct firmware *me_fw;	/* all family ME firmware */
+ 	const struct firmware *pfp_fw;	/* r6/700 PFP firmware */
++	const struct firmware *rlc_fw;	/* r6/700 RLC firmware */
+ 	struct r600_blit r600_blit;
+ 	int msi_enabled; /* msi enabled */
++	struct r600_ih ih; /* r6/700 interrupt ring */
+ };
+ 
+ int radeon_device_init(struct radeon_device *rdev,
+@@ -1103,7 +1122,12 @@ extern void r600_wb_disable(struct radeon_device *rdev);
+ extern void r600_scratch_init(struct radeon_device *rdev);
+ extern int r600_blit_init(struct radeon_device *rdev);
+ extern void r600_blit_fini(struct radeon_device *rdev);
+-extern int r600_cp_init_microcode(struct radeon_device *rdev);
++extern int r600_init_microcode(struct radeon_device *rdev);
+ extern int r600_gpu_reset(struct radeon_device *rdev);
++/* r600 irq */
++extern int r600_irq_init(struct radeon_device *rdev);
++extern void r600_irq_fini(struct radeon_device *rdev);
++extern void r600_ih_ring_init(struct radeon_device *rdev, unsigned ring_size);
++extern int r600_irq_set(struct radeon_device *rdev);
+ 
+ #endif
+diff --git a/drivers/gpu/drm/radeon/radeon_asic.h b/drivers/gpu/drm/radeon/radeon_asic.h
+index 94991ed..4994279 100644
+--- a/drivers/gpu/drm/radeon/radeon_asic.h
++++ b/drivers/gpu/drm/radeon/radeon_asic.h
+@@ -459,6 +459,7 @@ static struct radeon_asic r600_asic = {
+ 	.ring_ib_execute = &r600_ring_ib_execute,
+ 	.irq_set = &r600_irq_set,
+ 	.irq_process = &r600_irq_process,
++	.get_vblank_counter = &rs600_get_vblank_counter,
+ 	.fence_ring_emit = &r600_fence_ring_emit,
+ 	.cs_parse = &r600_cs_parse,
+ 	.copy_blit = &r600_copy_blit,
+@@ -497,6 +498,7 @@ static struct radeon_asic rv770_asic = {
+ 	.ring_ib_execute = &r600_ring_ib_execute,
+ 	.irq_set = &r600_irq_set,
+ 	.irq_process = &r600_irq_process,
++	.get_vblank_counter = &rs600_get_vblank_counter,
+ 	.fence_ring_emit = &r600_fence_ring_emit,
+ 	.cs_parse = &r600_cs_parse,
+ 	.copy_blit = &r600_copy_blit,
+diff --git a/drivers/gpu/drm/radeon/radeon_device.c b/drivers/gpu/drm/radeon/radeon_device.c
+index e4b3c77..820b190 100644
+--- a/drivers/gpu/drm/radeon/radeon_device.c
++++ b/drivers/gpu/drm/radeon/radeon_device.c
+@@ -533,6 +533,8 @@ int radeon_device_init(struct radeon_device *rdev,
+ 	mutex_init(&rdev->cs_mutex);
+ 	mutex_init(&rdev->ib_pool.mutex);
+ 	mutex_init(&rdev->cp.mutex);
++	if (rdev->family >= CHIP_R600)
++		spin_lock_init(&rdev->ih.lock);
+ 	rwlock_init(&rdev->fence_drv.lock);
+ 	INIT_LIST_HEAD(&rdev->gem.objects);
+ 
+diff --git a/drivers/gpu/drm/radeon/radeon_drv.h b/drivers/gpu/drm/radeon/radeon_drv.h
+index 350962e..e137852 100644
+--- a/drivers/gpu/drm/radeon/radeon_drv.h
++++ b/drivers/gpu/drm/radeon/radeon_drv.h
+@@ -1104,7 +1104,6 @@ extern u32 radeon_get_scratch(drm_radeon_private_t *dev_priv, int index);
+ #       define R600_IT_WAIT_REG_MEM             0x00003C00
+ #       define R600_IT_MEM_WRITE                0x00003D00
+ #       define R600_IT_INDIRECT_BUFFER          0x00003200
+-#       define R600_IT_CP_INTERRUPT             0x00004000
+ #       define R600_IT_SURFACE_SYNC             0x00004300
+ #              define R600_CB0_DEST_BASE_ENA    (1 << 6)
+ #              define R600_TC_ACTION_ENA        (1 << 23)
+diff --git a/drivers/gpu/drm/radeon/radeon_fence.c b/drivers/gpu/drm/radeon/radeon_fence.c
+index 3beb26d..ab2a8b1 100644
+--- a/drivers/gpu/drm/radeon/radeon_fence.c
++++ b/drivers/gpu/drm/radeon/radeon_fence.c
+@@ -168,37 +168,6 @@ bool radeon_fence_signaled(struct radeon_fence *fence)
+ 	return signaled;
+ }
+ 
+-int r600_fence_wait(struct radeon_fence *fence,  bool intr, bool lazy)
+-{
+-	struct radeon_device *rdev;
+-	int ret = 0;
+-
+-	rdev = fence->rdev;
+-
+-	__set_current_state(intr ? TASK_INTERRUPTIBLE : TASK_UNINTERRUPTIBLE);
+-
+-	while (1) {
+-		if (radeon_fence_signaled(fence))
+-			break;
+-
+-		if (time_after_eq(jiffies, fence->timeout)) {
+-			ret = -EBUSY;
+-			break;
+-		}
+-
+-		if (lazy)
+-			schedule_timeout(1);
+-
+-		if (intr && signal_pending(current)) {
+-			ret = -ERESTARTSYS;
+-			break;
+-		}
+-	}
+-	__set_current_state(TASK_RUNNING);
+-	return ret;
+-}
+-
+-
+ int radeon_fence_wait(struct radeon_fence *fence, bool intr)
+ {
+ 	struct radeon_device *rdev;
+@@ -216,13 +185,6 @@ int radeon_fence_wait(struct radeon_fence *fence, bool intr)
+ 		return 0;
+ 	}
+ 
+-	if (rdev->family >= CHIP_R600) {
+-		r = r600_fence_wait(fence, intr, 0);
+-		if (r == -ERESTARTSYS)
+-			return -EBUSY;
+-		return r;
+-	}
+-
+ retry:
+ 	cur_jiffies = jiffies;
+ 	timeout = HZ / 100;
+diff --git a/drivers/gpu/drm/radeon/radeon_irq_kms.c b/drivers/gpu/drm/radeon/radeon_irq_kms.c
+index a0fe623..a55cb52 100644
+--- a/drivers/gpu/drm/radeon/radeon_irq_kms.c
++++ b/drivers/gpu/drm/radeon/radeon_irq_kms.c
+@@ -94,10 +94,18 @@ int radeon_irq_kms_init(struct radeon_device *rdev)
+ 	}
+ 	/* enable msi */
+ 	rdev->msi_enabled = 0;
+-	if (rdev->family >= CHIP_RV380) {
++	/* MSIs don't seem to work on my rs780;
++	 * not sure about rs880 or older rs780s.
++	 * Needs more investigation.
++	 */
++	if ((rdev->family >= CHIP_RV380) &&
++	    (rdev->family != CHIP_RS780) &&
++	    (rdev->family != CHIP_RS880)) {
+ 		int ret = pci_enable_msi(rdev->pdev);
+-		if (!ret)
++		if (!ret) {
+ 			rdev->msi_enabled = 1;
++			DRM_INFO("radeon: using MSI.\n");
++		}
+ 	}
+ 	drm_irq_install(rdev->ddev);
+ 	rdev->irq.installed = true;
+diff --git a/drivers/gpu/drm/radeon/rv770.c b/drivers/gpu/drm/radeon/rv770.c
+index b0efd0d..b68c4b1 100644
+--- a/drivers/gpu/drm/radeon/rv770.c
++++ b/drivers/gpu/drm/radeon/rv770.c
+@@ -887,6 +887,15 @@ static int rv770_startup(struct radeon_device *rdev)
+ 		return r;
+ 	}
+ 
++	/* Enable IRQ */
++	rdev->irq.sw_int = true;
++	r = r600_irq_init(rdev);
++	if (r) {
++		DRM_ERROR("radeon: IH init failed (%d).\n", r);
++		return r;
++	}
++	r600_irq_set(rdev);
++
+ 	r = radeon_ring_init(rdev, rdev->cp.ring_size);
+ 	if (r)
+ 		return r;
+@@ -1001,11 +1010,19 @@ int rv770_init(struct radeon_device *rdev)
+ 	r = radeon_object_init(rdev);
+ 	if (r)
+ 		return r;
++
++	r = radeon_irq_kms_init(rdev);
++	if (r)
++		return r;
++
+ 	rdev->cp.ring_obj = NULL;
+ 	r600_ring_init(rdev, 1024 * 1024);
+ 
+-	if (!rdev->me_fw || !rdev->pfp_fw) {
+-		r = r600_cp_init_microcode(rdev);
++	rdev->ih.ring_obj = NULL;
++	r600_ih_ring_init(rdev, 64 * 1024);
++
++	if (!rdev->me_fw || !rdev->pfp_fw || !rdev->rlc_fw) {
++		r = r600_init_microcode(rdev);
+ 		if (r) {
+ 			DRM_ERROR("Failed to load firmware!\n");
+ 			return r;
+@@ -1051,6 +1068,8 @@ void rv770_fini(struct radeon_device *rdev)
+ 	rv770_suspend(rdev);
+ 
+ 	r600_blit_fini(rdev);
++	r600_irq_fini(rdev);
++	radeon_irq_kms_fini(rdev);
+ 	radeon_ring_fini(rdev);
+ 	r600_wb_fini(rdev);
+ 	rv770_pcie_gart_fini(rdev);
+-- 
+1.5.6.3

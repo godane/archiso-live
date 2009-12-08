@@ -127,7 +127,7 @@ if [ "x${BOOT}" = "x" ]; then BOOT="syslinux"; fi
 
 if [ "${NOLZMA}" = "y" ]; then
 	EXT="sqfs"
-	OPTION="-nolzma"
+	OPTION="-comp gzip"
 else
 	EXT="lzm"
 	OPTION=""
@@ -177,7 +177,7 @@ remove()
 check()
 {
 	if [ ! "$(pacman -Q aufs2)" ]; then
-		error "Sqlzma needs to be installed."
+		error "Aufs2 needs to be installed."
 		exit 1
 	elif [ ! "$(pacman -Q aufs2-util)" ]; then
 		error "Aufs2-util needs to be installed."

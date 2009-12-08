@@ -1,0 +1,17 @@
+pkgname=radeon-r6xx-irq-firmware
+pkgver=1.0
+pkgrel=1
+pkgdesc="Firmware for Radeon graphic cards with r6xx/r7xx chipset that is needed to support the interrupt controller."
+arch=(i686 x86_64)
+url="http://sourceforge.net/projects/dri/"
+license=('free')
+depends=('kernel26')
+makedepends=()
+source=('R600_rlc.bin' 'R700_rlc.bin')
+
+build() {
+        install -m644 -D "${srcdir}/R600_rlc.bin" "${pkgdir}/lib/firmware/radeon/R600_rlc.bin"
+        install -m644 -D "${srcdir}/R700_rlc.bin" "${pkgdir}/lib/firmware/radeon/R700_rlc.bin"
+}
+md5sums=('f74a5163948bde215be6b689ca24afde'
+         '411b41ca3117ca88dbd9689a57f09a89')
