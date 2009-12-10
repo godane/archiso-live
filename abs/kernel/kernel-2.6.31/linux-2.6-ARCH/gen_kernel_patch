@@ -28,7 +28,7 @@ get_file() {
   cd ${OPWD}
 }
 
-source $HOME/makepkg.conf
+source /etc/makepkg.conf
 source PATCHCFG
 
 export SRCNAME
