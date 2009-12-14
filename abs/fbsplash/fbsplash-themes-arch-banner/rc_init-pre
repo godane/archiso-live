@@ -1,0 +1,10 @@
+#!/bin/bash
+
+[ "${1}" = sysinit -o "${1}" = shutdown ] || exit 0
+
+if [[ "$RUNLEVEL" == [06] ]]; then
+	count=$( splash_svclist_init stop )
+	"${0%/*}"/cache-links stop
+else
+	"${0%/*}"/cache-links
+fi

@@ -1,0 +1,69 @@
+#!/bin/bash
+
+#
+# cache-files
+#
+# args: [stop|exit]
+#
+
+icon_size=32
+icon_size_small=16
+
+daemons=(
+	acpid
+	alsa
+	cups
+	samba
+	mysqld
+	netfs
+	nfsd
+	sensors
+	smartd
+)
+
+stats=( start stop fail )
+
+theme_images=/etc/splash/"${SPLASH_THEME}"/images
+
+. /etc/splash/"${SPLASH_THEME}"/icons.conf
+
+splash_have_cache || exit
+
+mkdir -p "${spl_cachedir}/arch-banner-icons"
+
+# status emblems
+ii=${icon_size_small}x${icon_size_small}
+for name in "${stats[@]}" ; do
+	icon="/usr/share/icons/${ICON_THEME}/${ii}/$( eval echo \"\$ICON_${name}\" )"
+	[ -f "${icon}" ] || icon="${theme_images}"/dummy.png
+	ln -sfT "${icon}" "${spl_cachedir}/arch-banner-icons/${name}"
+done
+
+# separator line painted on splash daemon [re]start
+ln -sfT "${theme_images}"/separator.png "${spl_cachedir}/arch-banner-icons/fbsplash-dummy.init"
+
+ii=${icon_size}x${icon_size}
+
+for name in "${daemons[@]}" ; do
+	# icons painted on splash daemon [re]start
+	ln -sfT "${theme_images}"/dummy.png "${spl_cachedir}/arch-banner-icons/${name}.init"
+	# icons painted on daemon actions
+	icon="/usr/share/icons/${ICON_THEME}/${ii}/$( eval echo \"\$ICON_${name}\" )"
+	[ -f "${icon}" ] || icon="${theme_images}"/dummy.png
+	ln -sfT "${icon}" "${spl_cachedir}/arch-banner-icons/${name}"
+done
+
+[ "${1}" = stop ] || exit
+
+if [ -e ${spl_cachedir}/fail_fbsplash-dummy ]; then
+	ln -sfT "${theme_images}"/separator-red.png "${spl_cachedir}/arch-banner-icons/fbsplash-dummy.init"
+fi
+
+for name in $( splash_svclist_get stop ) ; do
+	icon="/usr/share/icons/${ICON_THEME}/${ii}/$( eval echo \"\$ICON_${name}\" )"
+	[ -f "${icon}" ] || continue
+	ln -sfT "${icon}" "${spl_cachedir}/arch-banner-icons/${name}.init"
+done
+
+
+
