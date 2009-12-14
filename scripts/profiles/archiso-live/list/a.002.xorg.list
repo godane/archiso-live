@@ -73,6 +73,11 @@ archlinux-xdg-menu
 # gtk engines
 gtk-engines
 #xfce deps
+ghostscript
+imagemagick
+ffmpeg
+a2ps
+psutils
 gstreamer0.10-base
 libexif
 libglade
