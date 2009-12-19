@@ -1,0 +1,44 @@
+Chakra (Alpha4 - NewAge)
+
+Today we're pleased to announce the release of Alpha4 named NewAge of our very own Chakra LiveMedias. Lot's had changed since Alpha3. We have a new KDE4 Theme by Phil Miller, Tribe can install custom mountpoints and we did a ton of fixes. KDEmod got updated to version 4.3.3. Chakra-Hardware-Detection got stripped down to fit xorg-server 1.7.1.901-2 pkg, so only nvidia drivers are the supported propertary drivers for now. On the DVD-Release we have all your goodies on.
+
+Please test this release wherever possible, and most of all, on real hardware. Report bugs, or even better send us patches and share your ideas. The place where all of this happens is our Bugtracker, please be sure to register on it. Also check our Wiki, a lot of questions are already answered. Thx flies out to our developers and the Chakra TestSquad who tested this image.
+
+With love,
+The Chakra Team
+
+
+System Requirements:
+
+    * a Intel Pentium II or higher processor for the i686 version, or
+    * a 64Bit-capable processor for the x86_64 version
+    * 384MiB of RAM for running the live system and 512MiB of RAM for the installation (the more the better)
+    * around 3 Gib (6GiB for DVD-Edition) of available hard disk space (the more the better)
+    * a screen capable of 1024 x 600 or higher resolution
+    * a reasonably fast internet connection, e.g. no modem (you wont have fun with this)
+
+
+
+Most noticeable changes & additions since Alpha3:
+
+Features:
+
+    * kernel-2.6.31.6 + fglrx-patch
+    * xorg-server 1.7.1.901-2
+    * updated KDE 4.3.3 pkgs
+    * chakra tools updated (aqpm, shaman, chase)
+    * catalyst support temp. dropped
+    * nvidia-190 and nvidia legancy series are the only propertary drivers atm
+    * vesa-force mode improved
+    * using ARM state 2009/11/16
+
+Tribe:
+
+    * proper rebuild against aqpm 1.3.3.4
+    * will install KDEmod with Phils theme
+    * can mount as many custom mountpoints you like
+    * uses unsquashfs
+    * locales.gen got fixed
+    * hosts got fixed
+
+disc created by Phil Miller (Amnon82 - Chakra ISO-Builder)

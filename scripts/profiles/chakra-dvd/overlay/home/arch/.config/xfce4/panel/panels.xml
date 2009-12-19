@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE config SYSTEM "config.dtd">
+<panels>
+	<panel>
+		<properties>
+			<property name="size" value="24"/>
+			<property name="monitor" value="0"/>
+			<property name="screen-position" value="1"/>
+			<property name="fullwidth" value="1"/>
+			<property name="xoffset" value="0"/>
+			<property name="yoffset" value="0"/>
+			<property name="handlestyle" value="0"/>
+			<property name="autohide" value="0"/>
+			<property name="transparency" value="20"/>
+			<property name="activetrans" value="0"/>
+		</properties>
+		<items>
+			<item name="showdesktop" id="1"/>
+			<item name="tasklist" id="3"/>
+			<item name="pager" id="2"/>
+			<item name="systray" id="4"/>
+		</items>
+	</panel>
+	<panel>
+		<properties>
+			<property name="size" value="36"/>
+			<property name="monitor" value="0"/>
+			<property name="screen-position" value="11"/>
+			<property name="fullwidth" value="0"/>
+			<property name="xoffset" value="271"/>
+			<property name="yoffset" value="987"/>
+			<property name="handlestyle" value="0"/>
+			<property name="autohide" value="0"/>
+			<property name="transparency" value="20"/>
+			<property name="activetrans" value="0"/>
+		</properties>
+		<items>
+			<item name="xfce4-menu" id="5"/>
+			<item name="separator" id="6"/>
+			<item name="launcher" id="7"/>
+			<item name="launcher" id="9"/>
+			<item name="launcher" id="10"/>
+			<item name="launcher" id="12366501270"/>
+			<item name="launcher" id="12244112574"/>
+			<item name="launcher" id="8"/>
+			<item name="launcher" id="12244110760"/>
+			<item name="launcher" id="12365578590"/>
+			<item name="launcher" id="12244111661"/>
+			<item name="launcher" id="12244116566"/>
+			<item name="launcher" id="12244117107"/>
+			<item name="separator" id="12244117449"/>
+			<item name="launcher" id="12366511520"/>
+			<item name="launcher" id="12365655830"/>
+			<item name="launcher" id="12244158280"/>
+			<item name="separator" id="12365573578"/>
+			<item name="actions" id="12"/>
+			<item name="separator" id="13"/>
+			<item name="clock" id="12381519530"/>
+			<item name="xfce4-mixer-plugin" id="12459828591"/>
+		</items>
+	</panel>
+</panels>

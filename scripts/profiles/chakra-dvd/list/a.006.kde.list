@@ -1,0 +1,19 @@
+# kde (minimal base)
+qtmod
+kdemod-common
+kdemod-kdelibs
+kdemod-kdelibs-experimental
+kdemod-kdepimlibs
+kdemod-kdebase-runtime
+kdemod-kdebase
+kdemod-kdebase-dolphin
+kdemod-kdebase-konqueror
+kdemod-kdebase-konsole
+kdemod-kdebase-workspace
+kdemod-oxygen-icons
+kdemod-phonon-backend-xine
+kdemod-taskhandlers-smoothtasks
+kdemod-taskhandlers-stasks
+kdemod-themes-kdm-planet
+kdemod-themes-ksplash-planet
+kdemod-themes-wallpapers-planet
