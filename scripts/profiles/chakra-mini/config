@@ -1,0 +1,8 @@
+#MOVE_MODULES="ap.008.kde-doc ap.009.kde-locale ap.010.kde-extragear ap.011.gimp ap.012.java"
+MODULES="a.000.kernel a.001.core a.002.xorg a.003.printing a.004.devel a.005.libs a.006.kde a.007.kde-apps ${MOVE_MODULES}"
+#DELDIR="usr/share/doc usr/share/devhelp usr/share/gtk-doc usr/share/wallpapers"
+KERNEL="/etc/mkinitcpio.d/kernel26.kver"
+VMLINUZ="boot/vmlinuz26"
+CDLABEL="Chakra-mini"
+PUBLISHER="http://chakra-project.org/"
+AUTHOR="Chakra Team"
