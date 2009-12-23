@@ -17,7 +17,7 @@ fuse
 ntfs-3g
 cpufrequtils
 # generally usefull tools that don't require X
-base-completion
+bash-completion
 openssh
 nmap
 lsof
@@ -46,7 +46,6 @@ nano
 cdemu-client
 testdisk
 iptables
-apr-utils
 cdparanoia
 cdrdao
 apr-util
