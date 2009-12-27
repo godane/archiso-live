@@ -1,0 +1,42 @@
+# kde (everything else)
+kdemod-kdeadmin-kuser
+kdemod-kdeadmin-kcron
+kdemod-kdeadmin-ksystemlog
+kdemod-kdeadmin-system-config-printer
+kdemod-kdegraphics-okular
+kdemod-kdemultimedia-kmix
+kdemod-kdemultimedia-dragonplayer
+kdemod-kdenetwork-kget
+kdemod-kdenetwork-kopete
+kdemod-kdepim-kmail
+kdemod-kdesdk-kate
+kdemod-kdeutils-ark
+kdemod-kdeutils-kcalc
+kdemod-kdeutils-kgpg
+kdemod-kdeutils-printer-applet
+kdemod-kdeutils-sweeper
+kdemod-partitionmanager
+# chakra networkmanagement
+consolekit
+kdemod-networkmanagement-knetworkmanager-kde4
+#wicd
+kdemod-kdenetwork-kppp
+# arxin, chase & tribe + dependencies
+kdemod-kdebindings-common
+kdemod-kdebindings-python
+kdemod-arxin
+kdemod-kgrubeditor
+kdemod-shaman
+kdemod-tribe
+kdemod-tribe-debug
+kdemod-chase
+kdemod-chase-debug
+# extragear
+konversation
+# browser
+arora
+# multimedia
+smplayer-themes
+qmmp
+# k3b
+kdemod-playground-k3b-svn

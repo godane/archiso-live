@@ -1,0 +1,199 @@
+
+# Contributor: Kurt J. Bosch <kujub at quantentunnel dot de>
+
+# Changelog:
+#
+# 0.4-2	Rebuild against archlinux-artwork-1.4
+# 0.4-3	Use symlinks instead of copies of files
+# 0.5-1	Paint a red colored separator on stat_fail
+#	Fix the small start/stop icons
+#	Depend on initscripts-extras-fbsplash>=43 therefore
+# 0.5-2	Fixed the URL
+# 0.6-1	Removed kde and icon themes from makedepends
+#	Added a icons configuration file
+#	Find and link icons into a tmp dir at runtime
+# 0.7-1 Some cleaning of the code and texts
+# 0.8-1	Minor fix in rc_init-pre
+#	Depend on fbsplash=>1.5.4.3-19 because of fixes there
+# 0.8-2 Depend on initscripts-extras-fbsplash>=45 instead of special fbsplash
+# 0.9-1 Fix fbcondecor complaining about missing icons: recreate the tmpfs
+# 1.0-1 Improve shutdown behavior:
+#       - Fade in with appropriate daemon icons painted
+#       - Restart with appropriate daemon icons and seperator painted
+#       Use fixed separator images instead of drawing boxes and parts of image
+# 1.0.1 Clean red separator on exit (for tuxoniceui_fbsplash)
+# 1.1-1 Fix tuxoniceui_fbsplash showing allways a reverse progress
+# 1.2-1 Added a simple animation to the progress bar background for bootup (mainly because of fsck)
+# 1.2.1-1 Make the animation look a little bit nicer.
+# 1.2.2-1 Don't use /usr/bin/dirname - might not exist if /usr lives on a separate FS
+# 1.2.2-2 Added screenshots
+#         Install icons.conf into noicons themes too to avoid error message
+# 1.2.2-3 Added missing 1280x800 resolution
+
+pkgname=fbsplash-themes-arch-banner
+pkgver=1.2.2
+pkgrel=3
+pkgdesc="Fbsplash themes with ArchLinux banner, message log and optional daemon icons"
+arch=('any')
+license="CCPL:cc-by-nc-sa custom:ArchLinux-trademarks custom:Vera-copyright"
+url="http://aur.archlinux.org/packages.php?ID=26966"
+depends=(
+	'fbsplash'
+	'initscripts-extras-fbsplash>=59'
+)
+makedepends=(
+	archlinux-artwork
+	ttf-liberation
+	imagemagick
+)
+optdepends=(
+   'uswsusp-fbsplash>=0.8	suspend/resume with fbsplash'
+   'gnome-icon-theme		GNOME daemon icons'
+   'kdebase-runtime		KDE4 daemon icons'
+   'tango-icon-theme		Tango daemon icons'
+)
+backup=( etc/splash/arch-banner-icons/icons.conf )
+install=${pkgname}.install
+source=(
+	Screenshot-icons.png
+	Screenshot-noicons.png
+	make-icons.sh
+	make-backgrounds.sh
+	make-cfg.sh 
+	icons.conf
+	cache-links
+	rc_init-pre
+	rc_exit-post
+	http://ftp.gnome.org/pub/GNOME/sources/ttf-bitstream-vera/1.10/ttf-bitstream-vera-1.10.tar.bz2
+)
+md5sums=('e81a772fb82c9697b091f9275a3dba0e'
+         '662aec6a14b244d010878ae2bd716bbf'
+         '4af28827a6af27365910508eaf817590'
+         'e42f033aee84a3999df90fc0c7204ae2'
+         '6f1d95c61229080e9cf9221729c6ffde'
+         'fc75a798e431668dd51fae951d11c87e'
+         '69929d8a8fd3c89f832449e710c5de98'
+         '3269ec8579b1c51ab9a1d9f596217122'
+         '018e667a48a55ed8f154ab9febcb1840'
+         'bb22bd5b4675f5dbe17c6963d8c00ed6')
+
+_sizes_normal="640x480 800x600 1024x768 1152x864 1152x900 1280x960 1280x1024 1400x1050 1600x1200"
+_sizes_wide="1280x720 1280x768 1280x800 1280x854 1366x768 1440x900 1680x1050 1920x1080 1920x1200"
+
+_banner_silent=/usr/share/archlinux/logos/archlinux-grad1-light.svg
+_banner_verbose=/usr/share/archlinux/logos/archlinux-mono-black.svg
+
+# separator images dimensions
+_sep_width=640
+_sep_height=3
+
+# progress-bar width
+_progress_width=20
+
+# sizes of daemon icons used
+# (change this in cache-icons and in icons.conf comments too !)
+_icon_size=32
+_icon_size_small=16
+
+_font=Vera.ttf
+_font_size=13
+
+build() {
+	cd "${srcdir}"
+	
+	./make-icons.sh \
+		${_banner_silent} ${_banner_verbose} \
+		${_sep_width}x${_sep_height} \
+		${_icon_size} ${_icon_size_small} \
+		${_progress_width} || return 1
+
+	for _size in $_sizes_normal $_sizes_wide ; do
+		./make-backgrounds.sh ${_size} || return 1
+	done
+
+	# get in font file
+	cp "ttf-bitstream-vera-1.10/$_font" .
+	for _wide in "" "-wide" ; do
+		if [ -z "${_wide}" ]; then _sizes="${_sizes_normal}"; else _sizes="${_sizes_wide}"; fi
+		for _variant in noicons icons ; do
+			_name=arch-banner-${_variant}${_wide}
+			_desc="Theme with ArchLinux banner and message log"
+			[ $_variant = noicons ] || _desc+=" using icons for daemons"
+			[ -z "${_wide}" ] || _desc+=" (wide screen version)"
+			# make <size>.cfg files
+			for _size in $_sizes ; do
+				"${srcdir}"/make-cfg.sh $_name $_variant $_size \
+					$_sep_width $_sep_height $_font $_font_size \
+					$_icon_size $_progress_width || return 1
+			done
+			# write metadata.xml file
+			cat > "${_name}"/metadata.xml <<EOF
+<?xml version="1.0" encoding=\"UTF-8\"?>
+<thememeta xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://fbsplash.berlios.de/schemas/1.0/thememeta.xsd">
+	<name>${_name}</name>
+	<version>${pkgver}</version>
+	<author>
+		<name>Kurt J. Bosch</name>
+		<email>kujub at quantentunnel dot de</name>
+	</author>
+	<description>${_desc}</description>
+	<license>${license}</license>
+	<url>${url}</url>
+</thememeta>
+EOF
+		done
+	done
+
+	## install files
+	
+	install_linked_file() {
+		local dirname=$( basename $( dirname "${1}" ) )
+		if [ $_variant = noicons ]
+		then install -m644 "${srcdir}"/${1} ${dirname}/
+		else ln -s ${2}/${1} ${dirname}/
+		fi
+	}
+
+	for _wide in "" "-wide" ; do
+		if [ -z "${_wide}" ]; then _sizes="${_sizes_normal}"; else _sizes="${_sizes_wide}"; fi
+		for _variant in noicons icons ; do
+			_name=arch-banner-${_variant}${_wide}
+			_link=arch-banner-noicons${_wide}
+			mkdir -p "${pkgdir}"/etc/splash/${_name}
+			cd       "${pkgdir}"/etc/splash/${_name}
+			# install font
+			install_linked_file "$_font" ../${_link} || return 1
+			# install images and animations
+			mkdir images
+			for _file in banner.png separator.png separator-red.png progress-bkgd.mng
+			do
+				install_linked_file images/$_file ../../${_link} || return 1
+			done
+			for _size in $_sizes ; do
+				install_linked_file images/silent-$_size.png  ../../${_link} || return 1
+				install_linked_file images/verbose-$_size.png ../../${_link} || return 1
+			done
+			# install cfg-files
+			for _size in $_sizes ; do
+				install -m644 "${srcdir}"/${_name}/$_size.cfg $_size.cfg || return 1
+			done
+			# install metadata.xml
+			install -m644 "${srcdir}"/${_name}/metadata.xml metadata.xml || return 1
+			# install the scripts for creating the symlinks to separator and icons
+			mkdir scripts
+			install -m755 "${srcdir}"/{cache-links,rc_init-pre,rc_exit-post} scripts/ || return 1
+			# install the configuration file
+			install -m644 "${srcdir}"/icons.conf . || return 1
+			if [ $_variant = icons ]; then
+				# install the icon images
+				install -m644 "${srcdir}"/images/{cover,cover-small,dummy}.png images/ || return 1
+			fi
+		done
+	done
+	# install licenses
+	mkdir -p "${pkgdir}"/usr/share/licenses/custom/${pkgname}
+	cd       "${pkgdir}"/usr/share/licenses/custom/${pkgname}
+	install -m644 /usr/share/licenses/custom/archlinux-artwork/TRADEMARKS ArchLinux-trademarks
+	install -m644 "${srcdir}"/ttf-bitstream-vera-1.10/COPYRIGHT.TXT Vera-copyright
+}

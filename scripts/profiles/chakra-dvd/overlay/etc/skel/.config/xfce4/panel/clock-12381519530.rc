@@ -1,0 +1,10 @@
+ClockType=2
+ShowFrame=true
+ShowSeconds=true
+ShowMilitary=false
+ShowMeridiem=false
+TrueBinary=false
+FlashSeparators=false
+DigitalFormat=%r
+TooltipFormat=%A %d %B %Y
+

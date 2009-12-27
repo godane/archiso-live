@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#
+# rc_exit-post
+#
+
+# make clean icon symlinks in the tmpfs for broken suspend tools
+"${0%/*}"/cache-links

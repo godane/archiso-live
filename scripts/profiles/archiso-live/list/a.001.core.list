@@ -10,7 +10,6 @@ dnsutils
 dmraid
 openssh
 openvpn
-pmount
 progsreiserfs
 syslinux
 mc
@@ -44,6 +43,10 @@ xdelta
 lsof
 time
 espeak
+irssi
+weechat
+screen
+rtorrnet
 tor
 privoxy
 #recoverly-tools

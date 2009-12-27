@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=0.7
+Name=Setup Calendar
+Type=Application
+Comment=Calendar Setup
+#Terminal=true
+Exec=amp-calendar
+Categories=System;Application;
+GenericName=Calendar Setup

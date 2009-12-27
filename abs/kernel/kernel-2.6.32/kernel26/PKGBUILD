@@ -6,8 +6,8 @@ pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -ARCH 
 # pkgname=kernel26-custom       # Build kernel with a different name
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.32
-pkgver=${_basekernel}
-pkgrel=3live
+pkgver=${_basekernel}.2
+pkgrel=1live
 _patchname="patch-${pkgver}-1-ARCH"
 arch=(i686 x86_64)
 license=('GPL2')
@@ -15,16 +15,12 @@ groups=('base')
 url="http://www.kernel.org"
 source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         ${_patchname}.bz2
-	0001-drm-radeon-kms-Add-support-for-interrupts-on-r6xx-r.patch
-	reverse-fix-coherency-issues-on-agp-cards.patch
         # the main kernel config files
         config config.x86_64
         # standard config files for mkinitcpio ramdisk
         kernel26.preset)
 md5sums=('260551284ac224c3a43c4adac7df4879'
-         '40755a56c5b68f75fa416e971f890487'
-         '49e98fb0a04e6df2cd2b8ce788bfb98d'
-         'd5f6950bbf93516d22cc2e5c9e6692ae'
+         '11c1eae8b7f8eb5291c455d7971ba926'
          '4faf9c2b6b276ca0a10094c50cc9d545'
          'c22d87e8e757b5a59958dc518d0ce7c6'
          '25584700a0a679542929c4bed31433b6')
@@ -34,8 +30,6 @@ build() {
   # Add -ARCH patches
   # See http://projects.archlinux.org/linux-2.6-ARCH.git/
   patch -Np1 -i ${srcdir}/${_patchname} || return 1
-  patch -Np1 -i ${srcdir}/0001-drm-radeon-kms-Add-support-for-interrupts-on-r6xx-r.patch || return 1
-  patch -Np1 -i ${srcdir}/reverse-fix-coherency-issues-on-agp-cards.patch || return 1
   if [ "$CARCH" = "x86_64" ]; then
     cat ../config.x86_64 >./.config
   else

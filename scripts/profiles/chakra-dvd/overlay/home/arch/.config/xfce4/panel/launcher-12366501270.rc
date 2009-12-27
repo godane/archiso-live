@@ -1,0 +1,12 @@
+[Entry 0]
+Name=Email Client
+Comment=Read and write email
+Icon=emblem-mail
+Exec=sylpheed-claws
+Terminal=false
+StartupNotify=false
+
+[Global]
+MoveFirst=false
+ArrowPosition=0
+

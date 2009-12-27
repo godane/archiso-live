@@ -1,0 +1,51 @@
+base
+chakra-hardware-detection
+eject
+hwd
+htop
+lzop
+syslinux
+hwdetect
+dmidecode
+bc
+# drivers & system utilities
+alsa-lib
+alsa-oss
+alsa-utils
+lm_sensors
+fuse
+ntfs-3g
+cpufrequtils
+# generally usefull tools that don't require X
+bash-completion
+openssh
+nmap
+lsof
+vim
+sudo
+# packers, compressors
+unzip
+unrar
+p7zip
+zip
+lxsplit
+unarj
+# wireless tools
+wireless_tools
+crda
+iw
+#other commandline tools
+parted
+netcfg
+rsync
+cdrkit
+dvd+rw-tools
+policykit
+nss-mdns
+nano
+cdemu-client
+testdisk
+iptables
+cdparanoia
+cdrdao
+apr-util

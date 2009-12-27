@@ -1,0 +1,59 @@
+#xorg-group
+xorg-server-utils
+xorg-server
+xf86-video-vesa
+#xorg-fonts-100dpi
+#xorg-fonts-75dpi
+xorg-res-utils
+xorg-twm
+xorg-utils
+xorg-xinit
+xterm
+xorg-xkb-utils
+xorg-xauth
+xorg-apps
+xorg-fonts-alias
+xorg-fonts-encodings
+xorg-fonts-misc
+mesa
+# xorg video drivers
+xf86-video-apm
+xf86-video-ark
+xf86-video-ati
+xf86-video-chips
+xf86-video-cirrus
+xf86-video-geode
+xf86-video-glint
+xf86-video-i128
+xf86-video-i740
+xf86-video-intel
+xf86-video-mach64
+xf86-video-mga
+xf86-video-neomagic
+# seems to break intel driver
+# xf86-video-nouveau
+xf86-video-nv
+xf86-video-openchrome
+xf86-video-r128
+xf86-video-radeonhd
+xf86-video-rendition
+xf86-video-s3
+xf86-video-s3virge
+xf86-video-savage
+xf86-video-siliconmotion
+xf86-video-sis
+xf86-video-sisusb
+xf86-video-tdfx
+xf86-video-trident
+xf86-video-tseng
+xf86-video-v4l
+xf86-video-voodoo
+# xorg input drivers
+xorg-input-drivers
+xf86-input-synaptics
+# fonts
+xorg-fonts-cyrillic
+ttf-bitstream-vera
+terminus-font
+ttf-ms-fonts
+ttf-liberation

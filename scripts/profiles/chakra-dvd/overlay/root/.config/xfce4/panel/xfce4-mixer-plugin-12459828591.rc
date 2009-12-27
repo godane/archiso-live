@@ -1,0 +1,4 @@
+card=HDAATISBAlsamixer
+track=Master
+command=xfce4-mixer
+

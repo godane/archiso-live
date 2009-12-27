@@ -1,0 +1,25 @@
+post_install() {
+	echo ">"
+	echo "> ATTENTION!!!"
+	echo "----------------------------------------------"
+	echo "> the scripts for fbsplash have been rewritten"
+	echo "> again and are now provided by the package"
+	echo ">  >  >  initscripts-extras-fbsplash  <  <  <"
+	echo "----------------------------------------------"
+	echo "> This package doesn't include a theme anymore."
+	echo "> You need to install one separately."
+	echo "----------------------------------------------"
+	echo "> Please read http://wiki.archlinux.org/fbsplash "
+	echo "> for more details on the changes. "
+	echo "----------------------------------------------"
+}
+
+post_upgrade() {
+	post_install
+}
+
+op=$1
+shift
+$op $*
+
+#EOF

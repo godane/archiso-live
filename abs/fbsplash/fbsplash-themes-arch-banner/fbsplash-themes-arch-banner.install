@@ -1,0 +1,16 @@
+post_install() {
+	cat <<EOF
+==> Please add at least one of  'arch-banner-icons' 'arch-banner-noicons'
+==> and/or 'arch-banner-icons-wide'  'arch-banner-noicons-wide'
+==> to THEMES in /etc/conf.d/fbsplash and something
+==> like 'splash=silent,theme:arch-banner-icons' to your kernel line
+==> and update your initcpio.
+==>
+==> By default Tango icons are used in the icons themes. You can change this 
+==> in /etc/splash/arch-banner-icons[-wide]/icons.conf .
+EOF
+}
+
+post_upgrade() {
+  post_install
+}
