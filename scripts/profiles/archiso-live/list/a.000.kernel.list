@@ -14,6 +14,8 @@
 -d ndiswrapper
 -d madwifi
 -d virtualbox-modules
+-d virtualbox-ose-additions-modules
+-d virtualbox-ose-additions
 #-d nouveau-drm
 -d drm-radeon-module-git-r6xx-r7xx-3d
 -d aufs2
