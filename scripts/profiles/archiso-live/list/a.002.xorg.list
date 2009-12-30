@@ -97,6 +97,9 @@ cups
 zenity
 xbindkeys
 gksu
+gtkdialog
+xdotool
+wmctrl
 #window manager
 awesome
 fluxbox
