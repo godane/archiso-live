@@ -45,9 +45,16 @@ def errorTrap(type, value, tb):
 
 
 import __builtin__
-def tr(s):
-    return s
-__builtin__._ = tr
+#def tr(s):
+#    return s
+#__builtin__._ = tr
+
+import gettext
+lang = os.getenv("LANG")
+if lang:
+    gettext.install('larchin', basedir+'/i18n', unicode=1)
+
+
 
 import traceback
 initialized = False

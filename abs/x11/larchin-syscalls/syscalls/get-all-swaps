@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# get-all-swaps
+
+# Get all swap partitions - also the size, in KiB
+
+sfdisk -d | grep 'Id=82' | sed -r 's|[ :].*size=[ ]*([0-9]*).*| \1|' | \
+        while read d m; do echo "${d} $(( m / 2 ))"; done

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# larchbootdev
+
+# If running larch, return the boot device
+
+# Actually I'm misusing the return code mechanism here, which is pretty evil
+if [ -f /.livesys/bootdevice ]; then
+    cat /.livesys/bootdevice
+else
+    echo -n '^OK^'
+fi

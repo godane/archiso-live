@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# make-parttable
+
+# Create a new msdos partition table on device $1
+
+if parted $1 mklabel msdos; then echo -n '^OK^'; fi

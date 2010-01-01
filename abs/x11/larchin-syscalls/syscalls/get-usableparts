@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# get-usableparts
+
+# Get a list of partitions which could, potentially be mounted.
+# Return the device basename, a tag: '+' for removable or '-' for not,
+# and the detected file-system type, space separated.
+
+blkid -c /dev/null -s TYPE | sed -r s'|:.*=| |' |  tr -d \" | \
+    while read dev type; do
+        # Ignore if type is "swap"
+        if [ "${type}" = "swap" ]; then
+            continue
+        fi
+        # Ignore if type is "lvm2pv"
+        if [ "${type}" = "lvm2pv" ]; then
+            continue
+        fi
+        # Ignore loop devices
+        if echo "${dev}" | grep "loop" &>/dev/null; then
+            continue
+        fi
+        part=${dev:5}
+        echo -n "${part}"
+        bdev=${part:0:3}
+        if [ $( cat /sys/block/${bdev}/removable 2>/dev/null ) -ne 0 ]; then
+            echo -n " + "
+        else
+            echo -n " - "
+        fi
+        echo "${type}"
+    done

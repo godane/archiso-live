@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# linuxparts
+
+# Get a list of partitions with code 83 (linux) on the given
+# (argument $1) device. Use sfdisk.
+
+sfdisk -d $1 | grep 'Id=83' | cut -d':' -f1

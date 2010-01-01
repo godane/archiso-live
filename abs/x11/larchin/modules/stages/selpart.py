@@ -1,6 +1,6 @@
 # selpart.py - select partitions manually
 #
-# (c) Copyright 2008 Michael Towers <gradgrind[at]online[dot]de>
+# (c) Copyright 2008,2009 Michael Towers <gradgrind[at]online[dot]de>
 #
 # This file is part of the larch project.
 #
@@ -19,7 +19,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2008.06.13
+# 2009.02.18
 
 from stage import Stage
 from selpart_gui import PartitionGui, SelTable, SelDevice
@@ -225,21 +225,16 @@ class Partition(PartitionGui):
         """Return a list of available format flags for the given
         file-system type.
         """
-        # At the moment there is only an entry for 'ext3'
-        return { 'ext3' : [
-                (_("disable boot-time checks"), 'c', False,
-                    _("Normally an ext3 file-system will be checked every"
-                      " 30 mounts or so. With a large partition this can"
-                      " take quite a while, and some people like to disable"
-                      " this and just rely on the journalling.")),
-
+        # At the moment there is only an entry for 'ext3' and 'ext4'
+        e34 = [
                 (_("directory indexing"), 'i', True,
                     _("This is supposed to speed up access.")),
 
                 (_("full journal"), 'f', False,
                     _("This is supposed to increase data safety, at some"
                       " small cost in speed (and disk space?)"))
-                ],
+            ]
+        return { 'ext3' : e34, 'ext4' : e34
             }.get(self.partitiondata[2])
 
     def mount_flags(self):
@@ -250,12 +245,6 @@ class Partition(PartitionGui):
         if self.partitiondata[0]:
             flg = [ (_("noatime"), 'a', True,
                     _("Disables recording atime (access time) to disk, thus"
-                      " speeding up disk access. This is unlikely to cause"
-                      " problems (famous last words ...). Important for"
-                      " flash devices")),
-
-                    (_("nodiratime"), 'd', True,
-                    _("Disables recording directory access time to disk, thus"
                       " speeding up disk access. This is unlikely to cause"
                       " problems (famous last words ...). Important for"
                       " flash devices")),

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# listparts
+
+# Get a list of partitions on the given (argument $1) device using parted.
+
+parted -sm $1 print | grep '^[0-9]\+' | cut -d':' -f1

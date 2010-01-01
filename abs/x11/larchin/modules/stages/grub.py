@@ -1,6 +1,6 @@
 # grub.py - stage for setting up the boot-loader
 #
-# (c) Copyright 2008 Michael Towers <gradgrind[at]online[dot]de>
+# (c) Copyright 2008,2009 Michael Towers <gradgrind[at]online[dot]de>
 #
 # This file is part of the larch project.
 #
@@ -19,7 +19,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2008.06.13
+# 2009.01.31
 
 from stage import Stage
 from grub_gui import Mbrinstall, Oldgrub
@@ -157,7 +157,13 @@ class Widget(Stage):
             text += "title  Arch Linux %s (initrd=/boot/%s)\n" % (
                     self.rootpart, init)
             text += "root   %s\n" % rp
-            text += "kernel %s/%s root=%s ro\n" % (bp, kernel, self.rootpart)
+
+            if install.use_uuid:
+                u = install.getUUID(self.rootpart)
+                r = "/dev/disk/by-uuid/%s" % u
+            else:
+                r = self.rootpart
+            text += "kernel %s/%s root=%s ro\n" % (bp, kernel, r)
             text += "initrd %s/%s\n\n" % (bp, init)
 
         if self.ntfsboot:

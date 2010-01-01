@@ -1,6 +1,6 @@
 # installstart.py - summarize formatting and installation partitions
 #
-# (c) Copyright 2008 Michael Towers <gradgrind[at]online[dot]de>
+# (c) Copyright 2008, 2009 Michael Towers <gradgrind[at]online[dot]de>
 #
 # This file is part of the larch project.
 #
@@ -19,7 +19,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2008.06.05
+# 2009.02.17
 
 from stage import Stage, Report
 from doinstall_gui import Progress
@@ -99,7 +99,8 @@ class Widget(Stage):
             if f:
                 self.output.report(_("Formatting partition %s as swap ...")
                         % p)
-                result = install.swapFormat(p)
+                result = install.swapFormat(p, "-c" if f.startswith("c")
+                        else "")
                 if result:
                     self.output.report(result)
                     return False

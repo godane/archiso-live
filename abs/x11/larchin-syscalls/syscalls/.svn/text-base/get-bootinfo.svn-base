@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# Get info for the grub entries (kernel and initramfs)
+# There may be only one kernel, reported first with a '+++ ' prefix.
+# There may be more than one initramfs, each is reported on a line of its own.
+
+INSTALL=/tmp/install
+
+# Find kernel
+kernels=( $( ls ${INSTALL}/boot/vmlinuz* 2>/dev/null ) )
+if [ ${#kernels[@]} -ne 1 ]; then
+    echo "ERROR: there should be one, and only one, kernel"
+    exit 1
+fi
+echo -n "+++ "
+basename ${kernels}
+
+# Find initramfs (could well be more than one!)
+inits="$( ls ${INSTALL}/boot/kernel*.img 2>/dev/null | \
+        sed "s|.*/|${bp}/|" | sort -r - )"
+
+for i in ${inits}; do
+    basename ${i}
+done

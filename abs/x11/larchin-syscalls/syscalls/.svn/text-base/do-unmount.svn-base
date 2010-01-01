@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# do-unmount
+
+# Unmount a partition mounted at /tmp/install$1
+
+if [ "$1" = "/" ]; then
+    umount /tmp/install
+else
+    umount /tmp/install$1
+fi
+
+if [ $? -eq 0 ]; then
+    echo -n '^OK^'
+fi

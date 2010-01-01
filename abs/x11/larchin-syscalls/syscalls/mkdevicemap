@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# mkdevicemap - make a device.map for GRUB, find GRUB menus
+
+INSTALL=/tmp/install
+
+# Create a device.map file
+rm -f ${INSTALL}/boot/grub/device.map
+#mkdir -p ${INSTALL}/boot/grub
+${INSTALL}/sbin/grub --batch --no-floppy \
+        --device-map=${INSTALL}/boot/grub/device.map &>/dev/null <<EOF
+quit
+EOF
+
+# Report device.map contents
+cat ${INSTALL}/boot/grub/device.map
+
+# Search all partitions for /boot/grub/menu.lst
+${INSTALL}/sbin/grub --batch --no-floppy \
+        --device-map=${INSTALL}/boot/grub/device.map \
+        2>/dev/null <<EOT | grep '(h' | sed 's|(|+++ /boot/grub/menu.lst (|'
+find /boot/grub/menu.lst
+quit
+EOT
+
+# Search all partitions for /grub/menu.lst
+${INSTALL}/sbin/grub --batch --no-floppy \
+        --device-map=${INSTALL}/boot/grub/device.map \
+        2>/dev/null <<EOT | grep '(h' | sed 's|(|+++ /grub/menu.lst (|'
+find /grub/menu.lst
+quit
+EOT
+

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# newpart
+
+# Create a new partition on the given device (argument $1)
+# $2 - start position (cylinders)
+# $3 - end position (cylinders)
+# $4 - fstype (ext2/linux-swap/...)
+# $5 - primary/logical
+if parted -s $1 unit cyl mkpart $5 $4 $2 $3; then
+    echo -n '^OK^'
+else
+    echo -n "Couldn't create partition on $1 from cylinder $2 to cylinder $3"
+fi

@@ -1,6 +1,6 @@
 # swaps.py - formatting swap partitions (expert mode only)
 #
-# (c) Copyright 2008 Michael Towers <gradgrind[at]online[dot]de>
+# (c) Copyright 2008,2009 Michael Towers <gradgrind[at]online[dot]de>
 #
 # This file is part of the larch project.
 #
@@ -19,7 +19,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2008.06.05
+# 2009.02.17
 
 from stage import Stage
 
@@ -30,7 +30,8 @@ class Widget(Stage):
                  " a swap partition, but it is not necessary if you have more"
                  " memory than you will ever need.\n\n"
                  " 0.5 - 1.0 GB of swap space should be plenty for most"
-                 " purposes.")
+                 " purposes, but you may well need more if you are"
+                 " suspending to swap.")
 
     def __init__(self):
         """
@@ -63,7 +64,12 @@ class Widget(Stage):
             self.setCheck(b, True)
             self.swaps[p] = b
 
-        if not all:
+        if all:
+            self.cformat = self.addCheckButton(_("Check for bad blocks "
+                    "when formatting.\nClear this when running in VirtualBox "
+                    "(it takes forever)."))
+            self.setCheck(self.cformat, True)
+        else:
             self.addLabel(_("There are no swap partitions available. If the"
                     " installation computer does not have a large amount of"
                     " memory, you are strongly advised to create one before"
@@ -71,9 +77,10 @@ class Widget(Stage):
 
     def forward(self):
         config = ""
+        fflag = "cformat" if self.getCheck(self.cformat) else "format"
         for p, b in self.swaps.items():
-            f = "" if self.done else "format"
-            i = "include"if self.getCheck(b) else ""
+            i = "include" if self.getCheck(b) else ""
+            f = fflag if (i and (p not in self.done)) else ""
             if config:
                 config += "\n"
             config += "%s:%s:%s" % (p, f, i)

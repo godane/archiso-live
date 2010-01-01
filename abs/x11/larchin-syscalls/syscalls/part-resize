@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# part-resize
+
+# Reduce the size of the given partition number (argument $2, type NTFS)
+# on the given device (argument $1)
+
+# $3 - new size, in sectors!
+
+# Get start sector
+#st="$( sfdisk -uS -l /dev/sda | grep $1$2 | ( read d s x; echo $s | tr -d + ) )"
+
+if echo ",$3" | sfdisk -uS $1 -N$2; then echo -n '^OK^'; fi

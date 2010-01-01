@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# tidyup - unmount things that got left mounted ...
+
+ml="$( cat /proc/mounts | grep "/tmp" | cut -d' ' -f2 )"
+
+while true; do
+    ml2=""
+    for m in ${ml}; do
+        if ! umount ${m}; then
+            ml2="${ml2} ${m}"
+        fi
+    done
+    if [ -z "${ml2}" ]; then break; fi
+    if [ "${ml}" = "${ml2}" ]; then
+        exit 1
+    fi
+    ml="${ml2}"
+done
+
+echo -n '^OK^'

@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# get-blkinfo
+
+# Get info on the given partition (argument $2) using blkid.
+# The requested info is set in $1. The interesting possibilities are probably:
+#    TYPE (file-system type)
+#    UUID
+#    LABEL
+
+blkid -c /dev/null -o value -s $1 $2

@@ -1,0 +1,17 @@
+# Maintainer: Michael Towers <gradgrind[at]online[dot]de>
+# 2009.05.29
+pkgname=larchin-syscalls
+pkgver=6.1.2
+pkgrel=3
+
+pkgdesc="bash scripts for larchin (larch hard disk installer with gui)"
+url="http://larch.berlios.de"
+depends=('parted' 'ntfsprogs')
+# strongly recommended: gparted
+arch=(i686 x86_64)
+license=('GPL')
+
+build() {
+  mkdir -p ${startdir}/pkg/opt/larchin
+  cp -dr ${startdir}/syscalls ${startdir}/pkg/opt/larchin
+}

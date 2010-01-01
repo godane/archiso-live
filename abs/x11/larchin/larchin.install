@@ -1,0 +1,9 @@
+pre_remove() {
+  # Remove generated stuff (compiled python files, *.pyc)
+  usr/bin/find opt/larchin -regex '.*\.pyc' -type f -exec rm '{}' \;
+  bin/true
+}
+
+op=$1
+shift
+$op $*

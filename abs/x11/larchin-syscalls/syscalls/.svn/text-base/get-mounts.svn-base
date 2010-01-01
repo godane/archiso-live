@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# get-mounts
+
+# Get all mounted devices - so that each line starts with the device
+# Here managed by returning the contents of /etc/mtab
+
+cat /etc/mtab
