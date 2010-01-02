@@ -6,6 +6,7 @@
 #
 # GENERAL OPTIONS
 #
+
 [options]
 # The following paths are commented out with their default values listed.
 # If you wish to use different paths, uncomment and update the paths.
@@ -40,9 +41,9 @@ HoldPkg     = pacman glibc
 #[chaox-broken]
 #Server = http://repo.chaox.net/broken
 
-[archiso-live]
+#[archiso-live]
 #Server = http://arch-live.isawsome.net/testing/
-Server = http://arch-live.isawsome.net/packages/
+#Server = http://arch-live.isawsome.net/packages/
 #Server = file:///mnt/sda3/arch-repo/
 
 # Testing is disabled by default.  To enable, uncomment the following
@@ -53,18 +54,45 @@ Server = http://arch-live.isawsome.net/packages/
 
 [core]
 # Add your preferred servers here, they will be used first
-Include = /etc/pacman.d/mirrorlist
+#Include = mirrorlist
+Server = ftp://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/i686
+Server = http://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/i686
+Server = ftp://mirrors.easynews.com/linux/archlinux/$repo/os/i686
+Server = http://mirrors.easynews.com/linux/archlinux/$repo/os/i686
+Server = ftp://ftp.archlinux.org/$repo/os/i686
+Server = http://mirrors.gigenet.com/archlinux/$repo/os/i686
+Server = ftp://ftp.gtlib.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
+Server = http://www.gtlib.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
+Server = ftp://mirrors.hosef.org/archlinux/$repo/os/i686
 
 #[edgy]
 #Server = http://kapsi.fi/~ighea/arch/edgy/
 
 [extra]
 # Add your preferred servers here, they will be used first
-Include = /etc/pacman.d/mirrorlist
+#Include = mirrorlist
+Server = ftp://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/i686
+Server = http://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/i686
+Server = ftp://mirrors.easynews.com/linux/archlinux/$repo/os/i686
+Server = http://mirrors.easynews.com/linux/archlinux/$repo/os/i686
+Server = ftp://ftp.archlinux.org/$repo/os/i686
+Server = http://mirrors.gigenet.com/archlinux/$repo/os/i686
+Server = ftp://ftp.gtlib.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
+Server = http://www.gtlib.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
+Server = ftp://mirrors.hosef.org/archlinux/$repo/os/i686
 
 [community]
 # Add your preferred servers here, they will be used first
-Include = /etc/pacman.d/mirrorlist
+#Include = mirrorlist
+Server = ftp://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/i686
+Server = http://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/i686
+Server = ftp://mirrors.easynews.com/linux/archlinux/$repo/os/i686
+Server = http://mirrors.easynews.com/linux/archlinux/$repo/os/i686
+Server = ftp://ftp.archlinux.org/$repo/os/i686
+Server = http://mirrors.gigenet.com/archlinux/$repo/os/i686
+Server = ftp://ftp.gtlib.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
+Server = http://www.gtlib.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
+Server = ftp://mirrors.hosef.org/archlinux/$repo/os/i686
 
 # kdemod current repo
 #[kdemod-core]

@@ -12,7 +12,7 @@ ArrowPosition=0
 [Entry 0]
 Name=Keyboard map
 Comment=Change the keyboard map
-Icon=/usr/share/icons/Tango/scalable/devices/keyboard.svg
+Icon=/usr/share/icons/Tango/32x32/devices/keyboard.png
 Exec=select-keyboard-layout
 Terminal=true
 StartupNotify=false

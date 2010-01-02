@@ -1,7 +1,7 @@
 [Entry 0]
 Name=Music Player
 Comment=Manage and listen to your music collection
-Icon=/usr/share/icons/Tango/scalable/mimetypes/audio-x-generic.svg
+Icon=/usr/share/icons/Tango/32x32/mimetypes/audio-x-generic.png
 Exec=audacious2
 Terminal=false
 StartupNotify=false

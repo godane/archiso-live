@@ -7,3 +7,4 @@ VMLINUZ="boot/vmlinuz26"
 CDLABEL="Archiso-Live"
 PUBLISHER="http://godane.wordpress.com/"
 AUTHOR="Christopher Rogers aka Godane"
+ARCH=x86_64

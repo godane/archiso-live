@@ -1,8 +1,10 @@
 #!/bin/bash
+
+source config
 WORKDIR=.working
 DATE="$(date +%F)"
 CDNAME="archiso-live"
-ISONAME=$CDNAME-${DATE}.iso
+ISONAME=$CDNAME-${DATE}-${ARCH}.iso
 
 
 makeinstall()
