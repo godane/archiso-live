@@ -21,7 +21,6 @@ EXCLUDE="${PROFILE}/exclude"
 ARCH=i686
 #ARCH=x86_64
 
-
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
 info () { echo -e "\033[1;32;40m>>> \033[1;37;40m$@\033[1;0m"; }
@@ -33,12 +32,6 @@ LIVELINUX="../../linux-live/initrd"
 
 if [ -f "${PROFILE}/config" ]; then
 	. ${PROFILE}/config
-fi
-
-if [ -f "${PROFILE}/pacman.conf-${ARCH}" ]; then
-	PACMANCONF="${PROFILE}/pacman.conf-${ARCH}"
-else
-	PACMANCONF="/etc/pacman.conf"
 fi
 
 APPNAME=$(basename "${0}")
@@ -104,6 +97,12 @@ echo "ARGS: $@"
 if [ "$EUID" != "0" ]; then
 	error "error: This script must be run as root."
 	exit 1
+fi
+
+if [ -f "${PROFILE}/pacman.conf-${ARCH}" ]; then
+	PACMANCONF="${PROFILE}/pacman.conf-${ARCH}"
+else
+	PACMANCONF="/etc/pacman.conf"
 fi
 
 command_name="${1}"
