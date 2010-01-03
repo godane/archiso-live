@@ -52,11 +52,15 @@ cd $HOME/archiso-live/scripts
 source exports
 cd profiles/archiso-live
 
-How you make the iso from scrach.
-./build makeiso
+How you make the iso from scrach for i686.
+./build makeiso i686
+or for x86_64
+./build makeiso x86_64
 
-How you make just the iso again.
-./build makeimg
+How you make just the iso again for i686.
+./build makeimg i686
+or for x86_64
+./build makeimg x86_64
 
 How you do a live backup of your system
 su root

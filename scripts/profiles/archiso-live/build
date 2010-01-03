@@ -1,7 +1,14 @@
 #!/bin/bash
 
 source config
-WORKDIR=.working
+
+if [ "${2}" = "i686" -o "${2}" = "x86_64" ]; then
+	ARCH=$2
+else
+	ARCH=i686
+fi
+
+WORKDIR=.working-${ARCH}
 DATE="$(date +%F)"
 CDNAME="archiso-live"
 ISONAME=$CDNAME-${DATE}-${ARCH}.iso
@@ -9,7 +16,7 @@ ISONAME=$CDNAME-${DATE}-${ARCH}.iso
 
 makeinstall()
 {
-	mkarchiso -c $CDNAME -m $1 -f install "${WORKDIR}"
+	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f install "${WORKDIR}"
 }
 
 livebackup()
@@ -19,18 +26,18 @@ livebackup()
 
 makeiso() 
 {
-	mkarchiso -c $CDNAME -m $1 -f all "${WORKDIR}" "${ISONAME}"
+	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f all "${WORKDIR}" "${ISONAME}"
 }
 
 makesquashfs()
 {
-	mkarchiso -c $CDNAME -m $1 -f squash "${WORKDIR}"
+	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f squash "${WORKDIR}"
 }
 
 makeimg()
 {
-	mkarchiso -c $CDNAME -m $1 -f imgprepare "${WORKDIR}"
-	mkarchiso -c $CDNAME -m $1 -f img "${WORKDIR}" "${ISONAME}"
+	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f imgprepare "${WORKDIR}"
+	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f img "${WORKDIR}" "${ISONAME}"
 }
 
 clean()

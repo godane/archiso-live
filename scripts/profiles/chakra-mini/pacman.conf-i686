@@ -6,7 +6,6 @@
 #
 # GENERAL OPTIONS
 #
-
 [options]
 # The following paths are commented out with their default values listed.
 # If you wish to use different paths, uncomment and update the paths.
@@ -45,6 +44,39 @@ HoldPkg     = pacman glibc
 #Server = http://arch-live.isawsome.net/testing/
 Server = http://arch-live.isawsome.net/packages/
 #Server = file:///mnt/sda3/arch-repo/
+
+[kdemod-core]
+#Include = /etc/pacman.d/kdemodmirrorlist
+Server = ftp://ftp.wh-stuttgart.net/kdemod/$repo/i686
+Server = http://chakra.virtualdisaster.net/kdemod/$repo/i686
+Server = http://archlinux.puzzle.ch/kdemod/$repo/i686
+Server = http://mirror.rit.edu/kdemod/$repo/i686
+Server = http://kdemod.iskrembilen.com/repo/$repo/i686
+Server = http://kdemod.bednarek.org.pl/$repo/i686
+Server = http://server.elsistech.com/archlinux/kdemod/$repo/i686
+Server = http://chakra-project.org/repo/$repo/i686
+
+[kdemod-extragear]
+#Include = /etc/pacman.d/kdemodmirrorlist
+Server = ftp://ftp.wh-stuttgart.net/kdemod/$repo/i686
+Server = http://chakra.virtualdisaster.net/kdemod/$repo/i686
+Server = http://archlinux.puzzle.ch/kdemod/$repo/i686
+Server = http://mirror.rit.edu/kdemod/$repo/i686
+Server = http://kdemod.iskrembilen.com/repo/$repo/i686
+Server = http://kdemod.bednarek.org.pl/$repo/i686
+Server = http://server.elsistech.com/archlinux/kdemod/$repo/i686
+Server = http://chakra-project.org/repo/$repo/i686
+
+[kdemod-playground]
+#Include = /etc/pacman.d/kdemodmirrorlist
+Server = ftp://ftp.wh-stuttgart.net/kdemod/$repo/i686
+Server = http://chakra.virtualdisaster.net/kdemod/$repo/i686
+Server = http://archlinux.puzzle.ch/kdemod/$repo/i686
+Server = http://mirror.rit.edu/kdemod/$repo/i686
+Server = http://kdemod.iskrembilen.com/repo/$repo/i686
+Server = http://kdemod.bednarek.org.pl/$repo/i686
+Server = http://server.elsistech.com/archlinux/kdemod/$repo/i686
+Server = http://chakra-project.org/repo/$repo/i686
 
 # Testing is disabled by default.  To enable, uncomment the following
 # two lines.  You can add preferred servers immediately after the header,

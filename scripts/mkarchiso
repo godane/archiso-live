@@ -57,7 +57,7 @@ usage ()
 	echo "    -b BOOT		Boot option (syslinux,grub,grub-gfx)"
 	echo "    -M MODULES       Modules for livecd. Default: ${MODULES}"
 	echo "    -m MODULESCOPY   Copy modules from a folder to modules place in IMGROOT. Default: none"
-	echo "    -a ADDON_DIR     Use addons from DIR. Default: none"
+	echo "    -a ARCH          Set the Arch type. Default: i686"
 	echo "    -t <iso,disk>    Type of image to create. Defaults to iso."
 	echo "    -v               Enable verbose output."
 	echo "    -h               This message."
@@ -81,7 +81,7 @@ while getopts 'i:P:b:M:m:a:t:c:nfvh' arg; do
 		b) BOOT="${OPTARG}" ;;
 		M) MODULES="${OPTARG}" ;;
 		m) MODULESCOPY="${OPTARG}" ;;
-		a) ADDON_DIR="${OPTARG}" ;;
+		a) ARCH="${OPTARG}" ;;
 		t) IMG_TYPE="${OPTARG}" ;;
 		c) CDNAME="${OPTARG}" ;;
 		n) NOLZMA="y" ;;
