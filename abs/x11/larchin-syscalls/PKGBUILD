@@ -2,13 +2,12 @@
 # 2009.05.29
 pkgname=larchin-syscalls
 pkgver=6.1.2
-pkgrel=3
-
+pkgrel=4
 pkgdesc="bash scripts for larchin (larch hard disk installer with gui)"
 url="http://larch.berlios.de"
 depends=('parted' 'ntfsprogs')
 # strongly recommended: gparted
-arch=(i686 x86_64)
+arch=(any)
 license=('GPL')
 
 build() {

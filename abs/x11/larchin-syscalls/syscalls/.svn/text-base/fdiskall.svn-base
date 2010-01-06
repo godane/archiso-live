@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# fdiskall
-
-# Get the general disk info returned by 'fdisk -l'
-#
-LANG=C fdisk -l

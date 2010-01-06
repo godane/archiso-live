@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# unmount1
-
-# Unmount a partition mounted at /tmp/mnt
-
-umount /tmp/mnt

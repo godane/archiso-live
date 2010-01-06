@@ -1,7 +1,0 @@
-#!/bin/sh
-
-# get-partsize
-
-# Return the size of partition $1 in a user-friendly form
-
-LANG=C parted ${1:0:8} print | grep "^[ ]*${1:8}" | ( read p b e s t; echo $s )

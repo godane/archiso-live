@@ -1,9 +1,0 @@
-#!/bin/sh
-
-# swap-format
-
-# Format a swap partition (argument = options ... device)
-
-if mkswap $*; then
-    echo -n '^OK^'
-fi
