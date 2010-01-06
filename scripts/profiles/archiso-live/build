@@ -29,6 +29,12 @@ makeiso()
 	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f all "${WORKDIR}" "${ISONAME}"
 }
 
+makeisoall()
+{
+	makeiso i686
+	makeiso x86_64
+}
+
 makesquashfs()
 {
 	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f squash "${WORKDIR}"
@@ -53,8 +59,13 @@ fi
 if [ "${1}" = "livebackup" ]; then
 	livebackup $2
 fi
+
 if [ "${1}" = "makeiso" ]; then
 	makeiso $2
+fi
+
+if [ "${1}" = "makeisoall" ]; then
+	makeisoall
 fi
 
 if [ "${1}" = "makeimg" ]; then
