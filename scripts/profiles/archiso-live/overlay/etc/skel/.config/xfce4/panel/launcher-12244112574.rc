@@ -1,8 +1,8 @@
 [Entry 0]
 Name=Internet Messenger
 Comment=Send instant messages over multiple protocols
-Icon=pidgin
-Exec=pidgin
+Icon=xchat
+Exec=xchat
 Terminal=false
 StartupNotify=false
 
