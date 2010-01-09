@@ -7,7 +7,7 @@ pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -ARCH 
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.32
 pkgver=${_basekernel}.3
-pkgrel=1live
+pkgrel=2live
 _patchname="patch-${pkgver}-1-ARCH"
 arch=(i686 x86_64)
 license=('GPL2')
@@ -20,8 +20,8 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         kernel26.preset)
 md5sums=('260551284ac224c3a43c4adac7df4879'
          '4f177578fe0bd1b8af8911a623b4a559'
-         '844b6ae005cbd3ed028164cce050b63c'
-         'aea57c07825eba22a3ab97d8a8487c6d'
+         '56cbb2f609eb63a90e0c3a2b0d0e4d44'
+         'd20de966f7e9981e0f2e85c3b9eb3593'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
