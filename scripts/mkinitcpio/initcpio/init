@@ -2,7 +2,7 @@
 
 . /init_functions
 
-info "Loading Initramfs"
+msg ":: Loading Initramfs"
 
 /bin/mount -t sysfs none /sys
 /bin/mount -t proc  none /proc
@@ -18,11 +18,21 @@ export kinit_params=""
 export root=""
 echo "/sbin/modprobe" > /proc/sys/kernel/modprobe
 
+# if available, start udevd at this stage
+if [ -x /sbin/udevd ]; then
+    msg ":: Starting udevd..."
+    echo > /proc/sys/kernel/hotplug
+    /sbin/udevd --daemon
+    msg "done."
+fi
+
 for cmd in ${CMDLINE}; do
     case "${cmd}" in
         \#*) break ;; # ignore everything after a # in the commandline
-        [0123456Ss]) export runlevel="${cmd}" ;;
-        single) export runlevel="S" ;; #some people use 'single'
+        # The kernel passes those to the kernel on its own
+        [0123456Ss]) ;;
+        [0-9]*) ;;
+        single) ;;
         #Allow "init=X" to pass-through
         init=*) kinit_params="${kinit_params} ${cmd}" ;;
         # only export stuff that does work with dash :)
@@ -65,75 +75,67 @@ for m in ${MODULES}; do
     fi
 done
 
+# If rootdelay is empty or not a non-negative integer, set it to 10
+if [ -z "${rootdelay}" ] || ! [ "${rootdelay}" -ge 0 ]; then
+    export rootdelay=10
+fi
+# We'll wait for the root device, so make sure klibc doesn't
+export kinit_params="${kinit_params} rootdelay=0"
+
 if [ -e "/hooks" ]; then
     for h in ${HOOKS}; do
         TST=""
         eval "TST=\$hook_${h}"
         if [ "${TST}" != "disabled" ]; then
-            run_hook () { info "${h}: no run function defined"; }
+            run_hook () { msg "${h}: no run function defined"; }
             if [ -e "/hooks/${h}" ]; then
                . /hooks/${h}
-               info "Running Hook [$G${h}$EMW]"
+               msg ":: Running Hook [${h}]"
                run_hook
             fi
         fi
     done
 fi
 
-if [ "${rootdelay}" != "0" ]; then
-    info -n "Waiting for devices to settle..."
-
-    /bin/sleep "${rootdelay}"
-
-    export rootdelay=0
-    export kinit_params="$kinit_params rootdelay=0"
-
-    hl "done."
-    echo
-fi
-
 if [ "${break}" = "y" ]; then
-    warn "Break requested, type 'exit' to resume operation"
-    warn "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+    echo ":: Break requested, type 'exit' to resume operation"
+    echo "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
     PS1="ramfs$ " /bin/sh -i
 fi
 
-if [ ! -b "${root}" ]; then
-    # This duplicates code from the filesystem hook
-    # without this, mkinitcpio would fail for users who use
-    # neither the udev hook, nor the filesystem hook
-    
-    echo
-    warn "Root device '${root}' doesn't exist, attempting to create it"
+# If we boot from NFS, don't check for a block device in /dev
+# Let kinit do it all
+if [ -z "${nfsroot}" -a "${root}" != "/dev/nfs" ]; then
+    if ! poll_device "${root}" ${rootdelay}; then
+        msg "\nRoot device '${root}' doesn't exist, attempting to create it"
 
-    eval $(/bin/parseblock "${root}")
-    if [ "${BLOCKNAME}" = "unknown" ]; then
-        error "ERROR: Failed to parse block device name for '${root}'"
-    elif [ -z "${BLOCKDEVICE}" ]; then
-        error "ERROR: Failed to parse block device ids for '${root}'"
-    else
-        export root="${BLOCKNAME}"
-        echo "/bin/mknod \"${BLOCKNAME}\" b ${BLOCKDEVICE}"
-        /bin/mknod "${BLOCKNAME}" b ${BLOCKDEVICE} >/dev/null
-    fi
-    if [ ! -b "${root}" ]; then
-        error "Unable to create/detect root device '${root}'"
-        
-        warn "Dropping to a recovery shell... type 'exit' to reboot"
-        warn "NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
-        echo ""
-        warn "If the device '${root}' gets created while you are here,"
-        warn "try adding 'rootdelay=8' or higher to the kernel command-line"
-        PS1="ramfs$ " /bin/sh -i
-        info "Rebooting..."
-        /bin/reboot
+        eval $(/bin/parseblock "${root}")
+        if [ -z "${BLOCKDEVICE}" ]; then
+            echo "ERROR: Failed to parse block device ids for '${root}'"
+        else
+            echo "/bin/mknod /dev/root b ${BLOCKDEVICE}"
+            /bin/mknod /dev/root b ${BLOCKDEVICE} >/dev/null
+            export root="/dev/root"
         fi
+        if [ ! -b "${root}" -a ! -h "${root}" ]; then
+            err "Unable to detect or create root device '${root}'"
+            echo "You are being dropped to a recovery shell"
+            echo "    Type 'reboot' to reboot"
+            echo "    Type 'exit' to try and continue booting"
+            echo "NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+            echo ""
+            echo "If the device '${root}' gets created while you are here,"
+            echo "try adding 'rootdelay=10' or higher to the kernel command-line"
+            PS1="ramfs$ " /bin/sh -i
+            msg "Trying to continue (this will most likely fail)..."
+        fi
+    fi
 fi
 
-info "Initramfs Completed - control passing to kinit"
 if [ -f "/message" ]; then
     msg "$(cat /message)"
 fi
+msg ":: Initramfs Completed - control passing to kinit"
 
 #Special handling if udev is running
 udevpid=$(/bin/minips -C udevd -o pid=)
@@ -142,5 +144,4 @@ if [ -n "${udevpid}" ]; then
     /bin/sleep 0.01
 fi
 
-
-exec /bin/kinit -- "root=${root}" ${kinit_params} "${runlevel}" > /dev/null 2>&1
+exec /bin/kinit "$@" -- "root=${root}" ${kinit_params} > /dev/null 2>&1
