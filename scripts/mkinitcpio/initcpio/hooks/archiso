@@ -1,7 +1,7 @@
 #args: source, mountpoint
 _mnt_bind()
 {
-    info "Binding ${1} to ${2}"
+    msg "Binding ${1} to ${2}"
     /bin/mkdir -p /real_root${2}
     /bin/mount -o bind ${1} /real_root${2}
 }
@@ -10,7 +10,7 @@ _mnt_iso()
 {
 	img="${1}"
 	
-	info "Mounting ${img}"
+	msg "Mounting ${img}"
 	/bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
 	
 	#/bin/mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
@@ -19,7 +19,7 @@ _mnt_iso()
         sleep 1
     done
     if ! /bin/losetup "/dev/loop10" ${img} > /dev/null 2>&1; then
-        error "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
+        err "Cannot mount loop device /dev/loop${LOOP_NUM}"
         break
     fi
     /bin/mount -t iso9660 "/dev/loop10" "/tmpfs/mnt/findiso"
@@ -34,11 +34,11 @@ _mnt_squashfs()
     base_img="/tmp/$(/usr/bin/basename ${img})";
     #mnt="${2}"
 
-    info "Adding new real_root branch: ${base_img}"
+    msg "Adding new real_root branch: ${base_img}"
     /bin/modprobe -q loop max_loop=255 >/dev/null 2>&1
 
     if [ "${copy2ram}" = "y" ]; then
-        info "Copying squashfs image to RAM"
+        msg "Copying squashfs image to RAM"
         /bin/mkdir -p /tmp
         /bin/mount -t tmpfs -o "size=6M" tmpfs /tmp
         /bin/cat ${img} > "${base_img}"
@@ -50,7 +50,7 @@ _mnt_squashfs()
         sleep 1
     done
     if ! /bin/losetup "/dev/loop${LOOP_NUM}" ${img} > /dev/null 2>&1; then
-        error "ERROR: Cannot mount loop device /dev/loop${LOOP_NUM}"
+        err "Cannot mount loop device /dev/loop${LOOP_NUM}"
         break
     fi
     /bin/mount -r -t squashfs "/dev/loop${LOOP_NUM}" "/tmpfs/mnt/loop${LOOP_NUM}"
@@ -64,9 +64,9 @@ mount_tmpfs ()
     #if [ "x${ramdisk_size}" = "x" ]; then
         ramdisk_size="3M"
     #fi
-    info -n "Mounting tmpfs, size=${ramdisk_size}... "
+    msg -n "Mounting tmpfs, size=${ramdisk_size}... "
     /bin/mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
-    hl "done."; echo
+    msg "done."; echo
 }
 
 device_mountdir()
@@ -81,17 +81,17 @@ run_hook ()
     mount_tmpfs
 
     # external drives may need to settle
-    info "Waiting for devices to settle..."
+    msg "Waiting for devices to settle..."
     /sbin/udevadm trigger --subsystem-match=usb
     /sbin/udevadm settle
     usbdelay=$(( ${usbdelay:-0} + 1 ))
-    info "Waiting ${usbdelay}s for USB devices"
+    msg "Waiting ${usbdelay}s for USB devices"
     /bin/sleep "${usbdelay}"
 
     found=0
     
     /bin/modprobe -q isofs >/dev/null 2>&1
-    info -n "Scanning cd drives: "
+    msg -n "Scanning cd drives: "
     for cdrom in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sg[0-9]*; do
     	[ ! -e "${cdrom}" ] && continue
         bootcdmnt="$(device_mountdir ${cdrom})"
@@ -99,24 +99,24 @@ run_hook ()
     	if /bin/mount -r -t iso9660 "${cdrom}" "${bootcdmnt}" >/dev/null 2>&1; then
     	    if [ -f "${bootcdmnt}/${findiso}" ]; then
                 found=1
-                info "${cdrom}"; echo
+                msg "${cdrom}"; echo
                 BOOT_MOUNT="${bootcdmnt}"
                 break
             elif [ -f "${bootcdmnt}/base.lzm" ]; then
                 found=1
-                hl "${cdrom}"; echo
+                msg "${cdrom}"; echo
                 BOOT_MOUNT="${bootcdmnt}"
                 break
             fi
         else
-            hl "uhm"; echo
-            error "Failed to mount ${cdrom}"
+            msg "uhm"; echo
+            err "Failed to mount ${cdrom}"
         fi
         [ ${found} -eq 0 ] && /bin/umount "${bootcdmnt}" >/dev/null 2>&1
     done
 
     if [ ${found} -eq 0 ]; then
-        info -n "Scanning usb drivers: "
+        msg -n "Scanning usb drivers: "
         for usb in /dev/sd[a-z][0-9]; do
             [ ! -e "${usb}" ] && continue
             bootusbmnt="$(device_mountdir ${usb})"
@@ -125,42 +125,41 @@ run_hook ()
                /bin/mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
                 if [ -f "${bootusbmnt}/${findiso}" ]; then
                         found=1
-                        info "${usb}"; echo
+                        msg "${usb}"; echo
                         BOOT_MOUNT="${bootusbmnt}"
                         break
                 elif [ "x${from}" != "x" ]; then
                     from=$(/usr/bin/basename ${from})
                     if [ -f "${bootusbmnt}/${from}/base.lzm" ]; then
                         found=1
-                        info "${usb}"; echo
+                        msg "${usb}"; echo
                         BOOT_MOUNT="${bootusbmnt}"
                         break
                     fi
                 else
                     if [ -f "${bootusbmnt}/base.lzm" ]; then
                         found=1
-                        hl "${usb}"; echo
+                        msg "${usb}"; echo
                         BOOT_MOUNT="${bootusbmnt}"
                         break
                     fi
                 fi
             else
-                error "Failed to mount ${usb}"
+                err "Failed to mount ${usb}"
             fi
             [ ${found} -eq 0 ] && /bin/umount "${bootusbmnt}" >/dev/null 2>&1
         done
     fi
 
     if [ ${found} -eq 0 ]; then
-        error "ERROR: cannot find boot device, cannot continue..."
-        error "   Falling back to interactive prompt"
+        err "cannot find boot device, cannot continue..."
+        msg "Falling back to interactive prompt"
         PS1="ramfs$ " /bin/sh -i
         exit 1
     fi
 
     if [ "${break}" = "y" ]; then
-        warn "Break requested, type 'exit' to resume operation"
-        warn "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+        msg "Break requested, type 'exit' to resume operation"
         PS1="ramfs$ " /bin/sh -i
     fi
 
@@ -177,7 +176,7 @@ run_hook ()
 
     /bin/mount -t aufs -o nowarn_perm,xino=$XINO/.aufs.xino,br:/tmpfs=rw aufs /real_root
     if [ $? -ne 0 ]; then
-        echo "Error: while mounting root (aufs) fileystem."
+        err "while mounting root (aufs) fileystem."
         exit 1
     fi
 
@@ -206,8 +205,7 @@ run_hook ()
     fi
 
     if [ "${break}" = "y" ]; then
-        warn ":: Break requested, type 'exit' to resume operation"
-        warn "   NOTE: klibc contains no 'ls' binary, use 'echo *' instead"
+        msg ":: Break requested, type 'exit' to resume operation"
         PS1="ramfs$ " /bin/sh -i
     fi
 		
@@ -217,13 +215,13 @@ run_hook ()
     /bin/mknod $ROOT/dev/null c 1 3 2>&1 >/dev/null
     /bin/mknod $ROOT/dev/zero c 1 5 2>&1 >/dev/null
 
-    udevpid=$(/bin/minips -C udevd -o pid=)
+    udevpid=$(/bin/pidof udevd)
     [ "x${udevpid}" != "x" ] && /bin/kill -9 $udevpid 2>&1 >/dev/null
     #Yep, we're bailing out here.  We don't need kinit.
     /bin/umount -l /sys
     /bin/umount -l /proc
     sleep 2
-    exec /bin/run-init -c /dev/console /real_root /sbin/init
+    exec /bin/switch_root -c /dev/console /real_root /sbin/init
 }
 
 # vim:ft=sh:ts=4:sw=4:et:

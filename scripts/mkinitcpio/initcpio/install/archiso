@@ -7,7 +7,7 @@ install ()
     if [ "x${MODULES}" != "x" ]; then
         MODULES="${MODULES} usb_storage sd_mod sr_mod"
     fi
-    BINARIES="cp ls grep basename"
+    BINARIES="basename"
     #FILES="/usr/lib/liblinuxlive"
     FiLES=""
     add_dir /real_root

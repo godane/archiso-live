@@ -31,13 +31,20 @@ BGM="\033[45m"
 BGC="\033[46m"
 BGW="\033[47m"
 
-hl () { echo -n "${W}$@${RST}";  }
+#msg () {
+#    [ "${quiet}" != "y" ] && echo $@
+#}
+#err () {
+#    echo "ERROR: $@"
+#}
+
+hl () { echo -en "${W}$@${RST}";  }
 
 info () {
     if [ $# -eq 2 ] && [ "$1" = "-n" ]; then
-        echo -n " $EMB*$RST "; hl "$2"
+        echo -en " $EMB*$RST "; hl "$2"
     else
-        echo -n " $EMB*$RST "; hl "$@"; echo
+        echo -en " $EMB*$RST "; hl "$@"; echo
     fi
 }
 
@@ -45,19 +52,11 @@ msg () {
     info $@;
 }
 
-error () {
+err () {
     if [ $# -eq 2 ] && [ "$1" = "-n" ]; then
-        echo -n " $EMR*$RST "; hl "$2"
+        echo -en " $EMR*$RST "; hl "$2"
     else
-        echo -n " $EMR*$RST "; hl "$@"; echo
-    fi
-}
-
-warn () {
-    if [ $# -eq 2 ] && [ "$1" = "-n" ]; then
-        echo -n " $EMY*$RST "; hl "$2"
-    else
-        echo -n " $EMY*$RST "; hl "$@"; echo
+        echo -en " $EMR*$RST "; hl "$@"; echo
     fi
 }
 
