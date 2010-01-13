@@ -1,4 +1,4 @@
-# $Id: PKGBUILD 53217 2009-09-27 01:03:32Z thomas $
+# $Id: PKGBUILD 62602 2010-01-10 16:26:44Z thomas $
 # Maintainer: Thomas Bächler <thomas@archlinux.org>
 pkgname=mkinitcpio-busybox
 pkgver=1.15.3
@@ -7,16 +7,21 @@ pkgdesc="base initramfs tools"
 arch=('i686' 'x86_64')
 url="http://www.busybox.net/"
 license=('GPL')
-makedepends=("make" "gcc" "sed" "ncurses")
+depends=('glibc')
 source=(http://busybox.net/downloads/busybox-${pkgver}.tar.bz2
         config)
-md5sums=('6059ac9456de6fb18dc8ee4cd0ec9240'
-         'e6deeb866c49e55f5d9ef9ad9d6aa6bf')
+sha256sums=('d74020ad2cc5a4dcc5109c44dbd0e22582d6ce42954b0f1ff29763c8c0ff03cb'
+            '38644aca29dbd5fdff55e4d24bde660ed6a9fa16882c848f238e822ea99d510c')
 
 build() {
   cd "${srcdir}/busybox-${pkgver}"
-  
-  cp -f ${srcdir}/config .config
+
+  unset CFLAGS CXXFLAGS
+  if [ ${CARCH} = "x86_64" ]; then
+    sed 's|^CONFIG_EXTRA_CFLAGS=.*|CONFIG_EXTRA_CFLAGS="-march=x86-64 -mtune=generic -Os -pipe"|' "${srcdir}/config" > .config
+  else
+    sed 's|^CONFIG_EXTRA_CFLAGS=.*|CONFIG_EXTRA_CFLAGS="-march=i686 -mtune=generic -Os -pipe"|' "${srcdir}/config" > .config
+  fi
   make || return 1
   install -D -m755 busybox "${pkgdir}/lib/initcpio/busybox"
 }
