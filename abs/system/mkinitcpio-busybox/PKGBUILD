@@ -1,0 +1,23 @@
+# $Id: PKGBUILD 53217 2009-09-27 01:03:32Z thomas $
+# Maintainer: Thomas Bächler <thomas@archlinux.org>
+pkgname=mkinitcpio-busybox
+pkgver=1.15.3
+pkgrel=1
+pkgdesc="base initramfs tools"
+arch=('i686' 'x86_64')
+url="http://www.busybox.net/"
+license=('GPL')
+makedepends=("make" "gcc" "sed" "ncurses")
+source=(http://busybox.net/downloads/busybox-${pkgver}.tar.bz2
+        config)
+md5sums=('6059ac9456de6fb18dc8ee4cd0ec9240'
+         'e6deeb866c49e55f5d9ef9ad9d6aa6bf')
+
+build() {
+  cd "${srcdir}/busybox-${pkgver}"
+  
+  cp -f ${srcdir}/config .config
+  make || return 1
+  install -D -m755 busybox "${pkgdir}/lib/initcpio/busybox"
+}
+# vim:set ts=2 sw=2 et:
