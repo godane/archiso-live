@@ -96,5 +96,11 @@ if [ "$fah" ]; then
 	/etc/rc.d/foldingathome start
 fi
 
+ARCH=$(uname -m)
+if [  ${ARCH} = x86_64 ]; then
+	sed -i 's|i686|x86_64|g' /etc/pacman.d/mirrorlist
+	sed -i 's|i686|x86_64|g' /etc/pacman.d/kdemodmirrorlist
+fi
+
 sed -i 's/^.*DAEMONS.*/DAEMONS=(syslog-ng hal wicd slim)/' /etc/rc.conf 
 chmod -x /etc/rc.d/archlive

@@ -1,14 +1,15 @@
 # Maintainer: Michael Towers <gradgrind[at]online[dot]de>
-# 2008.12.17
+# 2009.05.29
 pkgname=larchin
-pkgver=6.0.2
+pkgver=6.1.2
 pkgrel=2
 
 pkgdesc="Arch hard disk installer with gui for larch live media"
 url="http://larch.berlios.de"
 depends=('pygtk' 'larchin-syscalls')
-arch=(i686 x86_64)
+arch=(any)
 license=('GPL')
+install=${pkgname}.install
 
 build() {
   mkdir -p ${startdir}/pkg/opt/larchin
@@ -16,6 +17,7 @@ build() {
   ${startdir}/compile.py ${startdir}/pkg/opt/larchin/modules
   cp -dr ${startdir}/etc ${startdir}/pkg
   cp -dr ${startdir}/run ${startdir}/pkg/opt/larchin
+  cp -dr ${startdir}/i18n ${startdir}/pkg/opt/larchin
   mkdir -p ${startdir}/pkg/usr/share/pixmaps
   cp ${startdir}/larchin1.jpg ${startdir}/pkg/usr/share/pixmaps
   cp ${startdir}/larchin.png ${startdir}/pkg/usr/share/pixmaps

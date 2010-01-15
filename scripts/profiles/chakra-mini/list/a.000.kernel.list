@@ -1,12 +1,6 @@
 -d kernel26
 -d kernel26-firmware
 -d vhba-module
--d v86d
--d fbsplash
--d fbsplash-theme-arch-black
--d fbsplash-themes-arch-banner
--d initscripts-extras-fbsplash
--d miscsplashutils
 #-d kernel26-headers
 #-d sqlzma
 -d squashfs-tools

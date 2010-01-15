@@ -1,7 +1,7 @@
 [Desktop Entry]
 Categories=Application;System
 Encoding=UTF-8
-Exec=sudo larchin.py
+Exec=sudo larchin
 Icon=larchin
 StartupNotify=true
 Terminal=false

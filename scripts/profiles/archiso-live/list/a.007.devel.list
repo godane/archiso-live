@@ -1,5 +1,6 @@
 # Development
 base-devel
+kernel26-headers
 git
 subversion
 cvs

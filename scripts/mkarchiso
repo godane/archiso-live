@@ -1,6 +1,5 @@
 #!/bin/bash
 
-CACHE="/var/cache/pacman/pkg"
 #PKGFILE="$(pwd)/packages.list"
 PKGLIST=""
 QUIET="n"
@@ -19,6 +18,8 @@ PROFILE=$(pwd)
 CPIOCONFIG="${PROFILE}/archiso-mkinitcpio.conf"
 OVERLAY="${PROFILE}/overlay"
 EXCLUDE="${PROFILE}/exclude"
+ARCH=i686
+#ARCH=x86_64
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
@@ -31,12 +32,6 @@ LIVELINUX="../../linux-live/initrd"
 
 if [ -f "${PROFILE}/config" ]; then
 	. ${PROFILE}/config
-fi
-
-if [ -f "${PROFILE}/pacman.conf" ]; then
-	PACMANCONF="${PROFILE}/pacman.conf"
-else
-	PACMANCONF="/etc/pacman.conf"
 fi
 
 APPNAME=$(basename "${0}")
@@ -55,7 +50,7 @@ usage ()
 	echo "    -b BOOT		Boot option (syslinux,grub,grub-gfx)"
 	echo "    -M MODULES       Modules for livecd. Default: ${MODULES}"
 	echo "    -m MODULESCOPY   Copy modules from a folder to modules place in IMGROOT. Default: none"
-	echo "    -a ADDON_DIR     Use addons from DIR. Default: none"
+	echo "    -a ARCH          Set the Arch type. Default: i686"
 	echo "    -t <iso,disk>    Type of image to create. Defaults to iso."
 	echo "    -v               Enable verbose output."
 	echo "    -h               This message."
@@ -79,7 +74,7 @@ while getopts 'i:P:b:M:m:a:t:c:nfvh' arg; do
 		b) BOOT="${OPTARG}" ;;
 		M) MODULES="${OPTARG}" ;;
 		m) MODULESCOPY="${OPTARG}" ;;
-		a) ADDON_DIR="${OPTARG}" ;;
+		a) ARCH="${OPTARG}" ;;
 		t) IMG_TYPE="${OPTARG}" ;;
 		c) CDNAME="${OPTARG}" ;;
 		n) NOLZMA="y" ;;
@@ -102,6 +97,12 @@ echo "ARGS: $@"
 if [ "$EUID" != "0" ]; then
 	error "error: This script must be run as root."
 	exit 1
+fi
+
+if [ -f "${PROFILE}/pacman.conf-${ARCH}" ]; then
+	PACMANCONF="${PROFILE}/pacman.conf-${ARCH}"
+else
+	PACMANCONF="/etc/pacman.conf"
 fi
 
 command_name="${1}"
@@ -137,6 +138,7 @@ fi
 info "${APPNAME} : Configuration Settings"
 echo "   mkinitcpio config file:   ${CPIOCONFIG}"
 #echo "   mount description file:   ${MOUNTFILE}"
+echo "                      arch:  ${ARCH}"
 echo "           profile folder:   ${PROFILE}"
 echo "         pacman.conf file:   ${PACMANCONF}"
 echo "                boot menu:   ${BOOT}"
@@ -427,7 +429,7 @@ command_install () {
 			remove "${union}/usr/share/icons/hicolor/icon-theme.cache"
 			remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
 			remove "${union}/usr/share/icons/nuoveXT2/icon-theme.cache"
-        	fi
+        fi
 
 		# remove the initcpio images that were generated for the host system
 		find "${union}/boot" -name *.img -delete

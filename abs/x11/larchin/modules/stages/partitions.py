@@ -1,6 +1,6 @@
 # partitions.py - Automatic partitioning and mount-point selection
 #
-# (c) Copyright 2008 Michael Towers <gradgrind[at]online[dot]de>
+# (c) Copyright 2008, 2009 Michael Towers <gradgrind[at]online[dot]de>
 #
 # This file is part of the larch project.
 #
@@ -19,7 +19,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2008.06.05
+# 2009.02.18
 
 from stage import Stage, ShowInfoWidget
 from partitions_gui import PartitionWidget
@@ -88,8 +88,14 @@ class Widget(Stage):
         self.swapsizeG = 0.0
         self.root = None    # To suppress writing before widget is created
 
+        self.swapfc = None  # To suppress errors due to widget not yet ready
         # swap size
         self.swapWidget()
+
+        self.swapfc = self.addCheckButton(_("Check for bad blocks "
+                "when formatting swap partition.\nClear this when running "
+                "in VirtualBox (it takes forever)."))
+        self.setCheck(self.swapfc, True)
 
         # home size
         self.homeWidget()
@@ -102,6 +108,8 @@ class Widget(Stage):
     def swapsize_cb(self, sizeG):
         self.swapsizeG = sizeG
         self.adjustroot()
+        if self.swapfc:
+            self.swapfc.set_sensitive(sizeG > 0.0)
 
     def homesize_cb(self, sizeG):
         self.homesizeG = sizeG
@@ -196,20 +204,21 @@ class Widget(Stage):
                 (swapC == 0) and (homeC == 0))
         # See partition formatting and fstab setting up for the
         # meaning of the flags
-        config = "/:%s%d:ext3:%s:%s" % (self.device, self.startpart,
-                install.FORMATFLAGS, install.MOUNTFLAGS)
+        config = "/:%s%d:%s:%s:%s" % (self.device, self.startpart,
+                install.DEFAULTFS, install.FORMATFLAGS, install.MOUNTFLAGS)
         self.startpart += 1
         if (swapC > 0):
+            format = "cformat" if self.getCheck(self.swapfc) else "format"
             startcyl = self.newpart(startcyl, endcyl, swapC,
                     (homeC == 0), True)
-            install.set_config("swaps", "%s%d:format:include" %
-                    (self.device, self.startpart))
+            install.set_config("swaps", "%s%d:%s:include" %
+                    (self.device, self.startpart, format))
             self.startpart += 1
 
         if (homeC > 0):
             startcyl = self.newpart(startcyl, endcyl, homeC, True)
-            config += "\n/home:%s%d:ext3:%s:%s" % (self.device, self.startpart,
-                    install.FORMATFLAGS, install.MOUNTFLAGS)
+            config += "\n/home:%s%d:%s:%s:%s" % (self.device, self.startpart,
+                    install.DEFAULTFS, install.FORMATFLAGS, install.MOUNTFLAGS)
 
         install.set_config("partitions", config)
         return 0

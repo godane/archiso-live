@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# ntfs-testrun
+
+# Do a test resize of the given (argument $1) NTFS partition, new size is $2.
+
+if ntfsresize -nP -s $2 $1; then echo -n '^OK^'; fi

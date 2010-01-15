@@ -6,3 +6,4 @@ VMLINUZ="boot/vmlinuz26"
 CDLABEL="Chakra-dvd"
 PUBLISHER="http://chakra-project.org/"
 AUTHOR="Chakra Team"
+NOLZMA=n

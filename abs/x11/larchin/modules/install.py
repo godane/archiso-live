@@ -4,7 +4,7 @@
 # be installed, which can be different to the one on which larchin is
 # running.
 #
-# (c) Copyright 2008 Michael Towers <gradgrind[at]online[dot]de>
+# (c) Copyright 2008,2009 Michael Towers <gradgrind[at]online[dot]de>
 #
 # This file is part of the larch project.
 #
@@ -23,7 +23,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2008.12.16
+# 2009.05.29
 
 from subprocess import Popen, PIPE, STDOUT
 import select
@@ -41,18 +41,26 @@ class installClass:
         #  1) Show which flags are available
         #  2) Show the defaults ('on' is capitalized)
         # Flags used to affect partition formatting (fs-type dependent usage):
-        # ext3::: c: disable boot-time checks, i:directory indexing,
-        #         f: full journal
-        self.FORMATFLAGS = "cIf"
+        # ext3/4::: i:directory indexing, f: full journal
+        self.FORMATFLAGS = "If"
         # Flags used to set mount options in /etc/fstab:
-        # a: noatime, d: nodiratime, m: noauto
-        self.MOUNTFLAGS = "ADm"
+        # a: noatime, m: noauto
+        self.MOUNTFLAGS = "Am"
+        # Default file-system for automatic partitioning
+        self.DEFAULTFS = "ext4"
 
         # Available file-systems for formatting
-        self.filesystems = ['ext3', 'reiserfs', 'ext2', 'jfs', 'xfs']
+        self.filesystems = ['ext4', 'ext3', 'reiserfs', 'ext2', 'jfs', 'xfs']
         # List of mount-point suggestions
         self.mountpoints = ['---', '/', '/home', '/boot', '/var',
                 '/opt', '/usr']
+
+        # By default use UUID for partitions, and for swap (if
+        # there is one). A problem with using UUID for swaps is that the
+        # partition might get reformatted by another installation,
+        # which would change the UUID!
+        self.use_uuid = True
+        self.use_uuid_swap = True
 
         self.host = host
 
@@ -190,6 +198,23 @@ class installClass:
         devices = []
         op = self.xcall("get-devices")
         for line in op.splitlines():
+            # In virtualbox with a fresh virtual disk, we can get this:
+            # "Error: /dev/sda: unrecognised disk label:"
+            em = line.split(":")
+            if (em[0].strip() == "Error" and (em[2].strip() ==
+                    "unrecognised disk label")):
+                dev = em[1].strip()
+                if popupWarning(_("Error scanning devices:\n %s\n"
+                        "Your disk (%s) seems to be empty and unformatted. "
+                        "Shall I prepare it for use (create an msdos "
+                        "partition table on it)?")
+                        % (line, dev)):
+                    op = self.xcall("make-parttable %s" % dev)
+                    if op:
+                        popupError(_("Couldn't create partition table:\n %s"))
+                    else:
+                        return self.listDevices()
+                continue
             devices.append(line.rstrip(';').split(':'))
         return devices
 
@@ -448,8 +473,12 @@ class installClass:
             swaps.append((ls[0], float(ls[1]) * 1024 / 1e9))
         return swaps
 
-    def swapFormat(self, p):
-        return self.xcall("swap-format %s" % p)
+    def swapFormat(self, p, c):
+        # If the partition alread has a UUID, keep it
+        uuid = self.getUUID(p).strip()
+        if uuid:
+            c += (" -U '%s'" % uuid)
+        return self.xcall("swap-format %s %s" % (c, p))
 
     def partFormat(self, part, format, options):
         return self.xcall("part-format %s %s %s" % (part, format, options))
@@ -540,6 +569,9 @@ class installClass:
                 slist.append(s.split(':'))
         return slist
 
+    def getUUID(self, part):
+        return self.xcall("get-blkinfo UUID %s" % part).strip()
+
     def fstab(self):
         """Build a suitable /etc/fstab for the newly installed system.
         """
@@ -568,9 +600,14 @@ class installClass:
                 pas = '0'
                 sysm = False
 
-            # Read format??? or just use 'auto'
-
-            s = "%-15s %-12s %-8s %s 0     %s\n" % (d, m, "auto", opt, pas)
+            # Read format? or just use 'auto'?
+            fstype = self.xcall("get-blkinfo TYPE %s" % d).strip() or "auto"
+            if self.use_uuid:
+                u = self.getUUID(d)
+                s = ("/dev/disk/by-uuid/%s %-12s %-8s %s 0     %s\n" %
+                        (u, m, fstype, opt, pas))
+            else:
+                s = "%-15s %-12s %-8s %s 0     %s\n" % (d, m, fstype, opt, pas)
             if sysm:
                 mmounts.append((m, s))
             else:
@@ -588,7 +625,9 @@ class installClass:
         fstab += "# Swaps\n"
         for p, f, i in self.getswaps():
             if i:
-                fstab += ("%-12s swap       swap   defaults        0     0\n"
+                if self.use_uuid_swap:
+                    p = ("/dev/disk/by-uuid/" + self.getUUID(p))
+                fstab += ("%s swap       swap   defaults        0     0\n"
                         % p)
 
         if xmounts:
@@ -602,8 +641,9 @@ class installClass:
             fstab += ("#/dev/%-6s /mnt/cd_%-4s auto"
                     "   user,noauto,exec,unhide 0     0\n" % (p, p))
 
-        # Add other partitions to /mnt if not already catered for
+        # Add other partitions to /mnt if not already catered for.
         # One shouldn't assume the existing device info is up to date.
+
         dl = []
         for devi in self.xcall("get-usableparts").splitlines():
             devi = devi.split()
@@ -615,12 +655,20 @@ class installClass:
             for devi in dl:
                 if (devi[1] == '+'):
                     # removable
-                    rmv = '_'
+                    pass
                 else:
-                    rmv = ''
-                fstype = devi[2].strip('"') or "auto"
-                fstab += ("#/dev/%-7s /mnt/%-7s %s    user,noauto,noatime"
-                        " 0     0\n" % (devi[0], devi[0]+rmv, fstype))
+                    fstype = devi[2].strip('"') or "auto"
+                    if self.use_uuid:
+                        u = self.getUUID("/dev/%s" % devi[0])
+                        s = ("#/dev/disk/by-uuid/%s /mnt/%-7s %s    "
+                                "user,noauto,noatime"
+                                " 0     0\n" % (u, devi[0], fstype))
+
+                    else:
+                        s = ("#/dev/%-7s /mnt/%-7s %s    user,noauto,noatime"
+                                " 0     0\n" % (devi[0], devi[0], fstype))
+
+                    fstab += s
 
         dl = []
         for dev in self.xcall("get-lvm").splitlines():
@@ -632,6 +680,12 @@ class installClass:
             for p in dl:
                 fstab += ("#/dev/mapper/%-6s /mnt/lvm_%-4s auto"
                     "   user,noauto,noatime 0     0\n" % (p, p))
+
+        fstab += ("\n# You may also want to add lines for removable devices,\n"
+                "# though it is recommended to let HAL deal with these.\n"
+                "# You will also need to create the mount point in /mnt.\n"
+                "# For example:\n"
+                "#/dev/sdb1 /mnt/usb    auto    user,noauto,noatime 0    0\n")
 
         fw = open("/tmp/larchin/fstab", "w")
         fw.write(fstab)

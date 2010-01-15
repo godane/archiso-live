@@ -1,6 +1,6 @@
 # installstart.py - summarize formatting and installation partitions
 #
-# (c) Copyright 2008 Michael Towers <gradgrind[at]online[dot]de>
+# (c) Copyright 2008, 2009 Michael Towers <gradgrind[at]online[dot]de>
 #
 # This file is part of the larch project.
 #
@@ -19,7 +19,7 @@
 #    51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 #----------------------------------------------------------------------------
-# 2008.12.16
+# 2009.02.18
 
 from stage import Stage
 from installstart_gui import PartTable
@@ -30,7 +30,20 @@ class Widget(Stage):
     def getHelp(self):
         return _("If you press OK now the chosen partitions will be"
                 " formatted and mounted and then the running system will"
-                " be copied onto them.")
+                " be copied onto them.\n"
+                "You can choose to use UUID rather than device names"
+                " (/dev/sda1 etc.) in /etc/fstab and GRUB. Although the"
+                " UUIDs look long, ugly and unmanageable, this has"
+                " the advantage that if - as can happen in systems with"
+                " more than one disk - the device names get swapped your"
+                " system will still work.\n"
+                "The UUID choice is made separately for swap because on"
+                " computers where a swap partition is shared between"
+                " different linux installations, it can happen that"
+                " a new installation changes the UUID (mean, but possible)."
+                " Then you must weigh up which danger is most likely."
+                " larchin should not change the UUID of an existing swap"
+                " partition.")
 
     def __init__(self):
         Stage.__init__(self, moduleDescription)
@@ -64,6 +77,12 @@ class Widget(Stage):
 
         self.addWidget(PartTable(plist))
 
+        self.uuid = self.addCheckButton(_("Use UUID instead of device name"))
+        self.setCheck(self.uuid, install.use_uuid)
+        self.uuid_swap = self.addCheckButton(
+                _("Use UUID instead of device name for swaps"))
+        self.setCheck(self.uuid_swap, install.use_uuid_swap)
+
     def getsize(self, part):
         """Get the size of a partition using the output of 'get-partsize'.
         """
@@ -74,6 +93,8 @@ class Widget(Stage):
             return "???"
 
     def forward(self):
+        install.use_uuid = self.getCheck(self.uuid)
+        install.use_uuid_swap = self.getCheck(self.uuid_swap)
         return 0
 
 

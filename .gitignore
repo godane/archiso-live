@@ -2,6 +2,8 @@ src/
 pkg/
 *.pkg.*
 .working/
+.working-i686/
+.working-x86_64/
 *.iso
 *.md5
 *.lzm

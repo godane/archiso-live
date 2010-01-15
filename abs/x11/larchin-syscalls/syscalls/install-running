@@ -1,0 +1,4 @@
+#! /bin/sh
+# install-running  - Test whether installation (larch-install) is still running
+
+pgrep larch-install | sed -r 's|^([0-9]*).*|\1|'

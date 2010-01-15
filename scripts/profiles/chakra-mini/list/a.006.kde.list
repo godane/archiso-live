@@ -17,3 +17,11 @@ kdemod-taskhandlers-stasks
 kdemod-themes-kdm-planet
 kdemod-themes-ksplash-planet
 kdemod-themes-wallpapers-planet
+# basic locale
+kdemod-kde-l10n-cs
+kdemod-kde-l10n-de
+kdemod-kde-l10n-en-gb
+kdemod-kde-l10n-es
+kdemod-kde-l10n-fr
+kdemod-kde-l10n-pl
+kdemod-kde-l10n-ru
