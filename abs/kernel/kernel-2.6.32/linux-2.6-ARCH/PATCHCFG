@@ -17,8 +17,8 @@ PATCHES=(
 
          # add aufs2 support, in reference to:
          # http://aufs.sourceforge.net
-         aufs2-base-20091203.patch%1
-         aufs2-standalone-20091203.patch%1
+         aufs2-base-20100116.patch%1
+         aufs2-standalone-20100116.patch%1
          # squashfs with lzma
          0001-Squashfs-move-zlib-decompression-wrapper-code-into.patch%1
          0002-Squashfs-Factor-out-remaining-zlib-dependencies-int.patch%1
