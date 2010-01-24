@@ -51,10 +51,20 @@ Server = http://arch-live.isawsome.net/packages/
 # and they will be used before the default mirrors.
 #[testing]
 #Include = /etc/pacman.d/mirrorlist
+#Server = ftp://ftp.archlinux.org/$repo/os/i686
+#Server = ftp://locke.suu.edu/linux/dist/archlinux/$repo/os/i686
+#Server = ftp://mirrors.unixheads.org/archlinux/$repo/os/i686
+#Server = ftp://ftp-linux.cc.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
+#Server = ftp://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/i686
+#Server = http://mirrors.easynews.com/linux/archlinux/$repo/os/i686
+#Server = ftp://ftp.ibiblio.org/pub/linux/distributions/archlinux/$repo/os/i686
+#Server = http://holmes.umflint.edu/archlinux/$repo/os/i686
+#Server = http://mirror.neotuli.net/arch/$repo/os/i686
 
 [core]
 # Add your preferred servers here, they will be used first
 #Include = /etc/pacman.d/mirrorlist
+Server = ftp://ftp.archlinux.org/$repo/os/i686
 Server = ftp://locke.suu.edu/linux/dist/archlinux/$repo/os/i686
 Server = ftp://mirrors.unixheads.org/archlinux/$repo/os/i686
 Server = ftp://ftp-linux.cc.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
@@ -70,6 +80,7 @@ Server = http://mirror.neotuli.net/arch/$repo/os/i686
 [extra]
 # Add your preferred servers here, they will be used first
 #Include = /etc/pacman.d/mirrorlist
+Server = ftp://ftp.archlinux.org/$repo/os/i686
 Server = ftp://locke.suu.edu/linux/dist/archlinux/$repo/os/i686
 Server = ftp://mirrors.unixheads.org/archlinux/$repo/os/i686
 Server = ftp://ftp-linux.cc.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
@@ -82,6 +93,7 @@ Server = http://mirror.neotuli.net/arch/$repo/os/i686
 [community]
 # Add your preferred servers here, they will be used first
 #Include = /etc/pacman.d/mirrorlist
+Server = ftp://ftp.archlinux.org/$repo/os/i686
 Server = ftp://locke.suu.edu/linux/dist/archlinux/$repo/os/i686
 Server = ftp://mirrors.unixheads.org/archlinux/$repo/os/i686
 Server = ftp://ftp-linux.cc.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
