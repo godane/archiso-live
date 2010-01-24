@@ -1,14 +1,15 @@
 # Maintainer: Matias Korhonen <webadmin@draco-vulgaris.net>
 pkgname=backintime
 pkgver=0.9.26
-pkgrel=1
+pkgrel=2
 pkgdesc="Back In Time is a simple backup system for Linux inspired from 'flyback project' and 'TimeVault'."
-arch=('i686' 'x86_64')
+#arch=('i686' 'x86_64')
+arch=('any')
 url="http://backintime.le-web.org/"
 license="GPL"
 
 if [ `which gnome-session` ]; then
-	depends=('python' 'pygtk' 'python-notify' 'gnome-python' 'rsync' 'meld' 'dcron')
+	depends=('python' 'pygtk' 'python-notify' 'gnome-python' 'rsync' 'meld' 'dcron' 'xorg-utils')
 	_de=gnome
 elif [ `which kdeinit4` ]; then
 	depends=('rsync' 'dcron' 'python' 'xorg-utils')
