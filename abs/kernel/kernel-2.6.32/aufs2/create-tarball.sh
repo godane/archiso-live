@@ -1,7 +1,7 @@
 #!/bin/sh
-AUFS2VERSION=""
+AUFS2VERSION="-32"
 KERNELVERSION=2.6.32
-GITSNAPSHOT=20091203
+GITSNAPSHOT=20100116
 # aufs2 (no -xx) for the latest -rc version.
 git clone http://git.c3sl.ufpr.br/pub/scm/aufs/aufs2-standalone.git aufs2-standalone.git
 cd aufs2-standalone.git
