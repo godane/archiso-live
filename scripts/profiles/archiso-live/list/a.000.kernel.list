@@ -28,8 +28,10 @@
 #-d speakup
 #-d speakup-utils
 # Firmware
+-d ar9170-fw
 -d rt2x00-rt61-fw
 -d rt2x00-rt71w-fw
+-d rt2870usb-fw
 -d iwlwifi-3945-ucode
 -d iwlwifi-4965-ucode
 -d iwlwifi-5000-ucode
