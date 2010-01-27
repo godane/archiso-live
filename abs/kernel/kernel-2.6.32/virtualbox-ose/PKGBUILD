@@ -1,17 +1,16 @@
 #Maintainer: Biru Ionut <ionut@archlinux.ro>
-pkgname=('virtualbox-ose' 'virtualbox-modules' 'virtualbox-ose-additions' 'virtualbox-ose-additions-modules')
 pkgbase=('virtualbox-ose')
-pkgver=3.1.0
-pkgrel=3live
+pkgname=('virtualbox-ose' 'virtualbox-modules' 'virtualbox-ose-additions' 'virtualbox-ose-additions-modules')
+pkgver=3.1.2
+pkgrel=2live
 arch=('i686')
 url='http://virtualbox.org'
 license=('GPL' 'custom')
 makedepends=('libstdc++5' 'bin86' 'dev86' 'iasl' 'libxslt' 'libxml2'
              'libxcursor' 'qt' 'libidl2' 'sdl_ttf' 'alsa-lib' 'pulseaudio'
-             'hal' 'libxtst' 'xalan-c' 'sdl' 'libxmu' 'curl' 'python')
+             'hal' 'libxtst' 'xalan-c' 'sdl' 'libxmu' 'curl' 'python' 'kernel26-headers>=2.6.32.3')
 source=(http://download.virtualbox.org/virtualbox/$pkgver/VirtualBox-$pkgver-OSE.tar.bz2
         '60-virtualbox.rules' 'LocalConfig.kmk' 'disable-update.patch')
-_kernver=2.6.32-ARCH
 
 build() {
     cd "$srcdir/VirtualBox-${pkgver}_OSE"
@@ -44,6 +43,7 @@ package_virtualbox-ose() {
 	        'pulseaudio: For PulseAudio Support'
 	        'python: For Python Support')
     install=virtualbox.install
+    provides=("virtualbox=${pkgver}")
 
     cd "$srcdir/VirtualBox-${pkgver}_OSE/out/linux.$BUILD_PLATFORM_ARCH/release/bin"
     rm -rf sdk tst* testcase SUPInstall SUPUninstall
@@ -94,9 +94,10 @@ package_virtualbox-ose() {
 }
 
 package_virtualbox-modules(){
+    _kernver=2.6.32-ARCH
     pkgdesc="Kernel modules for VirtualBox"
     license=('GPL')
-    depends=('kernel26>=2.6.32' 'kernel26<2.6.33')
+    depends=('kernel26>=2.6.32.3' 'kernel26<2.6.33')
     install=virtualbox-modules.install
 
     cd "$srcdir/VirtualBox-${pkgver}_OSE/out/linux.$BUILD_PLATFORM_ARCH/release/bin/src"
@@ -131,31 +132,31 @@ package_virtualbox-ose-additions(){
 	  "$pkgdir/usr/share/hal/fdi/policy/20thirdparty/90-vboxguest.fdi"  || return 1
     install -d "$pkgdir/usr/lib/dri"
     install -m755 VBoxOGL*.so "$pkgdir/usr/lib" || return 1
-    ln -sf /usr/lib/VBoxOGL.so $pkgdir/usr/lib/dri/vboxvideo_dri.so
 }
 package_virtualbox-ose-additions-modules(){
+    _kernver=2.6.32-ARCH
     pkgdesc="Kernel modules for VirtualBox Guest Additions"
     license=('GPL')
     install=virtualbox-ose-additions-modules.install
-    depends=('kernel26>=2.6.32' 'kernel26<2.6.33')
+    depends=('kernel26>=2.6.32.3' 'kernel26<2.6.33')
 
     cd "$srcdir/VirtualBox-${pkgver}_OSE/out/linux.$BUILD_PLATFORM_ARCH/release/bin/additions/src"
 
     cd vboxguest
     install -D -m644 vboxguest.ko \
-	"$pkgdir/lib/modules/${_kernver}/misc/vboxguest.ko" || return 1
+	"$pkgdir/lib/modules/$_kernver/misc/vboxguest.ko" || return 1
 
     cd ../vboxvfs
     install -D -m644 vboxvfs.ko \
-    	"$pkgdir/lib/modules/${_kernver}/misc/vboxvfs.ko" || return  1
- 
+    	"$pkgdir/lib/modules/$_kernver/misc/vboxvfs.ko" || return  1
+
     cd ../vboxvideo
     install -D -m644 vboxvideo.ko \
-	"$pkgdir/lib/modules/${_kernver}/misc/vboxvideo.ko" || return 1
+	"$pkgdir/lib/modules/$_kernver/misc/vboxvideo.ko" || return 1
 
     sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" "$startdir/virtualbox-ose-additions-modules.install" || return 1
 }
-md5sums=('442dff6ff4a8fe92d223d303b475a146'
+md5sums=('e7808f16114f5b1a65aa2df1aa33e1a7'
          '519d32d8c2408e0ed9d643f412117644'
-         '59e5406d5fc646c72ad0f872d1b97f4f'
+         '58e19502c2d461ad239608337a2e693a'
          'ca1c043c4015e8e145af34b5ba09547a')
