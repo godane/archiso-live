@@ -1,0 +1,30 @@
+pkgname=packer
+pkgver=20100129
+pkgrel=1
+pkgdesc="Bash wrapper for pacman and aur"
+url="http://github.com/bruenig/packer"
+license="GPL"
+arch=('i686' 'x86_64')
+makedepends=('git')
+depends=('grep' 'sed' 'coreutils' 'bash' 'wget' 'pacman')
+optdepends=('sudo: install and update packages as non-root'
+            'pacman-color: colorized output')
+_gitroot='git://github.com/bruenig/packer.git'
+_gitname='packer'
+
+build() {
+    cd "$startdir/src"
+  
+    msg "Connecting to github GIT server...."
+    
+    if [ -d "$startdir/src/$_gitname" ] ; then
+        cd $_gitname && git pull origin
+    else
+        git clone "$_gitroot"
+        cd $_gitname
+    fi
+      
+    mkdir -p "$startdir/pkg/usr/bin/"
+    install -m 755 packer "$startdir/pkg/usr/bin/packer"
+}
+
