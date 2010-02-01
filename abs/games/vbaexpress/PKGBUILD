@@ -1,14 +1,15 @@
 # Contributor: Achraf cherti <achrafcherti@gmail.com>
 pkgname=vbaexpress
 pkgver=1.2
-pkgrel=2
+pkgrel=3
 pkgdesc="A VisualBoyAdvance frontend to configure the emulator easily."
 arch=(i686)
 url="http://vbaexpress.tuxfamily.org"
-depends=('sdl' 'fltk' 'libxpm' 'visualboyadvance')
+depends=('sdl' 'fltk' 'libxpm' 'visualboyadvance' 'libpng>=1.4.0-2')
 makedepends=()
 source=(http://vbaexpress.tuxfamily.org/$pkgname-$pkgver.tar.gz)
 md5sums=('09aa109c9adf2b1e70fed04016546d89')
+license=('GPL')
 
 build() {
   cd $startdir/src/$pkgname-$pkgver
