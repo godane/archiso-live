@@ -2,7 +2,7 @@
 pkgbase=('virtualbox-ose')
 pkgname=('virtualbox-ose' 'virtualbox-modules' 'virtualbox-ose-additions' 'virtualbox-ose-additions-modules')
 pkgver=3.1.2
-pkgrel=2live
+pkgrel=3live
 arch=('i686')
 url='http://virtualbox.org'
 license=('GPL' 'custom')
@@ -40,8 +40,9 @@ package_virtualbox-ose() {
     optdepends=('qt: For VirtualBox GUI'
                 'libgl: For Shared OpenGL'
                 'libxt: For Shared Clipboard'
-	        'pulseaudio: For PulseAudio Support'
-	        'python: For Python Support')
+                'pulseaudio: For PulseAudio Support'
+                'python: For Python Support'
+                'consolekit: for acl support')
     install=virtualbox.install
     provides=("virtualbox=${pkgver}")
 
