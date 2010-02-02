@@ -43,3 +43,4 @@ gnome-games-extra-data
 libdvdcss
 ca-certificates-java
 libstdc++5
+python-chardet

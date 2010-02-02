@@ -5,6 +5,7 @@ crda
 nfs-utils
 netkit-bsd-finger
 netcfg
+rfkill
 pptpclient
 dnsutils
 dmraid

@@ -101,6 +101,7 @@ gtkdialog
 xdotool
 wmctrl
 #window manager
+gnome-session
 awesome
 fluxbox
 icewm
