@@ -1,8 +1,8 @@
 # $Id: PKGBUILD 64290 2010-01-19 18:48:21Z pierre $
 # Maintainer: Paul Mattal <pjmattal@elys.com>
 pkgname=aufs2
-pkgver=2.6.32_20100116
-pkgrel=2live
+pkgver=2.6.32_20100207
+pkgrel=1live
 _kernver=${pkgver%_*}-ARCH
 pkgdesc="Another Unionfs Implementation"
 arch=('i686' 'x86_64')
@@ -12,9 +12,10 @@ depends=('kernel26>=2.6.32.4' 'kernel26<2.6.33')
 makedepends=('kernel26-headers>=2.6.32' 'kernel26-headers<2.6.33')
 replaces=('aufs')
 install=${pkgname}.install
-source=(ftp://ftp.archlinux.org/other/aufs2/${pkgname}-${pkgver}.tar.gz)
+#source=(ftp://ftp.archlinux.org/other/aufs2/${pkgname}-${pkgver}.tar.gz)
+source=(${pkgname}-${pkgver}.tar.gz)
 options=(!makeflags)
-md5sums=('81371ca76d344ab09fde3a09efe4abcb')
+md5sums=('48583464dd2bb2ae48a44bdc58dc5ed7')
 
 build() {
   cd ${srcdir}/${pkgname}-${pkgver} || return 1
