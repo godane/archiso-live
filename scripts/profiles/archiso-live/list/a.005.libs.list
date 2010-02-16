@@ -33,7 +33,6 @@ gtkpod
 xsane
 gtk-recordmydesktop
 pan
-shaman
 homebank
 vym
 gpodder
@@ -44,3 +43,4 @@ libdvdcss
 ca-certificates-java
 libstdc++5
 python-chardet
+polkit-qt
