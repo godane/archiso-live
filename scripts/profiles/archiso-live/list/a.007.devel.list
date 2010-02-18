@@ -7,10 +7,12 @@ cvs
 scons
 pacbuilder-svn
 abs
-yaourt
+packer
 devtools
 pkgtools
 gdb
 distcc
 ruby
 vala
+mercurial
+bzrtools

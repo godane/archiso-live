@@ -1,0 +1,28 @@
+# vim: set ft=sh:
+
+install ()
+{
+    MODULES=""
+    BINARIES=""
+    FILES=""
+    SCRIPT="consolefont"
+    eval "$(grep -e "^CONSOLEFONT=" /etc/rc.conf)"
+    if [ -n "$CONSOLEFONT" ]; then
+        CONSOLEFONT_FILE_GZ="/usr/share/kbd/consolefonts/$CONSOLEFONT.psfu.gz"
+        if [ -e ${CONSOLEFONT_FILE_GZ} ]; then
+	        CONSOLEFONT_FILE="$(mktemp ${TMPDIR}/consolefont.psfu.XXXXXX)"
+	        zcat ${CONSOLEFONT_FILE_GZ} > ${CONSOLEFONT_FILE}
+	        add_file ${CONSOLEFONT_FILE} /consolefont.psfu
+	    else
+	        echo "consolefont: Font file does not exist or does not end with .psfu.gz"
+	        echo "consolefont: Only unicode fonts are supported at the moment."
+        fi
+    fi
+}
+
+help ()
+{
+cat<<HELPEOF
+  This hook loads consolefont specified in rc.conf during early userspace.
+HELPEOF
+}

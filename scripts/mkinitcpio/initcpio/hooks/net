@@ -1,0 +1,98 @@
+# vim: set ft=sh:
+run_hook ()
+{
+    local line i address netmask gateway dns0 dns1 rootserver rootpath defaultrootpath defaultserver
+
+    : > /ip_opts
+
+    if [ -n "${ip}" ]; then
+        # setup network and save some values
+        ipconfig "${ip}" | while read line; do
+            # echo ":: ${line}"
+            if [ "${line#"IP-Config:"}" != "${line}" ]; then
+                continue
+            fi
+            line="$(echo ${line} | sed -e 's/ :/:/g;s/: /=/g')"
+            for i in ${line}; do
+                case "${i}" in
+                    address=*)
+                        echo "${i}" >> /ip_opts
+                        ;;
+                    netmask=*)
+                        echo "${i}" >> /ip_opts
+                        ;;
+                    gateway=*)
+                        echo "${i}" >> /ip_opts
+                        ;;
+                    dns0=*)
+                        echo "${i}" >> /ip_opts
+                        ;;
+                    dns1=*)
+                        echo "${i}" >> /ip_opts
+                        ;;
+                    rootserver=*)
+                        echo "${i}" >> /ip_opts
+                        ;;
+                    rootpath=*)
+                        echo "${i}" >> /ip_opts
+                        ;;
+                esac
+            done
+        done
+
+        . /ip_opts
+
+        echo "IP-Config: ${address}/${netmask}"
+        echo "IP-Config: gw: ${gateway}    dns0: ${dns0}    dns1: ${dns1}"
+
+        # calculate nfs_server, nfs_path and nfs_option for later nfs mount
+        if [ "${root}" = "/dev/nfs" -o "${nfsroot}" != "" ]; then
+            # parse rootpath if defined by dhcp server
+            if [ -n "${rootpath}" ]; then
+                line="${rootpath}"
+                nfs_server="${line%%:*}"
+                [ "${nfs_server}" = "${line}" ] && nfs_server="${rootserver}"
+                defaultserver="${nfs_server}"
+                line="${line#*:}"
+                nfs_path="${line}"
+                defaultrootpath="${nfs_path}"
+            else
+                # define a default rootpath
+                if [ "${rootpath}" = "" ]; then
+                    defaultrootpath="/tftpboot/${address}"
+                fi
+            fi
+
+            # parse nfsroot if present (overrides rootpath)
+            if [ -n "${nfsroot}" ]; then
+                line="${nfsroot}"
+                nfs_server="${line%%:*}"
+                [ -z "${nfs_server}" ] && nfs_server="${defaultserver}"
+                line="${line#*:}"
+                nfs_path="${line%%,*}"
+                line="${line#"${nfs_path}"}"
+                [ -z "${nfs_path}" ] && nfs_path="${defaultrootpath}"
+                nfs_option="${line#","}"
+            fi
+
+            # ensure root and filesystem type are set proper for nfs boot
+            root="/dev/nfs"
+            rootfstype="nfs"
+
+            echo "NFS-Mount: ${nfs_server}:${nfs_path}"
+            # set mount handler for NFS
+            mount_handler="nfs_mount_handler"
+        fi
+    fi
+}
+
+nfs_mount_handler() {
+    if [ -z "$nfs_server" -o -z "$nfs_path" ]; then
+        err "Unable to mount root filesystem over NFS: wrong parameters."
+        echo "You are being dropped to a recovery shell"
+        echo " Type 'exit' to try and continue booting"
+        launch_interactive_shell
+        msg "Trying to continue (this will most likely fail) ..."
+    fi
+    nfsmount ${nfs_option:+-o ${nfs_option}} "${nfs_server}:${nfs_path}" "$1"
+}
