@@ -223,6 +223,36 @@
 					</action>
 				</item>
 			</menu>
+			<menu id="effects" label="Effects">
+			<item label="No effects">
+				<action name="Execute">
+					<execute>
+						~/.config/openbox/xcompmgr.sh unset
+					</execute>
+				</action>
+			</item>
+			<item label="Transparency">
+				<action name="Execute">
+					<execute>
+						~/.config/openbox/xcompmgr.sh set
+					</execute>
+				</action>
+			</item>
+			<item label="Transparency, fading">
+				<action name="Execute">
+					<execute>
+						~/.config/openbox/xcompmgr.sh setshaded
+					</execute>
+				</action>
+			</item>
+			<item label="Transparancy, fading shadows">
+				<action name="Execute">
+					<execute>
+						~/.config/openbox/xcompmgr.sh setshadowshade
+					</execute>
+				</action>
+			</item>
+		</menu>
 			<menu id="preferences-912735" label="System Settings">
 				<item label="rc.conf">
 					<action name="Execute">

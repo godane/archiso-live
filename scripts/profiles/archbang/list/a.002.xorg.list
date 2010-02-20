@@ -16,6 +16,8 @@ alsa-oss
 notification-daemon
 volwheel
 wicd
+wvdial
+xcompmgr
 #xorg-video-drivers
 xf86-video-apm
 xf86-video-ark
@@ -61,6 +63,7 @@ lxterminal
 openbox
 obconf
 obmenu
+obkey-dev
 conky
 tint2
 nitrogen
@@ -89,7 +92,7 @@ tango-icon-theme-extras
 desktop-file-utils
 gtk-engines
 #fonts
-#ttf-arbat
+ttf-arbat
 ttf-bitstream-vera
 ttf-dejavu
 ttf-liberation
