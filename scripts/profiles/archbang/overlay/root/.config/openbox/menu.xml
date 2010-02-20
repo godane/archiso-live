@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openbox_menu xmlns="http://openbox.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://openbox.org/                 file:///usr/share/openbox/menu.xsd">
+	<menu id="root-menu" label="Openbox 3.4">
+	<menu execute="~/.config/openbox/scripts/xdg-menu.py" id="dynamic_places" label="Programs"/>
+		<menu id="root-menu-741848" label="Internet">
+			<item label="firefox">
+				<action name="Execute">
+					<execute>
+						firefox
+					</execute>
+				</action>
+			</item>
+			<item label="centerim">
+				<action name="Execute">
+					<execute>
+						lxterminal -e &quot;centerim&quot;
+					</execute>
+				</action>
+			</item>
+			<item label="irssi">
+				<action name="Execute">
+					<execute>
+						lxterminal -e &quot;irssi&quot;
+					</execute>
+				</action>
+			</item>
+		</menu>
+		<menu id="graphics" label="Graphics">
+			<item label="GPicView Image Viewer">
+				<action name="Execute">
+					<execute>
+						gpicview
+					</execute>
+				</action>
+			</item>
+			<menu id="graphicsScreenshots" label="Take Screenshot">
+				<item label="Select area">
+					<action name="Execute">
+						<execute>
+							scrot -s
+						</execute>
+					</action>
+				</item>
+				<item label="Now">
+					<action name="Execute">
+						<execute>
+							scrot '%Y-%m-%d--%s_$wx$h_scrot.png' -e 'mv $f ~/ &amp; gpicview ~/$f'
+						</execute>
+					</action>
+				</item>
+				<item label="In 5 Seconds...">
+					<action name="Execute">
+						<execute>
+							scrot -d 5 '%Y-%m-%d--%s_$wx$h_scrot.png' -e 'mv $f ~/ &amp; gpicview ~/$f'
+						</execute>
+					</action>
+				</item>
+				<item label="In 10 Seconds...">
+					<action name="Execute">
+						<execute>
+							scrot -d 10 '%Y-%m-%d--%s_$wx$h_scrot.png' -e 'mv $f ~/ &amp; gpicview ~/$f'
+						</execute>
+					</action>
+				</item>
+			</menu>
+			<separator/>
+			<menu id="graphicsOnline" label="Online Tools">
+				<item label="Colour Lovers">
+					<action name="Execute">
+						<execute>
+							firefox http://www.colourlovers.com/
+						</execute>
+					</action>
+				</item>
+				<item label="Color Hunter">
+					<action name="Execute">
+						<execute>
+							firefox http://colorhunter.com/
+						</execute>
+					</action>
+				</item>
+				<item label="FavIcon from Pics">
+					<action name="Execute">
+						<execute>
+							firefox http://www.htmlkit.com/services/favicon/
+						</execute>
+					</action>
+				</item>
+				<item label="Image Hosting">
+					<action name="Execute">
+						<execute>
+							firefox http://www.zwixy.com/
+						</execute>
+					</action>
+				</item>
+				<item label="Image to ASCII">
+					<action name="Execute">
+						<execute>
+							firefox http://lunatic.no/ol/img2aschtml.php
+						</execute>
+					</action>
+				</item>
+				<item label="Vector Magic">
+					<action name="Execute">
+						<execute>
+							firefox http://vectormagic.stanford.edu/
+						</execute>
+					</action>
+				</item>
+			</menu>
+		</menu>
+		<menu id="tools" label="Tools &amp; Utilities">
+			<item label="catfish">
+				<action name="Execute">
+					<execute>
+						catfish
+					</execute>
+				</action>
+			</item>
+			<item label="Recorder">
+				<action name="Execute">
+					<execute>
+						recorder
+					</execute>
+				</action>
+			</item>
+			<item label="Xarchiver">
+				<action name="Execute">
+					<execute>
+						xarchiver
+					</execute>
+				</action>
+			</item>
+			<item label="Leafpad">
+				<action name="Execute">
+					<execute>
+						leafpad
+					</execute>
+				</action>
+			</item>
+			<item label="PcMan File Manager">
+				<action name="Execute">
+					<execute>
+						pcmanfm
+					</execute>
+				</action>
+			</item>
+			<item label="pcmanfm (root)">
+				<action name="Execute">
+					<execute>
+						sudo pcmanfm
+					</execute>
+				</action>
+			</item>
+			<separator/>
+			<item label="Advanced Bash Guide">
+				<action name="Execute">
+					<execute>
+						firefox http://tldp.org/LDP/abs/html/
+					</execute>
+				</action>
+			</item>
+			<item label="LinuxCommand.org">
+				<action name="Execute">
+					<execute>
+						firefox http://www.linuxcommand.org/
+					</execute>
+				</action>
+			</item>
+		</menu>
+		<separator/>
+		<menu id="preferences" label="Preferences">
+			<menu id="conkyconfig" label="Conky Config">
+				<item label="Edit .conkyrc">
+					<action name="Execute">
+						<execute>
+							leafpad ~/.conkyrc
+						</execute>
+					</action>
+				</item>
+			</menu>
+			<menu id="obConfig" label="Openbox Config">
+				<item label="Edit menu.xml">
+					<action name="Execute">
+						<execute>
+							leafpad ~/.config/openbox/menu.xml
+						</execute>
+					</action>
+				</item>
+				<item label="Edit rc.xml">
+					<action name="Execute">
+						<execute>
+							leafpad ~/.config/openbox/rc.xml
+						</execute>
+					</action>
+				</item>
+				<item label="Edit autostart.sh">
+					<action name="Execute">
+						<execute>
+							leafpad ~/.config/openbox/autostart.sh
+						</execute>
+					</action>
+				</item>
+				<item label="GUI Menu Editor">
+					<action name="Execute">
+						<execute>
+							obmenu
+						</execute>
+					</action>
+				</item>
+				<item label="GUI Config Tool">
+					<action name="Execute">
+						<execute>
+							obconf
+						</execute>
+					</action>
+				</item>
+				<item label="Obkey">
+					<action name="Execute">
+						<execute>
+							obkey
+						</execute>
+					</action>
+				</item>
+			</menu>
+			<menu id="preferences-912735" label="System Settings">
+				<item label="rc.conf">
+					<action name="Execute">
+						<execute>
+							leafpad /etc/rc.conf
+						</execute>
+					</action>
+				</item>
+				<item label="xorg.conf">
+					<action name="Execute">
+						<execute>
+							leafpad /etc/X11/xorg.conf
+						</execute>
+					</action>
+				</item>
+			</menu>
+			<menu id="tint2config" label="tint2 Panel Config">
+				<item label="Edit config file">
+					<action name="Execute">
+						<execute>
+							leafpad ~/.config/tint2/tint2rc
+						</execute>
+					</action>
+				</item>
+			</menu>
+			<item label="Change wallpaper">
+				<action name="Execute">
+					<execute>
+						nitrogen /usr/share/wallpapers
+					</execute>
+				</action>
+			</item>
+			<item label="User Interface Settings">
+				<action name="Execute">
+					<execute>
+						lxappearance
+					</execute>
+				</action>
+			</item>
+		</menu>
+		<menu id="system" label="System">
+			<item label="Disk Partitioner">
+				<action name="Execute">
+					<execute>
+						sudo gparted
+					</execute>
+				</action>
+			</item>
+			<item label="System Upgrade">
+				<action name="Execute">
+					<execute>
+						xterm -e &quot;sudo bauerbill -Syyu&quot;
+					</execute>
+				</action>
+			</item>
+		</menu>
+		<menu execute="python ~/.config/openbox/scripts/gweather.py Montreal" id="pipe-weather" label="Weather"/>
+		<separator/>
+		<item label="Reboot">
+			<action name="Execute">
+				<execute>
+					sudo reboot
+				</execute>
+			</action>
+		</item>
+		<item label="Exit">
+			<action name="Execute">
+				<execute>
+					sudo shutdown -h now
+				</execute>
+			</action>
+		</item>
+	</menu>
+</openbox_menu>
+

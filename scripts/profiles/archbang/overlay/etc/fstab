@@ -1,0 +1,5 @@
+none		/		none
+/dev/sda5	swap		swap	defaults	0	0
+none		/dev/pts	devpts	defaults	0	0
+none		/dev/shm	tmpfs	defaults	0	0
+LABEL=archbang	/bootcd		auto	ro,user,noauto	0	0
