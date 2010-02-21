@@ -1,8 +1,7 @@
 wicd-client &
 nitrogen --restore &
+#pcmanfm -d &
 tint2 &
-#thunar --daemon &
-lxpanel &
 conky -q &
 volwheel &
 parcellite &

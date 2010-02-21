@@ -1,0 +1,130 @@
+! rxvt-unicode ---------------------------------------------------------------
+
+! font preference
+urxvt*font:      -*-terminus-*-*-*-*-*-*-*-*-*-*-*-*
+urxvt*boldFont:  -*-terminus-*-*-*-*-*-*-*-*-*-*-*-*
+!initial size
+urxvt*geometry:           120x35
+!internal whitespace
+urxvt*internalBorder:     5
+!fade text n% upon unfocus
+urxvt*fading:             20
+!darken=(0 to 100) lighten=(-1 to -100)
+urxvt*shading:            30
+!tint background with this color
+urxvt*tintColor:          black
+!set to 32-bit for real transparency (compositing required)
+!urxvt*depth:             24
+!save n lines of scrollback buffer
+urxvt*saveLines:          32767
+!flash screen for attention
+urxvt*visualBell:         true
+!jump to bottom (prompt) on keypress
+urxvt*scrollTtyKeypress:  true
+!jump to bottom (prompt) when tty gets new lines
+urxvt*scrollWithBuffer:   false
+!jump to bottom (prompt) on tty output
+urxvt*scrollTtyOutput:    false
+!toggle scrollbar
+urxvt*scrollBar:          false
+!scrollbar styles: rxvt, plain, next or xterm
+urxvt*scrollstyle:        plain
+!scrollbar alignment
+urxvt*scrollBar_right:    true
+urxvt*scrollColor:        #777777
+urxvt*cursorColor:        #ffcc00
+!is this a login shell?
+urxvt*loginShell:         true
+!set the TERM environment variable
+urxvt*termName:           rxvt-unicode
+!enable pseudo-transparency (requires depth: 24 (see above))
+urxvt*inheritPixmap:      true
+!delimiters for double-click mouse selection
+urxvt*cutchars:           "()*,<>[]{}|'
+!screen dump settings
+urxvt*print-pipe:         cat > $(echo urxvt.dump.$(date +'%Y%M%d%H%m%S'))
+!secondary screen scroll (default enabled)
+urxvt*secondaryScroll:    true
+!de-iconify (map) on receipt of a bell character
+urxvt*mapAlert:           true
+!inhibit writing record into the system log file utmp
+urxvt*utmpInhibit:        true
+!! BEGIN urlLauncher settings !!
+urxvt*perl-lib:           /usr/lib/urxvt/perl/
+urxvt*perl-ext-common:    default,matcher
+urxvt*urlLauncher:        /usr/bin/firefox
+urxvt*matcher.button:     1
+!! END urlLauncher settings !!
+
+!transparent=0000 opaque=ffff
+urxvt*background: rgba:1111/1111/1111/dddd
+
+! xpdf 
+-----------------------------------------------------------------------
+
+xpdf*enableFreetype:    yes
+xpdf*antialias:         yes
+xpdf*foreground:        black
+xpdf*background:        white
+xpdf*urlCommand:        /usr/bin/firefox %s
+
+
+! xscreensaver 
+---------------------------------------------------------------
+
+!font settings
+xscreensaver.Dialog.headingFont:  -*-dina-bold-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.Dialog.bodyFont:     -*-dina-medium-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.Dialog.labelFont:        -*-dina-medium-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.Dialog.unameFont:          -*-dina-medium-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.Dialog.buttonFont:         -*-dina-bold-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.Dialog.dateFont:           -*-dina-medium-r-*-*-12-*-*-*-*-*-*-*
+xscreensaver.passwd.passwdFont:         -*-dina-bold-r-*-*-12-*-*-*-*-*-*-*
+!general dialog box (affects main hostname, username, password text)
+xscreensaver.Dialog.foreground:         #ffffff
+xscreensaver.Dialog.background:         #111111
+xscreensaver.Dialog.topShadowColor:     #111111
+xscreensaver.Dialog.bottomShadowColor:  #111111
+xscreensaver.Dialog.Button.foreground:  #666666
+xscreensaver.Dialog.Button.background:  #ffffff
+!username/password input box and date text colour
+xscreensaver.Dialog.text.foreground:    #666666
+xscreensaver.Dialog.text.background:    #ffffff
+xscreensaver.Dialog.internalBorderWidth:24
+xscreensaver.Dialog.borderWidth:        20
+xscreensaver.Dialog.shadowThickness:    2
+!timeout bar (background is actually determined by 
+Dialog.text.background)
+xscreensaver.passwd.thermometer.foreground:  #ff0000
+xscreensaver.passwd.thermometer.background:  #000000
+xscreensaver.passwd.thermometer.width:       8
+!datestamp format--see the strftime(3) manual page for details
+xscreensaver.dateFormat:    %I:%M%P %a %b %d, %Y
+
+! Xft settings ---------------------------------------------------------------
+
+Xft.dpi:        96
+Xft.antialias:  true
+Xft.rgba:       rgb
+Xft.hinting:    true
+Xft.hintstyle:  hintslight
+
+! xterm ----------------------------------------------------------------------
+
+xterm*geometry:           80x25
+xterm*faceName:           terminusbold:pixelsize=14
+!xterm*font:             -*-terminus-*-*-16-*-*-*-*-*-*-*
+xterm*dynamicColors:      true
+xterm*utf8:               2
+xterm*eightBitInput:      true
+xterm*saveLines:          512
+xterm*scrollTtyKeypress:  true
+xterm*scrollTtyOutput:    false
+xterm*scrollBar:          true
+xterm*rightScrollBar:     true
+xterm*loginShell:         true
+xterm*jumpScroll:         true
+xterm*multiScroll:        true
+xterm*toolBar:            false
+
+

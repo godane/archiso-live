@@ -10,6 +10,13 @@
 					</execute>
 				</action>
 			</item>
+			<item label="rtorrent">
+				<action name="Execute">
+					<execute>
+						lxterminal -e &quot;rtorrent&quot;
+					</execute>
+				</action>
+			</item>
 			<item label="centerim">
 				<action name="Execute">
 					<execute>
@@ -21,6 +28,13 @@
 				<action name="Execute">
 					<execute>
 						lxterminal -e &quot;irssi&quot;
+					</execute>
+				</action>
+			</item>
+			<item label="weechat">
+				<action name="Execute">
+					<execute>
+						lxterminal -e &quot;weechat-curses&quot;
 					</execute>
 				</action>
 			</item>
@@ -109,6 +123,15 @@
 				</item>
 			</menu>
 		</menu>
+		<menu id="audio" label="Sound &amp; Video">
+			<item label="VLC">
+				<action name="Execute">
+					<execute>
+						vlc
+					</execute>
+				</action>
+			</item>
+		</menu>
 		<menu id="tools" label="Tools &amp; Utilities">
 			<item label="catfish">
 				<action name="Execute">
@@ -128,6 +151,13 @@
 				<action name="Execute">
 					<execute>
 						xarchiver
+					</execute>
+				</action>
+			</item>
+			<item label="HTop">
+				<action name="Execute">
+					<execute>
+						lxterminal -e &quot;htop&quot;
 					</execute>
 				</action>
 			</item>
