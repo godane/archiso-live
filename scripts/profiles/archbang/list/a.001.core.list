@@ -35,7 +35,6 @@ dvd+rw-tools
 powertop
 cpufreqd
 laptop-mode-tools
-nmap
 rsync
 setuptools
 bcwipe
@@ -49,19 +48,10 @@ weechat
 screen
 rtorrent
 fuseiso
-tor
-privoxy
 centerim
 nano
 wireless_tools
 bauerbill
-#recoverly-tools
-ddrescue
-testdisk
-sleuthkit
-autopsy
-magicrescue
-foremost
 #server
 apache
 lighttpd

@@ -10,3 +10,12 @@ gimp
 abiword
 gnumeric
 transmission-gtk
+gpsdrive
+#libs
+openobex
+libnet
+libnids
+gd
+rrdtool
+libmcrypt
+mhash

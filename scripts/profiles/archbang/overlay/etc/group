@@ -2,7 +2,7 @@ root::0:root
 bin::1:root,bin,daemon
 daemon::2:root,bin,daemon
 sys::3:root,bin
-adm::4:root,daemon
+adm::4:root,daemon,live
 tty::5:arch
 disk::6:root,live
 lp::7:daemon
