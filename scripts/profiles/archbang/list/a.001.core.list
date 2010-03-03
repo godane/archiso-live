@@ -50,6 +50,9 @@ rtorrent
 fuseiso
 centerim
 nano
+parted
+ethtool
+sg3_utils
 wireless_tools
 bauerbill
 #server
