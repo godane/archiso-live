@@ -1,5 +1,5 @@
-# $Id: PKGBUILD 11596 2010-02-14 23:26:01Z ibiru $
-#Maintainer: Biru Ionut <ionut@archlinux.ro>
+# $Id: PKGBUILD 12111 2010-02-27 14:50:18Z ibiru $
+#Maintainer: Ionut Biru <ibiru@archlinux.org>
 pkgbase=('virtualbox-ose')
 pkgname=('virtualbox-ose' 'virtualbox-modules' 'virtualbox-ose-additions' 'virtualbox-ose-additions-modules')
 pkgver=3.1.4
