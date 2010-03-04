@@ -10,7 +10,7 @@ fi
 
 WORKDIR=.working-${ARCH}
 DATE="$(date +%F)"
-CDNAME="archbang"
+CDNAME="archbang-live"
 ISONAME=$CDNAME-${DATE}-${ARCH}.iso
 
 

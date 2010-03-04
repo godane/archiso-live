@@ -341,6 +341,13 @@
 		</menu>
 		<menu execute="python ~/.config/openbox/scripts/gweather.py Montreal" id="pipe-weather" label="Weather"/>
 		<separator/>
+		<item label="Logout">
+			<action name="Execute">
+				<execute>
+					oblogout
+				</execute>
+			</action>
+		</item>
 		<item label="Reboot">
 			<action name="Execute">
 				<execute>

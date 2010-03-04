@@ -27,7 +27,7 @@ cpu_avg_samples 2
 override_utf8_locale no
 
 TEXT
-${image ~/.alogo.png -p 20,0 -s 40x40}${offset 80}${voffset 20}${color white}ArchBang 1.05${color}
+${image ~/.alogo.png -p 20,0 -s 40x40}${offset 80}${voffset 20}${color white}ArchBang-Live${color}
 
 
 SYSTEM INFO:
