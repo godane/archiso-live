@@ -1,0 +1,51 @@
+{
+   "HostReferralList": [  ],
+   "StartupDNSPrefetchList": [  ],
+   "browser": {
+      "window_placement": {
+         "bottom": 722,
+         "left": 15,
+         "maximized": false,
+         "right": 1019,
+         "top": 3,
+         "work_area_bottom": 740,
+         "work_area_left": 0,
+         "work_area_right": 1024,
+         "work_area_top": 1
+      }
+   },
+   "shutdown": {
+      "num_processes": 1,
+      "num_processes_slow": 0,
+      "type": 1
+   },
+   "uninstall_metrics": {
+      "installation_date2": "1265169403",
+      "launch_count": "2",
+      "uptime_sec": "11"
+   },
+   "user_experience_metrics": {
+      "initial_logs": [  ],
+      "ongoing_logs": [  ],
+      "session_id": 1,
+      "stability": {
+         "breakpad_registration_fail": 0,
+         "breakpad_registration_ok": 0,
+         "crash_count": 0,
+         "debugger_not_present": 0,
+         "debugger_present": 0,
+         "exited_cleanly": true,
+         "incomplete_session_end_count": 0,
+         "last_timestamp_sec": "1265169418",
+         "launch_count": 2,
+         "launch_time_sec": "1265169416",
+         "page_load_count": 0,
+         "plugin_stats2": [  ],
+         "renderer_crash_count": 0,
+         "renderer_hang_count": 0,
+         "session_end_completed": true,
+         "stats_version": "4.0.249.64-devel",
+         "uptime_sec": "11"
+      }
+   }
+}

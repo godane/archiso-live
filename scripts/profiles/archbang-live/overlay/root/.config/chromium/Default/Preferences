@@ -1,0 +1,43 @@
+{
+   "browser": {
+      "ntp": {
+         "promo_image_remaining": 3,
+         "promo_line_remaining": 3
+      }
+   },
+   "download": {
+      "directory_upgrade": true,
+      "extensions_to_open": ""
+   },
+   "extensions": {
+      "autoupdate": {
+         "next_check": "12909643298359124"
+      },
+      "settings": {
+
+      }
+   },
+   "ntp": {
+      "most_visited_blacklist": {
+
+      },
+      "pinned_urls": {
+
+      },
+      "pref_version": 1,
+      "shown_sections": 29,
+      "tips_cache": {
+
+      },
+      "tips_cache_update": ""
+   },
+   "profile": {
+      "exited_cleanly": true,
+      "id": "not-signed-in",
+      "name": "",
+      "nickname": ""
+   },
+   "session": {
+      "urls_to_restore_on_startup": [  ]
+   }
+}

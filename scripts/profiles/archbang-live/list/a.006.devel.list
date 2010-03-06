@@ -1,0 +1,18 @@
+# Development
+base-devel
+kernel26-headers
+git
+subversion
+cvs
+scons
+pacbuilder-svn
+abs
+packer
+devtools
+pkgtools
+gdb
+distcc
+ruby
+vala
+bzr
+bzrtools

@@ -1,0 +1,57 @@
+background yes
+use_xft yes
+xftfont Arbat-Bold:size=8
+xftalpha 1
+update_interval 1.0
+total_run_times 0
+own_window yes
+own_window_transparent yes
+own_window_type normal
+own_window_hints undecorated,below,sticky,skip_taskbar,skip_pager
+double_buffer yes
+minimum_size 200 200
+maximum_width 240
+draw_shades yes
+draw_outline no
+draw_borders no
+draw_graph_borders no
+default_color white
+default_shade_color black
+default_outline_color white
+alignment top_right
+gap_x 12
+gap_y 12
+no_buffers yes
+uppercase no
+cpu_avg_samples 2
+override_utf8_locale no
+
+TEXT
+${image ~/.alogo.png -p 20,0 -s 40x40}${offset 80}${voffset 20}${color white}ArchBang-Live${color}
+
+
+SYSTEM INFO:
+${hr}
+Host:$alignr$nodename
+Uptime:$alignr$uptime
+RAM:$alignr$mem/$memmax
+Swap usage:$alignr$swap/$swapmax
+Disk usage:$alignr${fs_used /}/${fs_size /}
+CPU usage:$alignr${cpu cpu0}%
+Battery:$alignr$battery
+
+
+SHORTCUT KEYS:
+${hr}
+Alt+F2$alignr Run Dialog
+Super+space$alignr Main Menu
+Super+tab$alignr Client Menu
+Super+t$alignr Terminal
+Super+f$alignr File Manager
+Super+e$alignr Editor
+Super+m$alignr Media Player
+Super+w$alignr Web Browser
+Super+u$alignr System Update
+Super+q$alignr xkill
+Super+v$alignr Volume Manager
+PrtSc$alignr Screenshot
