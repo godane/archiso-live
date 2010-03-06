@@ -287,14 +287,14 @@
 				<item label="rc.conf">
 					<action name="Execute">
 						<execute>
-							leafpad /etc/rc.conf
+							sudo leafpad /etc/rc.conf
 						</execute>
 					</action>
 				</item>
 				<item label="xorg.conf">
 					<action name="Execute">
 						<execute>
-							leafpad /etc/X11/xorg.conf
+							sudo leafpad /etc/X11/xorg.conf
 						</execute>
 					</action>
 				</item>
@@ -324,6 +324,13 @@
 			</item>
 		</menu>
 		<menu id="system" label="System">
+			<item label="Installer">
+				<action name="Execute">
+					<execute>
+						lxterminal -e &quot;sudo ab-install&quot;
+					</execute>
+				</action>
+			</item>
 			<item label="Disk Partitioner">
 				<action name="Execute">
 					<execute>
