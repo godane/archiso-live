@@ -1,5 +1,6 @@
 base
 archiso-installer
+parted
 inetutils
 crda
 nfs-utils
