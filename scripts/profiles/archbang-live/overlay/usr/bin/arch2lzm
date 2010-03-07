@@ -79,7 +79,7 @@ merge()
 	pacman -Sw "$1" --needed --noconfirm --cachedir $CACHE
 	
 	# PKG varible to list all packages in caches to install
-	PKG=$(ls $CACHE/*.pkg.tar.gz) 
+	PKG=$(ls $CACHE/*.pkg.tar.*z) 
 	CWD=$(pwd)
 	
 	mkdir -p $TMPDIR/var/lib/pacman/local
@@ -149,7 +149,7 @@ mergelist()
 		pacman -Sw --needed --noconfirm --cachedir $CACHE "$PKGNAME" 
 	done
 	
-	PKG=$(ls $CACHE/*.pkg.tar.gz)
+	PKG=$(ls $CACHE/*.pkg.tar.*z)
 	pacman -U --needed -d -r $TMPDIR $PKG
 	MODULE=$(basename "$1" .lzm).lzm
 	
@@ -244,7 +244,7 @@ addlist()
 		pacman -Syu -d -r $UNION --noconfirm
 	else
 		pacman -Sw -d "$PKGNAME" --noconfirm
-		PKG=$(ls /var/cache/pacman/pkg/$PKGNAME-[0-9]*.pkg.tar.gz)
+		PKG=$(ls /var/cache/pacman/pkg/$PKGNAME-[0-9]*.pkg.tar.*z)
 		#PKG=$(ls /var/cache/pacman/pkg/*.pkg.tar.gz)
 		pacman -U -f -d -r $UNION $PKG
 	fi
@@ -271,13 +271,13 @@ pkg()
 	#sync
 
 	pacman -Sw "$1" --noconfirm
-	PKG=$(ls /var/cache/pacman/pkg/$1-[0-9]*.pkg.tar.gz | tail -1)
+	PKG=$(ls /var/cache/pacman/pkg/$1-[0-9]*.pkg.tar.*z | tail -1)
 	
 	pacman -U -d -r $TMPDIR $PKG
 	
 	echo "Creating module ..."
 
-	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.gz).lzm"
+	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.*z).lzm"
 	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
 	
 	if [ $? -ne 0 ]; then 
@@ -296,7 +296,7 @@ aur()
 	
 	#if [ $(whereis yaourt) ]; then
 	yaourt -Sw "$1" --noconfirm
-	PKG=$(ls /var/cache/pacman/pkg/$1-[0-9]*.pkg.tar.gz)
+	PKG=$(ls /var/cache/pacman/pkg/$1-[0-9]*.pkg.tar.*z)
 	yaourt -U -d -r $TMPDIR $PKG
 	#else
 	#pacman -Sw "$1" --noconfirm
@@ -305,7 +305,7 @@ aur()
 	
 	echo "Creating module ..."
 
-	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.gz).lzm"
+	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.*z).lzm"
 	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
 	
 	if [ $? -ne 0 ]; then 
@@ -320,12 +320,12 @@ local()
 {
 	TMPDIR="$(pwd)/pkg2lzm$$"
 	mkdir -p $TMPDIR/var/lib/pacman/local
-	PKG=$(ls $1-[0-9]*.pkg.tar.gz)
+	PKG=$(ls $1-[0-9]*.pkg.tar.*z)
 	pacman -U -d -r $TMPDIR $PKG
 	
 	echo "Creating module ..."
 
-	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.gz).lzm"
+	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.*z).lzm"
 	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
 
 	if [ $? -ne 0 ]; then 
