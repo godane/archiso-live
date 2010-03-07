@@ -23,19 +23,6 @@ if [ "$AUTOCMD" != "" ]; then
    su --login -c "$AUTOCMD"
 fi
 
-VOL=$(cmdline_value "vol")
-if [ "$VOL" != "" ]; then
-   echo "Setting sound volume: ${VOL}%"
-   for SCONTROL in {"Master","PCM","Front","Surround","Center","CD","Video"}; do
-     /usr/bin/amixer -q sset $SCONTROL ${VOL}% unmute 2>/dev/null
-   done
-else
-   echo "Setting sound volume: 90%"
-   for SCONTROL in {"Master","PCM","Front","Surround","Center","CD","Video"}; do
-     /usr/bin/amixer -q sset $SCONTROL 90% unmute 2>/dev/null
-   done
-fi
-
 # ldconfig: Updates dynamic library cache. Useful when new modules are
 # added to the live cd.
 if [ "`cmdline_parameter ldconfig`" ]; then
@@ -103,5 +90,5 @@ if [  ${ARCH} = x86_64 ]; then
 	sed -i 's|i686|x86_64|g' /etc/pacman.d/kdemodmirrorlist
 fi
 
-sed -i 's/^.*DAEMONS.*/DAEMONS=(syslog-ng hal wicd slim)/' /etc/rc.conf 
+sed -i 's/^.*DAEMONS.*/DAEMONS=(syslog-ng hal sound wicd slim)/' /etc/rc.conf 
 chmod -x /etc/rc.d/archlive
