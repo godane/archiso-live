@@ -1,5 +1,7 @@
 #!/bin/bash
 
+. /usr/lib/liblinuxlive
+
 VOL=$(cmdline_value "vol")
 if [ "$VOL" != "" ]; then
    echo "Setting sound volume: ${VOL}%"

@@ -735,13 +735,15 @@ installpkg() {
     # execute install in a subshell so we can follow its progress
     # pacman output goes /tmp/unsquashfs.log
     # /tmp/setup-install-running acts as a lockfile
-    DIR="bin boot etc home lib opt root sbin srv tmp usr var"
+    DIR="bin boot etc home lib opt sbin srv usr var"
     
     ( \
 		echo "Currently installing..." >/tmp/install.log ; \
         touch /tmp/setup-install-running ; \
     for i in $DIR ;do mkdir -p $DESTDIR/$i;done ; \
     for i in $DIR ;do cp -ar /$i/* $DESTDIR/$i;done &>/dev/null ;\
+    cp -ar /root $DESTDIR/root ; \
+    mkdir -p $DESTDIR/tmp ; \
         echo $? > /tmp/.install-retcode ; \
         if [ $(cat /tmp/.install-retcode) -ne 0 ]; then
             echo -e "\nError while installating !!" >>/tmp/install.log

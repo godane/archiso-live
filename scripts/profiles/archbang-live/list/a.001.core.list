@@ -55,6 +55,8 @@ ethtool
 sg3_utils
 wireless_tools
 bauerbill
+iptables
+dhcp
 #server
 apache
 lighttpd
