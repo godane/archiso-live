@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openbox_menu xmlns="http://openbox.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://openbox.org/                 file:///usr/share/openbox/menu.xsd">
 	<menu id="root-menu" label="Openbox 3.4">
-	<menu execute="~/.config/openbox/scripts/xdg-menu.py" id="dynamic_places" label="Programs"/>
+		<menu execute="~/.config/openbox/scripts/xdg-menu.py" id="dynamic_places" label="Programs"/>
 		<menu id="root-menu-741848" label="Internet">
 			<item label="firefox">
 				<action name="Execute">
@@ -200,6 +200,148 @@
 		</menu>
 		<separator/>
 		<menu id="preferences" label="Preferences">
+			<menu id="preferences-83221" label="Keyboard Config">
+				<item label="American layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap us
+						</execute>
+					</action>
+				</item>
+				<item label="Belgian layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap be
+						</execute>
+					</action>
+				</item>
+				<item label="Brazilian layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap br
+						</execute>
+					</action>
+				</item>
+				<item label="British layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap gb
+						</execute>
+					</action>
+				</item>
+				<item label="Bulgarian layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap bg
+						</execute>
+					</action>
+				</item>
+				<item label="Canadian layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap ca
+						</execute>
+					</action>
+				</item>
+				<item label="Czech layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap cz
+						</execute>
+					</action>
+				</item>
+				<item label="Danish layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap dk
+						</execute>
+					</action>
+				</item>
+				<item label="Dutch layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap nl
+						</execute>
+					</action>
+				</item>
+				<item label="French layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap fr
+						</execute>
+					</action>
+				</item>
+				<item label="German layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap de
+						</execute>
+					</action>
+				</item>
+				<item label="Hungarian layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap hu
+						</execute>
+					</action>
+				</item>
+				<item label="Icelandic layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap is
+						</execute>
+					</action>
+				</item>
+				<item label="Italian layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap it
+						</execute>
+					</action>
+				</item>
+				<item label="Norwegian layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap no
+						</execute>
+					</action>
+				</item>
+				<item label="Polish layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap pl
+						</execute>
+					</action>
+				</item>
+				<item label="Portuguese layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap pt
+						</execute>
+					</action>
+				</item>
+				<item label="Russian layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap ru
+						</execute>
+					</action>
+				</item>
+				<item label="Spanish layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap es
+						</execute>
+					</action>
+				</item>
+				<item label="Swedish layout">
+					<action name="Execute">
+						<execute>
+							setxkbmap se
+						</execute>
+					</action>
+				</item>
+			</menu>
 			<menu id="conkyconfig" label="Conky Config">
 				<item label="Edit .conkyrc">
 					<action name="Execute">
@@ -254,35 +396,35 @@
 				</item>
 			</menu>
 			<menu id="effects" label="Effects">
-			<item label="No effects">
-				<action name="Execute">
-					<execute>
+				<item label="No effects">
+					<action name="Execute">
+						<execute>
 						~/.config/openbox/xcompmgr.sh unset
-					</execute>
-				</action>
-			</item>
-			<item label="Transparency">
-				<action name="Execute">
-					<execute>
+						</execute>
+					</action>
+				</item>
+				<item label="Transparency">
+					<action name="Execute">
+						<execute>
 						~/.config/openbox/xcompmgr.sh set
-					</execute>
-				</action>
-			</item>
-			<item label="Transparency, fading">
-				<action name="Execute">
-					<execute>
+						</execute>
+					</action>
+				</item>
+				<item label="Transparency, fading">
+					<action name="Execute">
+						<execute>
 						~/.config/openbox/xcompmgr.sh setshaded
-					</execute>
-				</action>
-			</item>
-			<item label="Transparancy, fading shadows">
-				<action name="Execute">
-					<execute>
+						</execute>
+					</action>
+				</item>
+				<item label="Transparancy, fading shadows">
+					<action name="Execute">
+						<execute>
 						~/.config/openbox/xcompmgr.sh setshadowshade
-					</execute>
-				</action>
-			</item>
-		</menu>
+						</execute>
+					</action>
+				</item>
+			</menu>
 			<menu id="preferences-912735" label="System Settings">
 				<item label="rc.conf">
 					<action name="Execute">
@@ -371,4 +513,3 @@
 		</item>
 	</menu>
 </openbox_menu>
-
