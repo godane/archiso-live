@@ -1,9 +1,6 @@
 vlc
 unetbootin
-virtualbox-ose
 pidgin
-gtkpod
-arista
 epdfview
 gimp
 abiword
@@ -13,14 +10,8 @@ audacious-plugins
 transmission-gtk
 hardinfo
 comix
-mplayer
-gnome-mplayer
-gecko-mediaplayer
 gpodder
-deluge
-devede
-#kismet
-#gpsdrive
+xfburn
 #others
 pan
 gftp

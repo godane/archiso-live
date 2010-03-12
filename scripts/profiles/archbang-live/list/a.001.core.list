@@ -57,6 +57,16 @@ wireless_tools
 bauerbill
 iptables
 dhcp
+nmap
+clamav
+gnu-netcat
+wipe
+# Forensic
+dcfldd
+ddrescue
+testdisk
+chkrootkit
+sleuthkit
 #server
 apache
 lighttpd

@@ -14,5 +14,5 @@ gdb
 distcc
 ruby
 vala
-bzr
+mercurial
 bzrtools
