@@ -72,7 +72,6 @@ fi
 
 #chown arch:users -R /home/arch
 #chown root:root -R /root
-chown live:users -R /home/live
 
 acerone=$(cmdline_parameter acerone)
 if [ "$acerone" ]; then
