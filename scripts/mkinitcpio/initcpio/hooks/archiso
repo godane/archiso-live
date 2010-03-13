@@ -56,6 +56,12 @@ _mnt_squashfs() {
     export LOOP_NUM=$(( $LOOP_NUM + 1 ))
 }
 
+#_mnt_changes () {
+#	if [ "x${changes}" != "x" ]; then
+        
+#	fi
+#}
+
 _mount_tmpfs () {
     #if [ "x${ramdisk_size}" = "x" ]; then
         ramdisk_size="3M"
@@ -85,65 +91,41 @@ run_hook () {
     found=0
     
     modprobe -q isofs >/dev/null 2>&1
-    msg -n "Scanning cd drives: "
-    for cdrom in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sg[0-9]*; do
-    	[ ! -e "${cdrom}" ] && continue
-        bootcdmnt="$(_device_mountdir ${cdrom})"
-        mkdir -p "${bootcdmnt}"
-    	if mount -r -t iso9660 "${cdrom}" "${bootcdmnt}" >/dev/null 2>&1; then
-    	    if [ -f "${bootcdmnt}/${findiso}" ]; then
+    modprobe -q ext4 >/dev/null 2>&1
+    msg -n "Scanning drives: "
+    for device in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sg[0-9]* /dev/sd[a-z][0-9]; do
+		[ ! -e "${device}" ] && continue
+        FSTYPE=$(blkid -o value -s TYPE ${device})
+        bootmnt="$(_device_mountdir ${device})"
+        mkdir -p "${bootmnt}"
+    	if mount -t ${FSTYPE} "${device}" "${bootmnt}" >/dev/null 2>&1; then
+    	    if [ -f "${bootmnt}/${findiso}" ]; then
                 found=1
-                msg "${cdrom}"; echo
-                BOOT_MOUNT="${bootcdmnt}"
+                msg "${device}"; echo
+                BOOT_MOUNT="${bootmnt}"
                 break
-            elif [ -f "${bootcdmnt}/base.lzm" ]; then
-                found=1
-                msg "${cdrom}"; echo
-                BOOT_MOUNT="${bootcdmnt}"
-                break
-            fi
-        else
-            msg "uhm"; echo
-            err "Failed to mount ${cdrom}"
-        fi
-        [ ${found} -eq 0 ] && umount "${bootcdmnt}" >/dev/null 2>&1
-    done
-
-    if [ ${found} -eq 0 ]; then
-        msg -n "Scanning usb drivers: "
-        for usb in /dev/sd[a-z][0-9]; do
-            [ ! -e "${usb}" ] && continue
-            bootusbmnt="$(_device_mountdir ${usb})"
-            mkdir -p "${bootusbmnt}"
-            if mount -t vfat "${usb}" "${bootusbmnt}" >/dev/null 2>&1 ||\
-               mount -t ext2 "${usb}" "${bootusbmnt}" >/dev/null 2>&1; then
-                if [ -f "${bootusbmnt}/${findiso}" ]; then
+            elif [ "x${from}" != "x" ]; then
+                from=$(basename ${from})
+                if [ -f "${bootmnt}/${from}/base.lzm" ]; then
                     found=1
-                    msg "${usb}"; echo
-                    BOOT_MOUNT="${bootusbmnt}"
+                    msg "${device}"; echo
+                    BOOT_MOUNT="${bootmnt}"
                     break
-                elif [ "x${from}" != "x" ]; then
-                    from=$(basename ${from})
-                    if [ -f "${bootusbmnt}/${from}/base.lzm" ]; then
-                        found=1
-                        msg "${usb}"; echo
-                        BOOT_MOUNT="${bootusbmnt}"
-                        break
-                    fi
-                else
-                    if [ -f "${bootusbmnt}/base.lzm" ]; then
-                        found=1
-                        msg "${usb}"; echo
-                        BOOT_MOUNT="${bootusbmnt}"
-                        break
-                    fi
                 fi
             else
-                err "Failed to mount ${usb}"
-            fi
-            [ ${found} -eq 0 ] && umount "${bootusbmnt}" >/dev/null 2>&1
-        done
-    fi
+                if [ -f "${bootmnt}/base.lzm" ]; then
+                    found=1
+                    msg "${device}"; echo
+                    BOOT_MOUNT="${bootmnt}"
+                    break
+                fi
+            fi   
+        else
+            msg "uhm"; echo
+            err "Failed to mount ${device}"
+        fi
+        [ ${found} -eq 0 ] && umount "${bootmnt}" >/dev/null 2>&1
+    done
 
     if [ ${found} -eq 0 ]; then
         err "cannot find boot device, cannot continue..."
@@ -172,7 +154,7 @@ run_hook () {
         exit 1
     fi
 
-	if [ "x${findiso}" != "x" ]; then
+    if [ "x${findiso}" != "x" ]; then
         if [ -f "${BOOT_MOUNT}/${findiso}" ]; then
             _mnt_iso "${BOOT_MOUNT}/${findiso}"
             BOOT_ORIG="${BOOT_MOUNT}"
@@ -185,11 +167,11 @@ run_hook () {
             _mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
         fi
     elif [ "x${from}" != "x" ]; then
-        _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm"
+       _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm"
     else
-    	_mnt_squashfs "${BOOT_MOUNT}/base.lzm"
+       _mnt_squashfs "${BOOT_MOUNT}/base.lzm"
     fi
-
+    
     echo "aufs / aufs defaults 0 0" > /real_root/etc/fstab
     mount -o move ${BOOT_MOUNT} /real_root/mnt/$(basename ${BOOT_MOUNT})
     if [ "x${findiso}" != x ]; then
