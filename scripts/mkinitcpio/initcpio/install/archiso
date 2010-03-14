@@ -9,7 +9,7 @@ install ()
     fi
     BINARIES=""
     #FILES="/usr/lib/liblinuxlive"
-    FiLES=""
+    FILES=""
     add_dir /real_root
     add_dir /tmpfs
     add_dir /bootmnt

@@ -56,11 +56,35 @@ _mnt_squashfs() {
     export LOOP_NUM=$(( $LOOP_NUM + 1 ))
 }
 
-#_mnt_changes () {
-#	if [ "x${changes}" != "x" ]; then
-        
-#	fi
-#}
+_mnt_changes () {
+	changes="$1"
+	#fstype="$2"
+	found=0
+	msg "finding changes folder..."
+	for device in /dev/sd[a-z][0-9]; do
+		[ ! -e "${device}" ] && continue
+		FSTYPE=$(blkid -o value -s TYPE ${device})
+		changesmnt="$(_device_mountdir ${device})"
+        mkdir -p "${changesmnt}"
+        if [ ${FSTYPE} != vfat -o ${FSTYPE} != ntfs ]; then
+			if mount -t ${FSTYPE} "${device}" "${changesmnt}" >/dev/null 2>&1; then
+				if [ -d "${changesmnt}/$(basename ${changes})" ]; then
+					found=1
+					msg "${device}"; echo
+					CHANGES_MOUNT="${changesmnt}"
+					break
+				fi
+			else
+				#msg "uhm"; echo
+				err "Failed to mount changes ${device}"
+			fi
+		else
+			err "Not the right filesystem type.Use memory."
+		fi
+        [ ${found} -eq 0 ] && umount "${changesmnt}" >/dev/null 2>&1
+	done
+	export CHANGES_MOUNT
+}
 
 _mount_tmpfs () {
     #if [ "x${ramdisk_size}" = "x" ]; then
@@ -174,10 +198,16 @@ run_hook () {
     
     echo "aufs / aufs defaults 0 0" > /real_root/etc/fstab
     mount -o move ${BOOT_MOUNT} /real_root/mnt/$(basename ${BOOT_MOUNT})
-    if [ "x${findiso}" != x ]; then
+    if [ "x${findiso}" != "x" ]; then
         mount -o move ${BOOT_ORIG} /real_root/mnt/$(basename ${BOOT_ORIG})
     fi
-
+    
+    if [ "x${changes}" != "x" ]; then
+		_mnt_changes ${changes}
+		mkdir -p /real_root/mnt/$(basename ${CHANGES_MOUNT}) >/dev/null 2>&1
+		mount -o move ${CHANGES_MOUNT} /real_root/mnt/$(basename ${CHANGES_MOUNT})
+    fi
+    
     if [ "${break}" = "y" ]; then
         msg ":: Break requested, type 'exit' to resume operation"
         PS1="ramfs$ " /bin/sh -i
