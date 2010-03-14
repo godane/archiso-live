@@ -341,6 +341,10 @@ fs_options()
    if [ "$1" = "ntfs-3g" ]; then
       echo ",locale=$(locale_id)"
    fi
+   
+   if [ "$1" = "ext3" -o "$1" = "ext4" ]; then
+      echo ",barrier=1,data=ordered"
+   fi
 }
 
 # discover filesystem used on the given device
@@ -877,6 +881,7 @@ modprobe_essential_modules()
    modprobe_module aufs brs=1
    modprobe_module ext2
    modprobe_module ext3
+   modprobe_module ext4
    modprobe_module reiserfs
    modprobe_module xfs
    modprobe_module vfat

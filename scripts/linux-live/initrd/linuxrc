@@ -34,7 +34,7 @@ debug_shell
 
 # make sure ext3 partitions are not mounted using ext2 driver,
 # and vfat partitions are not mounted using msdos driver
-echo -e "ext3\next2\nvfat\n*" >/etc/filesystems
+echo -e "ext4\next3\next2\nvfat\n*" >/etc/filesystems
 
 mkdir -p $UNION
 mkdir -p $MEMORY
