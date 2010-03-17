@@ -30,6 +30,14 @@ ROOT_MOD="$(ls -1 ${PROFILE}/list | head -1)"
 CDNAME="livecd"
 LIVELINUX="../../linux-live/initrd"
 
+if [ "${NOLZMA}" = "y" ]; then
+	EXT="sqfs"
+	MKOPTION="-comp gzip"
+else
+	EXT="lzm"
+	MKOPTION="-comp lzma -b 256k"
+fi
+
 if [ -f "${PROFILE}/config" ]; then
 	. ${PROFILE}/config
 fi
@@ -126,14 +134,6 @@ if [ "x${BOOT}" = "x" ]; then BOOT="syslinux"; fi
 [ "x${imgname}" = "x" ] && (warn "Bootable image name must be specified" && usage 1)
 [ "x${work_dir}" = "x" ] && (warn "please specify a working directory" && usage 1)
 
-if [ "${NOLZMA}" = "y" ]; then
-	EXT="sqfs"
-	OPTION="-comp gzip"
-else
-	EXT="lzm"
-	OPTION=""
-fi
-
 
 info "${APPNAME} : Configuration Settings"
 echo "   mkinitcpio config file:   ${CPIOCONFIG}"
@@ -203,10 +203,10 @@ mksquash ()
 		MOD="$(basename $DIR).${EXT}"
 		info "Building module $MOD"
 		if [ "${QUIET}" = "y" ]; then
-			#/sbin/mksquashfs ${ROOT}/$DIR ${moduleplace}/$MOD -keep-as-directory -noappend -ef exclude ${OPTION}> /dev/null
+			#/sbin/mksquashfs ${ROOT}/$DIR ${moduleplace}/$MOD -keep-as-directory -noappend -ef exclude ${MKOPTION}> /dev/null
 			mksquashfs $1${DIR} ${moduleplace}/$MOD $2 $3 $4 $5 $6 $7 >/dev/null
 		else
-			#/sbin/mksquashfs ${ROOT}/$DIR ${moduleplace}/$MOD -keep-as-directory -noappend -ef exclude ${OPTION}
+			#/sbin/mksquashfs ${ROOT}/$DIR ${moduleplace}/$MOD -keep-as-directory -noappend -ef exclude ${MKOPTION}
 			mksquashfs $1${DIR} ${moduleplace}/$MOD $2 $3 $4 $5 $6 $7
 		fi
 		chmod 0755 ${moduleplace}/$MOD
@@ -245,9 +245,9 @@ command_livebackup ()
 	fi
 	
 	if [ -f "${EXCLUDE}" ]; then
-		mksquash / -keep-as-directory -noappend -ef ${EXCLUDE} ${OPTION}
+		mksquash / -keep-as-directory -noappend -ef ${EXCLUDE} ${MKOPTION}
 	else
-		mksquash / -keep-as-directory -noappend ${OPTION}
+		mksquash / -keep-as-directory -noappend ${MKOPTION}
 	fi
 	
 }
@@ -521,9 +521,9 @@ command_overlay () {
 	#find "${OVERLAY}" -name ".svn" -type d > exclude
 
 	if [ "${QUIET}" = "y" ]; then
-		mksquashfs "${OVERLAY}" "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}" -noappend ${OPTION} >/dev/null
+		mksquashfs "${OVERLAY}" "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}" -noappend ${MKOPTION} >/dev/null
 	else
-		mksquashfs "${OVERLAY}" "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}" -noappend ${OPTION}
+		mksquashfs "${OVERLAY}" "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}" -noappend ${MKOPTION}
 	fi
 
 	#rm exclude
@@ -545,7 +545,7 @@ command_squash () {
 	for DIR in $MODULES; do
 		MOD="$(basename $DIR).${EXT}"
 		if [ ! "$(find "$IMGROOT/$CDNAME" -name "$MOD")" ]; then
-			mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${OPTION}
+			mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${MKOPTION}
 			# subtrack module in updated.list file if it exist
 			if [ $(cat ${packlist}/updated.list | grep $DIR) ]; then
 				sed -i "s|$DIR||g" ${packlist}/updated.list
@@ -559,7 +559,7 @@ command_squash () {
 	if [ "$MODULES" = "" ]; then
 		info "Not build modules"
 	else
-		mksquash ${moduledir}/ -noappend ${OPTION}
+		mksquash ${moduledir}/ -noappend ${MKOPTION}
 	fi
 
 	if [ "${MOVE_MODULES}" != "" ]; then
