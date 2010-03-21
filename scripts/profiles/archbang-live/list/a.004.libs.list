@@ -12,5 +12,10 @@ hardinfo
 comix
 gpodder
 xfburn
+claws-mail
 #libs
 recordmydesktop
+iso-codes
+libxklavier
+lm_sensors
+rrdtool

@@ -6,4 +6,4 @@ fbpanel &
 conky -q &
 volwheel &
 parcellite &
-#adeskbar &
+adeskbar &

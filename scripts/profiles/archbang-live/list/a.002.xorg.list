@@ -84,7 +84,9 @@ gpicview
 zenity
 gksu
 fbpanel
-slock
+adeskbar
+xdg-utils
+xlockmore
 #larchin
 thunar
 # login manager
@@ -105,3 +107,10 @@ ttf-dejavu
 ttf-liberation
 ttf-ms-fonts
 gsfonts
+#window manager
+gnome-session
+awesome
+fluxbox
+icewm
+lxde
+e17-svn

@@ -13,6 +13,14 @@ virtualbox-ose
 arista
 gtkpod
 xchm
+audacity
+lmms
+hydrogen
+blender
+cinelerra-cv
+miro
+#games
+gnome-games
 #libs
 openobex
 libnet
@@ -35,3 +43,7 @@ libelf
 perl-io-socket-ssl
 net-snmp
 libdvdcss
+fltk
+gtkglext
+gtkglextmm
+libglademm

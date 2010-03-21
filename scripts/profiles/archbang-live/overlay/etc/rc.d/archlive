@@ -29,36 +29,12 @@ if [ "`cmdline_parameter ldconfig`" ]; then
     [[ -x /sbin/ldconfig ]] && /sbin/ldconfig
 fi
 
-# lang: Override default language
-lang="`cmdline_value lang`"
-if [ "$lang" ]; then
-    locale-gen
-    # Make firefox match OS locale
-    #if [ -f /usr/lib/firefox-3.0/defaults/preferences/firefox-I10n.js ]; then
-    # 	echo "pref("general.useragent.locale", "$lang")" > /usr/lib/firefox-3.0/defaults/preferences/firefox-I10n.js
-    #fi
-fi
-
 # Make thunderbird match OS locale
 #if [ -w /usr/lib/thunderbird-2.0/greprefs/all.js ]; then
 #    sed -i -e 's/pref("intl.locale.matchOS",                 false);/pref("intl.locale.matchOS",                 true);/g' /usr/lib/thunderbird/greprefs/all.js
 #fi
 
 depmod -a
-
-# keyb: Override default keyboard layout
-keyb="`cmdline_value keyb`"
-if [ "$keyb" ]; then
-   if [ -x /bin/loadkeys ]; then
- 	/bin/loadkeys $keyb
-   fi
-fi
-
-session="`cmdline_value session`"
-if [ "$session" != "" ]; then
-	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/X11/xinit/xinitrc
-	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/skel/.xinitrc
-fi
 
 chmod 0440 /etc/sudoers
 
@@ -89,5 +65,5 @@ if [  ${ARCH} = x86_64 ]; then
 	sed -i 's|i686|x86_64|g' /etc/pacman.d/kdemodmirrorlist
 fi
 
-sed -i 's/^.*DAEMONS.*/DAEMONS=(syslog-ng hal sound wicd slim)/' /etc/rc.conf 
+sed -i 's/^.*DAEMONS.*/DAEMONS=(syslog-ng hal config wicd slim)/' /etc/rc.conf 
 chmod -x /etc/rc.d/archlive

@@ -2,7 +2,7 @@ mplayer
 gnome-mplayer
 gecko-mediaplayer
 avidemux-gtk
-kino
+#kino
 pitivi
 rawstudio
 inkscape
@@ -13,3 +13,9 @@ virtualbox-ose
 arista
 gtkpod
 xchm
+audacity
+lmms
+hydrogen
+blender
+#cinelerra-cv
+miro
