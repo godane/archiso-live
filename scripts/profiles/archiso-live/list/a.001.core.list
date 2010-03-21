@@ -1,6 +1,5 @@
 base
 archiso-installer
-parted
 inetutils
 crda
 nfs-utils
@@ -36,7 +35,6 @@ dvd+rw-tools
 powertop
 cpufreqd
 laptop-mode-tools
-nmap
 rsync
 setuptools
 bcwipe
@@ -50,15 +48,27 @@ weechat
 screen
 rtorrent
 fuseiso
+centerim
+nano
+parted
+ethtool
+sg3_utils
+wireless_tools
+bauerbill
+iptables
+dhcp
+nmap
+clamav
+gnu-netcat
+wipe
 tor
 privoxy
-#recoverly-tools
+# Forensic
+dcfldd
 ddrescue
 testdisk
+chkrootkit
 sleuthkit
-autopsy
-magicrescue
-foremost
 #server
 apache
 lighttpd

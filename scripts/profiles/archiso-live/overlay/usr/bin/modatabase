@@ -36,7 +36,7 @@ pkg()
 	
 	#if [ $(whereis yaourt) ]; then
 	pacman -Sw "$1" --noconfirm
-	PKG=$(ls /var/cache/pacman/pkg/$1-[0-9]*.pkg.tar.gz)
+	PKG=$(ls /var/cache/pacman/pkg/$1-[0-9]*.pkg.tar.*z)
 	pacman -U -d -r $TMPDIR $PKG
 	#else
 	#pacman -Sw "$1" --noconfirm
@@ -45,7 +45,7 @@ pkg()
 	
 	echo "Creating module ..."
 
-	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.gz).lzm"
+	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.*z).lzm"
 	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
 	
 	if [ $? -ne 0 ]; then 

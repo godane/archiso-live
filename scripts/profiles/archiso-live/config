@@ -1,6 +1,6 @@
 #ROOT_MOD="a.001.core"
-MOVE_MODULES="ap.010.xlibs ap.011.xapps" # ap.012.games" # z.avidemux z.blender z.hydrogen-svn z.inkscape z.kino z.lmms"
-MODULES="a.000.kernel a.001.core a.002.xorg a.003.xfce a.004.firefox a.005.libs a.006.apps a.007.devel a.008.java a.009.games ${MOVE_MODULES}"
+MOVE_MODULES="ap.008.xlibs ap.009.xapps ap.010.games" # ap.012.games" # z.avidemux z.blender z.hydrogen-svn z.inkscape z.kino z.lmms"
+MODULES="a.000.kernel a.001.core a.002.xorg a.003.firefox a.004.libs a.005.apps a.006.devel a.007.xfce ${MOVE_MODULES}"
 DELDIR="usr/share/doc usr/share/devhelp usr/share/gtk-doc usr/share/wallpapers"
 KERNEL="/etc/mkinitcpio.d/kernel26.kver"
 VMLINUZ="boot/vmlinuz26"
@@ -8,3 +8,4 @@ CDLABEL="Archiso-Live"
 PUBLISHER="http://godane.wordpress.com/"
 AUTHOR="Christopher Rogers aka Godane"
 NOLZMA=n
+MKOPTION="-comp lzma -b 256k"

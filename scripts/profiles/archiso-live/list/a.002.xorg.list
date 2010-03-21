@@ -11,6 +11,13 @@ xorg-xinit
 xterm
 xorg-input-drivers
 mesa
+alsa-utils
+alsa-oss
+notification-daemon
+volwheel
+wicd
+wvdial
+xcompmgr
 #xorg-video-drivers
 xf86-video-apm
 xf86-video-ark
@@ -49,57 +56,57 @@ freeglut
 xaw3d
 enca
 glproto
-#fonts
-ttf-dejavu
-ttf-liberation
-ttf-ms-fonts
-gsfonts
-# sound
-alsa-lib
-alsa-utils
-alsa-oss
-# icon
+mesa
+lxappearance
+leafpad
+lxterminal
+terminal
+openbox
+obconf
+obmenu
+oblogout
+obkey-dev
+conky
+tint2
+nitrogen
+pcmanfm
+gmrun
+ghex
+gparted
+gnome-menus
+recorder
+parcellite
+notification-daemon
+scrot
+catfish
+xarchiver
+gpicview
+zenity
+gksu
+fbpanel
+adeskbar
+xdg-utils
+xlockmore
+#larchin
+thunar
+# login manager
+slim
+# archlinux stuff
+archlinux-themes-slim
+#icons
 hicolor-icon-theme
 tango-icon-theme
 gnome-icon-theme
 tango-icon-theme-extras
 desktop-file-utils
-# login manager
-slim
-# archlinux stuff
-archlinux-themes-slim
-archlinux-menus
-archlinux-xdg-menu
-# gtk engines
 gtk-engines
-#xfce deps
-ghostscript
-imagemagick
-ffmpeg
-a2ps
-psutils
-gstreamer0.10-base
-libexif
-libglade
-libnotify
-libwnck
-libxres
-libxklavier
-lm_sensors
-taglib
-vte
-hunspell
-libidl2
-mime-types
-nss
-scrot
-cups
-zenity
-xbindkeys
-gksu
-gtkdialog
-xdotool
-wmctrl
+#fonts
+ttf-arbat
+ttf-bitstream-vera
+ttf-dejavu
+ttf-liberation
+ttf-ms-fonts
+gsfonts
 #window manager
 gnome-session
 awesome

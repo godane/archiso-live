@@ -1,7 +1,9 @@
-#export PS1="\u@\H > "
-
-# Custom prompt
-export PS1="\[\e[31;1m\]\u\[\e[30;1m\]@\[\e[37;1m\]\H \[\e[37;1m\]\W $ \[\e[0m\]"
+alias ls='ls --color=auto'
+PS1='[\u@\h \W]\$ '
+#cat ~/.logo
+#echo
+#cal
+#set show-all-if-ambiguous on
 
 # Use a dedicated file for bash aliases
 if [ -f ~/.bash_aliases ]; then
