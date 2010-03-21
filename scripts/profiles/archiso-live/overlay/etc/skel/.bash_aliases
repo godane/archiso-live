@@ -6,8 +6,8 @@
 if [ "$TERM" != "dumb" ]; then
     eval "`dircolors -b`"
     alias ls='ls --color=auto'
-    #alias dir='ls --color=auto --format=vertical'
-    #alias vdir='ls --color=auto --format=long'
+    alias dir='ls --color=auto --format=vertical'
+    alias vdir='ls --color=auto --format=long'
 fi
 
 # work around for a common typo
@@ -30,3 +30,7 @@ alias today='date +"%A, %B %-d, %Y"'
 
 # Make cal use Monday as first day of the week.
 alias cal="cal -m"
+
+alias bb="bauerbill"
+
+alias update="sudo bauerbill -Syu"

@@ -177,7 +177,7 @@ e17svn)
 	enlightenment_start
 	;;
 openbox)
-	exec openbox
+	exec ck-launch-session openbox-session
 	;;
 icewm)
 	exec icewm-session

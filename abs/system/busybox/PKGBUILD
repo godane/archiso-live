@@ -3,7 +3,7 @@
 # Contributor: Jens Pranaitis <jens@jenux.homelinux.org>
 
 pkgname=busybox
-pkgver=1.14.3
+pkgver=1.15.3
 pkgrel=1
 pkgdesc="Utilities for rescue and embedded systems"
 arch=("i686" "x86_64")
@@ -13,14 +13,14 @@ makedepends=("make" "gcc" "sed" "ncurses")
 options=()
 source=($url/downloads/$pkgname-$pkgver.tar.bz2 \
 	config)
-md5sums=('d170bf5f97a41aec3a505eab690d5699'
-         '5085b7ec01064dac33da4f3e44c0b444')
+md5sums=('6059ac9456de6fb18dc8ee4cd0ec9240'
+         '4ff97fee538c89166ce5707f93f44540')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
   cp $srcdir/config .config
   # if you want to run menuconfig uncomment the following line:
-  # make menuconfig ; return 1
+  #make menuconfig ; return 1
   make || return 1
   mkdir $pkgdir/bin
   install -m755 busybox $pkgdir/bin/

@@ -1,9 +1,0 @@
-# Write your default config options here!
-
-
-[gnome-mplayer]
-vo=x11
-vf=eq2
-msglevel=all=5
-zoom=1
-ao=alsa

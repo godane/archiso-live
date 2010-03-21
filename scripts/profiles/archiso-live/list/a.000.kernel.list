@@ -13,10 +13,12 @@
 -d madwifi-utils
 -d ndiswrapper
 -d madwifi
+-d tiacx
 -d virtualbox-modules
 -d virtualbox-ose-additions-modules
 -d virtualbox-ose-additions
 #-d nouveau-drm
+-d nouveau-firmware
 #-d drm-radeon-module-git-r6xx-r7xx-3d
 -d aufs2
 -d aufs2-util

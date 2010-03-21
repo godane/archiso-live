@@ -13,9 +13,9 @@
 
 ## Only one of the following two lines can be uncommented!
 # Boot to console
-#id:4:initdefault:
+id:5:initdefault:
 # Boot to X11
-id:4:initdefault:
+#id:5:initdefault:
 
 rc::sysinit:/etc/rc.sysinit
 rs:S1:wait:/etc/rc.single
@@ -34,10 +34,9 @@ c6:2345:respawn:/sbin/agetty -8 38400 tty6 linux
 ca::ctrlaltdel:/sbin/shutdown -t3 -r now
 
 # Example lines for starting a login manager
-#x:5:respawn:/usr/bin/xdm -nodaemon
+#x:5:once:/bin/su live -l -c "/bin/bash --login -c /usr/bin/startx >/dev/null 2>&1"
 #x:5:respawn:/usr/sbin/gdm -nodaemon
 #x:5:respawn:/usr/bin/kdm -nodaemon
 x:5:respawn:/usr/bin/slim >& /dev/null
-#x:5:respawn:/bin/su arch -l -c "/bin/sh --login -c /usr/bin/startx > /dev/null 2>/dev/null"
 
 # End of file
