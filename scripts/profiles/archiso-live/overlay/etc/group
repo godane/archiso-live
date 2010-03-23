@@ -31,7 +31,12 @@ vboxusers:x:108:arch
 dbus:x:81:arch
 policykit:x:109:
 hal:x:82:arch
+clamav:x:64:
 avahi:x:84:
 camera:x:97:
+rtkit:x:999:
+pulse:x:130:
+pulse-access:x:131:
+pulse-rt:x:132:
 tor:x:43:
 privoxy:x:42:

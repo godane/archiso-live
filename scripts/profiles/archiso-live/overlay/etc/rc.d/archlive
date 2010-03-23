@@ -65,5 +65,5 @@ if [  ${ARCH} = x86_64 ]; then
 	sed -i 's|i686|x86_64|g' /etc/pacman.d/kdemodmirrorlist
 fi
 
-sed -i 's/^.*DAEMONS.*/DAEMONS=(syslog-ng hal config wicd slim)/' /etc/rc.conf 
+sed -i 's/^.*DAEMONS=.*/DAEMONS=(syslog-ng hal config wicd slim)/' /etc/rc.conf 
 chmod -x /etc/rc.d/archlive
