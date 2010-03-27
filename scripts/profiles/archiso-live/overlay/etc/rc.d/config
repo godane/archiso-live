@@ -41,5 +41,6 @@ fi
 
 timezone="`cmdline_value timezone`"
 if [ "$timezone" != "" ]; then
-	sed -i "s/^.*TIMEZONE.*/TIMEZONE=${timezone}/" /etc/rc.conf 
+	#sed -i "s/^.*TIMEZONE=.*/TIMEZONE=$timezone/" /etc/rc.conf # sed doesn't like / in variables
+	ln -sf /usr/share/zoneinfo/$timezone /etc/localtime 
 fi
