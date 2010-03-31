@@ -1,84 +1,71 @@
-#args: source, mountpoint
+# args: source, mountpoint
+_mnt_aufs() {
+    src="${1}"
+    mnt="${2}"
+    msg "::: Adding new aufs branch: ${src} to ${mnt}"
+    mkdir -p "${mnt}"
+    /bin/mount -t aufs -o remount,append:"${src}"=ro aufs "${mnt}"
+}
+
+# args: source, mountpoint
 _mnt_bind() {
-    msg "Binding ${1} to ${2}"
-    mkdir -p /real_root${2}
-    mount -o bind ${1} /real_root${2}
+    src="${1}"
+    mnt="${2}"
+    msg "::: Binding ${src} to ${mnt}"
+    mkdir -p "${mnt}"
+    /bin/mount -o bind "${src}" "${mnt}"
+}
+
+# args: source, mountpoint
+_mnt_move() {
+    src="${1}"
+    mnt="${2}"
+    msg "::: Moving ${src} to ${mnt}"
+    mkdir -p "${mnt}"
+    /bin/mount -o move "${src}" "${mnt}"
 }
 
 _mnt_iso() {
-	img="${1}"
-	
-	msg "Mounting ${img}"
-	modprobe -q loop max_loop=255 >/dev/null 2>&1
-	
-	#/bin/mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
-	mkdir -p "/tmpfs/mnt/findiso"
-    while [ ! -e "/dev/loop10" ]; do
-        sleep 1
-    done
-    if ! losetup "/dev/loop10" ${img} > /dev/null 2>&1; then
-        err "Cannot mount loop device /dev/loop${LOOP_NUM}"
-        break
-    fi
-    mount -t iso9660 "/dev/loop10" "/tmpfs/mnt/findiso"
-
-    #export LOOP_NUM=$(( $LOOP_NUM + 1 ))
+    img="${1}"
+    #mnt="${2}"
+    mnt="/tmpfs/mnt/findiso"
+    msg "::: Mounting ${img} to ${mnt}"
+    mkdir -p "${mnt}"
+    mount -r -t iso9660 "${img}" "${mnt}"
 }
 
 # args: /path/to/image_file, mountpoint
 _mnt_squashfs() {
     img="${1}"
-    base_img="/tmp/$(basename ${img})";
-    #mnt="${2}"
+    mnt="${2}"
+    img_fullname="${img##*/}";
+    img_name="${img_fullname%.*}"
+    tmp_mnt="/tmpfs/mnt/${img_name}"
 
-    msg "Adding new real_root branch: ${base_img}"
-    modprobe -q loop max_loop=255 >/dev/null 2>&1
-
-    if [ "${copy2ram}" = "y" ]; then
-        msg "Copying squashfs image to RAM"
-        mkdir -p /tmp
-        mount -t tmpfs -o "size=6M" tmpfs /tmp
-        cp -f ${img} ${base_img}
-        img="${base_img}"
+    if [ "${copytoram}" = "y" ]; then
+        msg -n ":: Copying squashfs image to RAM..."
+        /bin/cp "${img}" "/tmpfs.sqfs/${img_fullname}"
+        img="/tmpfs.sqfs/${img_fullname}"
+        msg "done."
     fi
 
-    mkdir -p "/tmpfs/mnt/loop${LOOP_NUM}"
-    while [ ! -e "/dev/loop${LOOP_NUM}" ]; do
-        sleep 1
-    done
-    if ! losetup "/dev/loop${LOOP_NUM}" ${img} > /dev/null 2>&1; then
-        err "Cannot mount loop device /dev/loop${LOOP_NUM}"
-        break
-    fi
-    mount -r -t squashfs "/dev/loop${LOOP_NUM}" "/tmpfs/mnt/loop${LOOP_NUM}"
-
-    mount -t aufs -o remount,add:1:/tmpfs/mnt/loop${LOOP_NUM}=rr aufs "/real_root"
-    export LOOP_NUM=$(( $LOOP_NUM + 1 ))
+    mkdir -p "${tmp_mnt}"
+    /bin/mount -r -t squashfs "${img}" "${tmp_mnt}"
+    _mnt_aufs "${tmp_mnt}" "${mnt}"
 }
 
-#_mnt_changes () {
-#	if [ "x${changes}" != "x" ]; then
-        
-#	fi
-#}
-
-_mount_tmpfs () {
+_mnt_tmpfs () {
     #if [ "x${ramdisk_size}" = "x" ]; then
         ramdisk_size="3M"
     #fi
-    msg "Mounting tmpfs, size=${ramdisk_size}... "
+    msg ":: Mounting tmpfs, size=${ramdisk_size}... "
     mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
     msg "done."; echo
 }
 
-_device_mountdir() {
-   echo "/tmpfs/mnt/$(basename "$1")"
-}
-
 run_hook () {
-	export LOOP_NUM="0"
 
-    _mount_tmpfs
+    _mnt_tmpfs
 
     # external drives may need to settle
     msg "Waiting for devices to settle..."
@@ -90,22 +77,23 @@ run_hook () {
 
     found=0
     
+    modprobe -q loop max_loop=255 >/dev/null 2>&1
     modprobe -q isofs >/dev/null 2>&1
     modprobe -q ext4 >/dev/null 2>&1
-    msg -n "Scanning drives: "
+    msg "Scanning drives: "
     for device in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sg[0-9]* /dev/sd[a-z][0-9]; do
-		[ ! -e "${device}" ] && continue
+        [ ! -e "${device}" ] && continue
         FSTYPE=$(blkid -o value -s TYPE ${device})
-        bootmnt="$(_device_mountdir ${device})"
+        bootmnt="/tmpfs/mnt/${device##*/}"
         mkdir -p "${bootmnt}"
-    	if mount -t ${FSTYPE} "${device}" "${bootmnt}" >/dev/null 2>&1; then
-    	    if [ -f "${bootmnt}/${findiso}" ]; then
+        if mount -t ${FSTYPE} "${device}" "${bootmnt}" >/dev/null 2>&1; then
+            if [ -f "${bootmnt}/${findiso}" ]; then
                 found=1
                 msg "${device}"; echo
                 BOOT_MOUNT="${bootmnt}"
                 break
             elif [ "x${from}" != "x" ]; then
-                from=$(basename ${from})
+                from=$(${from##*/})
                 if [ -f "${bootmnt}/${from}/base.lzm" ]; then
                     found=1
                     msg "${device}"; echo
@@ -122,7 +110,7 @@ run_hook () {
             fi   
         else
             msg "uhm"; echo
-            err "Failed to mount ${device}"
+            err "Failed to mount ${device} (FS is ${FSTYPE})"
         fi
         [ ${found} -eq 0 ] && umount "${bootmnt}" >/dev/null 2>&1
     done
@@ -162,20 +150,20 @@ run_hook () {
         fi
 
         if [ -f "${BOOT_MOUNT}/base.lzm" ]; then
-            _mnt_squashfs "${BOOT_MOUNT}/base.lzm"
+            _mnt_squashfs "${BOOT_MOUNT}/base.lzm" "/real_root"
         elif [ -f "${BOOT_MOUNT}/initrd.lzm" ]; then
-            _mnt_squashfs "${BOOT_MOUNT}/initrd.lzm"
+            _mnt_squashfs "${BOOT_MOUNT}/initrd.lzm" "/real_root"
         fi
     elif [ "x${from}" != "x" ]; then
-       _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm"
+       _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm" "/real_root"
     else
-       _mnt_squashfs "${BOOT_MOUNT}/base.lzm"
+       _mnt_squashfs "${BOOT_MOUNT}/base.lzm" "/real_root"
     fi
     
     echo "aufs / aufs defaults 0 0" > /real_root/etc/fstab
-    mount -o move ${BOOT_MOUNT} /real_root/mnt/$(basename ${BOOT_MOUNT})
+    _mnt_move ${BOOT_MOUNT} /real_root/mnt/${BOOT_MOUNT##*/}
     if [ "x${findiso}" != x ]; then
-        mount -o move ${BOOT_ORIG} /real_root/mnt/$(basename ${BOOT_ORIG})
+        _mnt_move ${BOOT_ORIG} /real_root/mnt/${BOOT_ORIG##*/}
     fi
 
     if [ "${break}" = "y" ]; then
