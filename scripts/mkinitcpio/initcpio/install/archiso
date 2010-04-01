@@ -10,7 +10,6 @@ install ()
 
     BINARIES=""
     FiLES=""
-    add_dir /real_root
     add_dir /tmpfs
     add_dir /bootmnt
     add_dir /tmpfs.sqfs

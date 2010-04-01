@@ -42,7 +42,7 @@ _mnt_squashfs() {
     img_name="${img_fullname%.*}"
     tmp_mnt="/tmpfs/mnt/${img_name}"
 
-    if [ "${copytoram}" = "y" ]; then
+    if [ "${copy2ram}" = "y" ]; then
         msg -n ":: Copying squashfs image to RAM..."
         /bin/cp "${img}" "/tmpfs.sqfs/${img_fullname}"
         img="/tmpfs.sqfs/${img_fullname}"
@@ -51,7 +51,12 @@ _mnt_squashfs() {
 
     mkdir -p "${tmp_mnt}"
     /bin/mount -r -t squashfs "${img}" "${tmp_mnt}"
-    _mnt_aufs "${tmp_mnt}" "${mnt}"
+
+    #if [ "/${mnt#/*/}" = "/" ]; then
+        _mnt_aufs "${tmp_mnt}" "${mnt}"
+    #else
+    #    _mnt_bind "${tmp_mnt}" "${mnt}"
+    #fi
 }
 
 _mnt_tmpfs () {
@@ -63,23 +68,7 @@ _mnt_tmpfs () {
     msg "done."; echo
 }
 
-run_hook () {
-
-    _mnt_tmpfs
-
-    # external drives may need to settle
-    msg "Waiting for devices to settle..."
-    /sbin/udevadm trigger --subsystem-match=usb
-    /sbin/udevadm settle
-    usbdelay=$(( ${usbdelay:-0} + 1 ))
-    msg "Waiting ${usbdelay}s for USB devices"
-    sleep "${usbdelay}"
-
-    found=0
-    
-    modprobe -q loop max_loop=255 >/dev/null 2>&1
-    modprobe -q isofs >/dev/null 2>&1
-    modprobe -q ext4 >/dev/null 2>&1
+_find_device() {
     msg "Scanning drives: "
     for device in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sg[0-9]* /dev/sd[a-z][0-9]; do
         [ ! -e "${device}" ] && continue
@@ -114,17 +103,64 @@ run_hook () {
         fi
         [ ${found} -eq 0 ] && umount "${bootmnt}" >/dev/null 2>&1
     done
+    export found
+    export archisodevice="${device}"
+    export BOOT_MOUNT
+}
 
-    if [ ${found} -eq 0 ]; then
-        err "cannot find boot device, cannot continue..."
-        msg "Falling back to interactive prompt"
-        PS1="ramfs$ " /bin/sh -i
-        exit 1
+_find_iso() {
+    if [ -f "${BOOT_MOUNT}/${findiso}" ]; then
+        _mnt_iso "${BOOT_MOUNT}/${findiso}"
+        BOOT_ORIG="${BOOT_MOUNT}"
+        BOOT_MOUNT="/tmpfs/mnt/findiso"
     fi
+
+    if [ -f "${BOOT_MOUNT}/base.lzm" ]; then
+        _mnt_squashfs "${BOOT_MOUNT}/base.lzm" "${newroot}"
+    fi
+
+    _mnt_move ${BOOT_ORIG} ${newroot}/mnt/${BOOT_ORIG##*/}
+    export BOOT_MOUNT
+    export BOOT_ORIG
+}
+
+run_hook() {
+
+    if [ "x${tmpfs_sqfs_size}" = "x" ]; then
+        tmpfs_sqfs_size="6M"
+    fi
+
+    mount_handler="archiso_mount_handler"
+}
+
+archiso_mount_handler() {
+    newroot="${1}" # newroot=/new_root
+    _mnt_tmpfs
+
+    found=0
+    
+    if [ "${copy2ram}" = "y" ]; then
+        msg ":: Mounting tmpfs (for squashfs), size=${tmpfs_sqfs_size}..."
+        mount -t tmpfs -o "size=${tmpfs_sqfs_size}" tmpfs /tmpfs.sqfs
+        msg "done."
+    fi
+
+    modprobe -q loop max_loop=255 >/dev/null 2>&1
+    modprobe -q isofs >/dev/null 2>&1
+    modprobe -q ext4 >/dev/null 2>&1
+    _find_device
+
+    msg ":: Waiting for boot device..."
+    while ! poll_device ${archisodevice} 30; do
+        echo "ERROR: boot device didn't show up after 30 seconds..."
+        echo "   Falling back to interactive prompt"
+        echo "   You can try to fix the problem manually, log out when you are finished"
+        launch_interactive_shell
+    done
 
     if [ "${break}" = "y" ]; then
         msg "Break requested, type 'exit' to resume operation"
-        PS1="ramfs$ " /bin/sh -i
+        launch_interactive_shell
     fi
 
     modprobe -q squashfs >/dev/null 2>&1
@@ -136,58 +172,28 @@ run_hook () {
     	mount -n -t tmpfs tmpfs $XINO
     fi
 
-    mount -t aufs -o nowarn_perm,xino=$XINO/.aufs.xino,br:/tmpfs=rw aufs /real_root
+    mount -t aufs -o nowarn_perm,xino=$XINO/.aufs.xino,br:/tmpfs=rw aufs "${newroot}"
     if [ $? -ne 0 ]; then
         err "while mounting root (aufs) fileystem."
         exit 1
     fi
-
-    if [ "x${findiso}" != "x" ]; then
-        if [ -f "${BOOT_MOUNT}/${findiso}" ]; then
-            _mnt_iso "${BOOT_MOUNT}/${findiso}"
-            BOOT_ORIG="${BOOT_MOUNT}"
-            BOOT_MOUNT="/tmpfs/mnt/findiso"
-        fi
-
-        if [ -f "${BOOT_MOUNT}/base.lzm" ]; then
-            _mnt_squashfs "${BOOT_MOUNT}/base.lzm" "/real_root"
-        elif [ -f "${BOOT_MOUNT}/initrd.lzm" ]; then
-            _mnt_squashfs "${BOOT_MOUNT}/initrd.lzm" "/real_root"
-        fi
-    elif [ "x${from}" != "x" ]; then
-       _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm" "/real_root"
-    else
-       _mnt_squashfs "${BOOT_MOUNT}/base.lzm" "/real_root"
-    fi
     
-    echo "aufs / aufs defaults 0 0" > /real_root/etc/fstab
-    _mnt_move ${BOOT_MOUNT} /real_root/mnt/${BOOT_MOUNT##*/}
-    if [ "x${findiso}" != x ]; then
-        _mnt_move ${BOOT_ORIG} /real_root/mnt/${BOOT_ORIG##*/}
+    if [ "x${findiso}" != "x" ]; then
+        _find_iso
+    elif [ "x${from}" != "x" ]; then
+        _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm" "${newroot}"
+    else
+        _mnt_squashfs "${BOOT_MOUNT}/base.lzm" "${newroot}"
     fi
+
+    echo "aufs / aufs defaults 0 0" > ${newroot}/etc/fstab
+    _mnt_move ${BOOT_MOUNT} ${newroot}/mnt/${BOOT_MOUNT##*/}
 
     if [ "${break}" = "y" ]; then
         msg ":: Break requested, type 'exit' to resume operation"
-        PS1="ramfs$ " /bin/sh -i
+        launch_interactive_shell
     fi
-		
-    ROOT=/real_root
-    mkdir -p $ROOT/dev 2>&1 >/dev/null
-    mknod $ROOT/dev/console c 5 1 2>&1 >/dev/null
-    mknod $ROOT/dev/null c 1 3 2>&1 >/dev/null
-    mknod $ROOT/dev/zero c 1 5 2>&1 >/dev/null
 
-    #Special handling if udev is running
-    udevpid=$(/bin/pidof udevd)
-    if [ -n "${udevpid}" ]; then
-        /bin/kill -9 ${udevpid} > /dev/null 2>&1
-        /bin/sleep 0.01
-    fi
-    msg ":: Passing control to Linux-Live Initrd...Please Wait"
-    umount -l /sys
-    umount -l /proc
-    sleep 2
-    exec /sbin/switch_root -c /dev/console /real_root /sbin/init
 }
 
 # vim:ft=sh:ts=4:sw=4:et:
