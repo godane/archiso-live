@@ -49,12 +49,12 @@ Server = http://arch-live.isawsome.net/packages/
 # Testing is disabled by default.  To enable, uncomment the following
 # two lines.  You can add preferred servers immediately after the header,
 # and they will be used before the default mirrors.
-[testing]
+#[testing]
 #Include = /etc/pacman.d/mirrorlist
-Server = ftp://ftp.archlinux.org/$repo/os/i686
-Server = ftp://locke.suu.edu/linux/dist/archlinux/$repo/os/i686
-Server = ftp://mirrors.unixheads.org/archlinux/$repo/os/i686
-Server = ftp://ftp-linux.cc.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
+#Server = ftp://ftp.archlinux.org/$repo/os/i686
+#Server = ftp://locke.suu.edu/linux/dist/archlinux/$repo/os/i686
+#Server = ftp://mirrors.unixheads.org/archlinux/$repo/os/i686
+#Server = ftp://ftp-linux.cc.gatech.edu/pub/linux/distributions/archlinux/$repo/os/i686
 #Server = ftp://mirror.cs.vt.edu/pub/ArchLinux/$repo/os/i686
 #Server = http://mirrors.easynews.com/linux/archlinux/$repo/os/i686
 #Server = ftp://ftp.ibiblio.org/pub/linux/distributions/archlinux/$repo/os/i686
