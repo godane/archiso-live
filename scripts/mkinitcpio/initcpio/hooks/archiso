@@ -70,7 +70,7 @@ _mnt_tmpfs () {
 
 _find_device() {
     msg "Scanning drives: "
-    for device in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sg[0-9]* /dev/sd[a-z][0-9]; do
+    for device in /dev/hd[a-z] /dev/sr[0-9]* /dev/scd[a-z] /dev/sd[a-z][0-9] /dev/sg[0-9]*; do
         [ ! -e "${device}" ] && continue
         FSTYPE=$(blkid -o value -s TYPE ${device})
         bootmnt="/tmpfs/mnt/${device##*/}"
@@ -109,6 +109,7 @@ _find_device() {
 }
 
 _find_iso() {
+    newroot=${1}
     if [ -f "${BOOT_MOUNT}/${findiso}" ]; then
         _mnt_iso "${BOOT_MOUNT}/${findiso}"
         BOOT_ORIG="${BOOT_MOUNT}"
@@ -119,7 +120,6 @@ _find_iso() {
         _mnt_squashfs "${BOOT_MOUNT}/base.lzm" "${newroot}"
     fi
 
-    _mnt_move ${BOOT_ORIG} ${newroot}/mnt/${BOOT_ORIG##*/}
     export BOOT_MOUNT
     export BOOT_ORIG
 }
@@ -136,6 +136,15 @@ run_hook() {
 archiso_mount_handler() {
     newroot="${1}" # newroot=/new_root
     _mnt_tmpfs 3M /tmpfs
+
+    usbdelay=5
+    # external drives may need to settle
+    msg "Waiting for devices to settle..."
+    /sbin/udevadm trigger --subsystem-match=usb
+    /sbin/udevadm settle
+    usbdelay=$(( ${usbdelay:-0} + 1 ))
+    msg "Waiting ${usbdelay}s for USB devices"
+    sleep "${usbdelay}"
 
     found=0
 
@@ -177,16 +186,35 @@ archiso_mount_handler() {
         exit 1
     fi
     
+    if [ "${break}" = "y" ]; then
+        msg ":: Break requested, type 'exit' to resume operation"
+        launch_interactive_shell
+    fi
+
     if [ "x${findiso}" != "x" ]; then
-        _find_iso
+        _find_iso "${newroot}"
     elif [ "x${from}" != "x" ]; then
         _mnt_squashfs "${BOOT_MOUNT}/${from}/base.lzm" "${newroot}"
     else
         _mnt_squashfs "${BOOT_MOUNT}/base.lzm" "${newroot}"
     fi
 
+    if [ "${break}" = "y" ]; then
+        msg ":: Break requested, type 'exit' to resume operation"
+        launch_interactive_shell
+    fi
+
     echo "aufs / aufs defaults 0 0" > ${newroot}/etc/fstab
     _mnt_move ${BOOT_MOUNT} ${newroot}/mnt/${BOOT_MOUNT##*/}
+
+    if [ "${break}" = "y" ]; then
+        msg ":: Break requested, type 'exit' to resume operation"
+        launch_interactive_shell
+    fi
+
+    if [ "x${findiso}" != "x" ]; then
+        _mnt_move ${BOOT_ORIG} ${newroot}/mnt/${BOOT_ORIG##*/}
+    fi
 
     if [ "${break}" = "y" ]; then
         msg ":: Break requested, type 'exit' to resume operation"
