@@ -43,7 +43,7 @@ _mnt_squashfs() {
     tmp_mnt="/tmpfs/mnt/${img_name}"
 
     if [ "${copy2ram}" = "y" ]; then
-        msg -n ":: Copying squashfs image to RAM..."
+        msg ":: Copying squashfs image to RAM..."
         /bin/cp "${img}" "/tmpfs.sqfs/${img_fullname}"
         img="/tmpfs.sqfs/${img_fullname}"
         msg "done."
@@ -59,13 +59,13 @@ _mnt_squashfs() {
     #fi
 }
 
+# args: ram size, mountpoint
 _mnt_tmpfs () {
-    #if [ "x${ramdisk_size}" = "x" ]; then
-        ramdisk_size="3M"
-    #fi
-    msg ":: Mounting tmpfs, size=${ramdisk_size}... "
-    mount -t tmpfs -o "size=${ramdisk_size}" tmpfs /tmpfs
-    msg "done."; echo
+    ram="${1}"
+    mnt="${2}"
+    msg ":: Mounting tmpfs, size=${ram}... "
+    mkdir -p "${mnt}"
+    mount -t tmpfs -o "size=${ram}" tmpfs "${mnt}"
 }
 
 _find_device() {
@@ -135,14 +135,12 @@ run_hook() {
 
 archiso_mount_handler() {
     newroot="${1}" # newroot=/new_root
-    _mnt_tmpfs
+    _mnt_tmpfs 3M /tmpfs
 
     found=0
-    
+
     if [ "${copy2ram}" = "y" ]; then
-        msg ":: Mounting tmpfs (for squashfs), size=${tmpfs_sqfs_size}..."
-        mount -t tmpfs -o "size=${tmpfs_sqfs_size}" tmpfs /tmpfs.sqfs
-        msg "done."
+        _mnt_tmpfs ${tmpfs_sqfs_size} /tmpfs.sqfs
     fi
 
     modprobe -q loop max_loop=255 >/dev/null 2>&1
@@ -172,9 +170,10 @@ archiso_mount_handler() {
     	mount -n -t tmpfs tmpfs $XINO
     fi
 
+    msg ":: Mounting root (aufs) filesystem"
     mount -t aufs -o nowarn_perm,xino=$XINO/.aufs.xino,br:/tmpfs=rw aufs "${newroot}"
     if [ $? -ne 0 ]; then
-        err "while mounting root (aufs) fileystem."
+        err "ERROR: while mounting root (aufs) fileystem."
         exit 1
     fi
     
