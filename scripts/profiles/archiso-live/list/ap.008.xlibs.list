@@ -18,6 +18,7 @@ hydrogen
 blender
 cinelerra-cv
 miro
+synfigstudio
 #games
 gnome-games
 #libs
@@ -55,3 +56,5 @@ silly
 cegui
 ode
 devil
+glew
+tre
