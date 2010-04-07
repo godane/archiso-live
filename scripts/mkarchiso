@@ -114,10 +114,6 @@ if [ "${OS}" = "archlinux" ]; then
     else
         PACMANCONF="/etc/pacman.conf"
     fi
-elif [ "${OS}" = "slackware" ]; then
-    if [ -f "${PROFILE}/mirror.conf-${ARCH}" ]; then
-	INSTALLCONF="${PROFILE}/mirror.conf-${ARCH}"
-    fi
 fi
 
 command_name="${1}"
@@ -322,97 +318,71 @@ command_livebackup_imgprepare()
 # install package function
 install_slack_package()
 {
-	local PKGNAME CANDIDATE
+    local repo="${1}"
+    local pkgname="${2}"
+    local union="${3}"
+    #local PKGNAME CANDIDATE
 
-	for PKG in $(find $1 -name "$2*.t*z"); do
-		PKGFULLNAME="${PKG##*/}"
-		PKGNAME="$(${PKGFULLNAME%.*} | sed 's/-[^-]*-[^-]*-[^-]*$//')"
-		if [ "$PKGNAME" = "$2" ]; then
-			if [ -z $CANDIDATE ]; then
-				CANDIDATE=$PKG
-			else
-				err "WARNING: more than one match for $2 , using $PKG" 
-				CANDIDATE=$PKG
-			fi
-		fi
-	done
-
-	if [ -n "$CANDIDATE" ]; then
-		installpkg -root $3 $CANDIDATE >/dev/null
-	else
-		err "WARNING: $2 not found on repository"
-	fi
+    if [ -n "${pkgname}" ]; then
+        installpkg -root ${union} ${pkgname} >/dev/null
+    else
+        warn "WARNING: ${pkgname} not found on repository"
+    fi
 }
 
 #  download_slack_pkg
 download_slack_pkg()
 {
+
+    mkdir -p ${repo}
+    # read package file
+    list=$(cat $(pwd)/list/${mod}.list)
 	
-	# read package file
-	list=$(cat $MOD/packages)
-		if [ $? -eq 0 ]; then
-			info "Read package file,... ok" 
-		else
-			info "No package file, check you current directory. write : cd /your/directory/with/packagefile and restart the script" 
-			umount $UNION
-			exit
-		fi
+    # get a complete PACKAGES.txt
+    info "getting packagelist"
+    neterror=$(wget -O ${repo}/PACKAGES.TXT ${mirror}/PACKAGES.TXT 2>&1 | grep -E "failed:|Not Found")
+    if [ "${neterror}" ] ; then
+        err "Unable to connect to ${mirror}, please check the network or choose another mirror" 
+        exit
+    fi
 		
-	# get a complete PACKAGES.txt
-	echo "get packagelist"
-		neterror=$(wget -O $ROOT/PACKAGES.TXT $mirror/PACKAGES.TXT 2>&1 | grep -E "failed:|Not Found")
-		if [ "$neterror" ] ; then
-			err "Unable to connect to $mirror, please check the network or choose another mirror" 
-			exit
-		fi
+    # try to download the packages for the module
+    echo "Begin download procede..."
+    categories="a ap d l n x xap /extra/a /extra/ap /extra/d /extra/e /extra/f /extra/g /extra/games /extra/kde /extra/l /extra/locale /extra/n /extra/s /extra/t /extra/tcl /extra/x /extra/xap"
+    for package in ${list} ; do
+
+        message=$(echo "${package}" | grep -v "#" )
+        if [ ! "${message}" = "" ]; then
+	    found="no"
+            completename=$(cat ${repo}/PACKAGES.TXT | grep " ${package}-[0-9]" | sed "s|PACKAGE NAME:  ||g")
+            if [ $(find ${repo}/${completename}) &> /dev/null ]; then
+                info "package ${completename} founded on local repo"
+                found="yes"
+            else
+                # this is to remove older version so the newer one is used
+                #if [ $(find -name "${repo}/${package}*.t*z") &> /dev/null ]; then
+                #    rm -f ${repo}/${package}*.t*z
+                #fi
+
+                info "Downloading ${completename} from global mirror..."
+                for categ in ${categories} ; do
+                    #mkdir -p ${repo}/${categ}
+                    neterror=$(wget -c -O ${repo}/${completename} ${mirror}/${categ}/${completename} 2>&1 | grep -E "failed:|Not Found")
+                    if [ ! "${neterror}" ] ; then
+                        if [ "${found}" = "no" ]; then 
+                            found="yes"
+                        fi
+                    fi
+                done	
 			
-	# try to download the packages for the module
-	echo "Begin download procede..."
-	categories="a ap d l n x xap /extra/a /extra/ap /extra/d /extra/e /extra/f /extra/g /extra/games /extra/kde /extra/l /extra/locale /extra/n /extra/s /extra/t /extra/tcl /extra/x /extra/xap"
-	for package in $list ; do
-	
-		message=$(echo "$package" | grep -v "#" )
-		if [ ! "$message" = "" ]; then
-			found="No"
-			completename=$(cat $ROOT/PACKAGES.TXT | grep .t*z | grep "$package")
-			completename=$(echo "$completename" | cut -f4 -d " ")
-				if [ ! "$completename" = "$package" ]; then
-					for var in $completename ; do 
-					varname=${var%-*}; varname=${varname%-*}; varname=${varname%-*} 
-						if [ "$varname" = "$package" ]; then
-							completename=$var
-						fi
-					done
-				fi
-				
-			if [ $(find $REPO/$completename) >/dev/null ]; then
-			 	info "package $completename founded on local repo"
-			 	found="yes"
-			else
-			# this is to move older version so the newer one is used
-			if [ $(find $REPO/$package*.t*z) >/dev/null ]; then
-				mv -f $REPOOLD/$package*.t*z
-			fi
-			
-				echo "Downloading $completename from global mirror..."
-				for categ in $categories ; do
-					#mkdir -p $REPO/$categ
-					neterror=$(wget -c -O $REPO/$completename $mirror/$categ/$completename 2>&1 | grep -E "failed:|Not Found")
-						if [ ! "$neterror" ] ; then
-							if [ "$found" = "No" ]; then 
-								found="Yes"
-							fi
-						fi
-				done	
-			
-				if [ "$found" = "No" ]; then 
-					info "$package not founded."
-				else
-					info "$package downloaded."
-				fi
-			fi
-		fi
-	done
+                if [ "${found}" = "no" ]; then 
+                    info "${package} not founded."
+                else
+                    info "${package} downloaded."
+                fi
+            fi
+        fi
+    done
 
 }
 
@@ -436,67 +406,77 @@ remove_slack_duplicates()
 
 install_arch_union () {
 
-	if [ -e "${union}/var/lib/pacman/db.lck" ]; then
-		rm -f ${union}/var/lib/pacman/db.lck
+    if [ -e "${union}/var/lib/pacman/db.lck" ]; then
+        rm -f ${union}/var/lib/pacman/db.lck
+    fi
+
+    mkdir -p "${union}/var/lib/pacman"
+    # Remove /var/lib/pacman/local folder in case it just there.
+    # This will not remove it if anything is in /var/lib/pacman/local folder. 
+    # Only if its a empty folder.
+    if [ ! -d "${INSTROOT}/var/lib/pacman/sync/core" ]; then
+        pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
+        rmdir --ignore-fail-on-non-empty ${INSTROOT}/var/lib/pacman/local
+    fi
+
+    if [ -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
+        pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.old
+        pacman -Su -f --needed --noconfirm --config "${PACMANCONF}" -fr "${union}"
+    elif [ ! -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
+        touch ${packlist}/${mod}.old
+
+        cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
+            info "Installing package $pkgname"
+            pacman -S -f --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname | tee -a ${buildlog}/${mod}-current.log
+            if [ $? -ne 0 ]; then
+                warn "Package $pkgname not correctly installed"
+                cat ${buildlog}/${mod}-current.log >> ${buildlog}/${mod}-errors.log
+            fi
+        done
+
+        if [ -e "$(pwd)/list/${mod}.removelist" ]; then
+            cat "$(pwd)/list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
+                info "Removing package $pkgname"
+                pacman -R -d -n --noprogressbar --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname &> /dev/null
+            done
+        fi
+    fi
+    
+    pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.new
+
+    if [ -f ${packlist}/${mod}.old ]; then
+        packagediff.py ${packlist}/${mod}.old ${packlist}/${mod}.new > ${packlist}/${mod}.list
+    fi
+
+    # Cleanup
+    info "Cleaning up image root files..."
+    find "${union}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+
+    # delete a lot of unnecessary cache/log files
+    # We don't have to delete stuff from /usr/share/doc if we are building archpwn module
+    if [ "${mod:4:7}" = "archpwn" ]; then
+        kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/ initrd"
+    else
+        kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd ${DELDIR}"
+    fi
+
+    for x in ${kill_dirs}; do
+        if [ -e "${union}/${x}" ]; then
+            rm -Rf "${union}/${x}"
 	fi
+    done
 
-	mkdir -p "${union}/var/lib/pacman"
-	# Remove /var/lib/pacman/local folder in case it just there.
-	# This will not remove it if anything is in /var/lib/pacman/local folder. 
-	# Only if its a empty folder.
-	if [ ! -d "${INSTROOT}/var/lib/pacman/sync/core" ]; then
-		pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
-		rmdir --ignore-fail-on-non-empty ${INSTROOT}/var/lib/pacman/local
-	fi
+}
 
-	if [ -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
-		pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.old
-		pacman -Su -f --needed --noconfirm --config "${PACMANCONF}" -fr "${union}"
-	elif [ ! -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
-		touch ${packlist}/${mod}.old
+install_slack_union () {
+    #if [ "${update}" = "yes" ]; then
+        download_slack_pkg 
+    #fi
 
-		cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
-			info "Installing package $pkgname"
-			pacman -S -f --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname | tee -a ${buildlog}/${mod}-current.log
-
-			if [ $? -ne 0 ]; then
-				warn "Package $pkgname not correctly installed"
-				cat ${buildlog}/${mod}-current.log >> ${buildlog}/${mod}-errors.log
-			fi
-		done
-
-		if [ -e "$(pwd)/list/${mod}.removelist" ]; then
-			cat "$(pwd)/list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
-				info "Removing package $pkgname"
-				pacman -R -d -n --noprogressbar --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname &> /dev/null
-			done
-		fi
-	fi
-
-	pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.new
-
-	if [ -f ${packlist}/${mod}.old ]; then
-		packagediff.py ${packlist}/${mod}.old ${packlist}/${mod}.new > ${packlist}/${mod}.list
-	fi
-
-	# Cleanup
-	info "Cleaning up image root files..."
-	find "${union}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
-
-	# delete a lot of unnecessary cache/log files
-	# We don't have to delete stuff from /usr/share/doc if we are building archpwn module
-	if [ "${mod:4:7}" = "archpwn" ]; then
-		kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/ initrd"
-	else
-		kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd ${DELDIR}"
-	fi
-
-	for x in ${kill_dirs}; do
-		if [ -e "${union}/${x}" ]; then
-			rm -Rf "${union}/${x}"
-		fi
-	done
-
+    #cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
+    #    info "Installing package ${pkgname}"
+    #    install_slack_package ${repo} ${pkgname} ${union}
+    #done
 }
 
 # Go through the main commands in order. If 'all' was specified, then we want
@@ -569,6 +549,8 @@ command_install () {
 
 		if [ "${OS}" = "archlinux" ]; then
 			install_arch_union
+		elif [ "${OS}" = "slackware" ]; then
+			install_slack_union
 		fi
 
 		if [ -e "${union}/etc/ld.so.conf" ]; then
