@@ -1,0 +1,11 @@
+#ROOT_MOD="a.001.core"
+#MOVE_MODULES="ap.008.xlibs ap.009.xapps ap.010.games" # ap.012.games" # z.avidemux z.blender z.hydrogen-svn z.inkscape z.kino z.lmms"
+MODULES="a.000.kernel a.001.core a.002.baseapp a.003.baselib a.004.basenet a.005.xorg a.006.xfcedep a.007.gnomecore a.008.firefox a.009.cublib a.010.cubapp a.011.xfce a.012.wolvixdep a.013.wolvixapp a.014.thunderbird a.015.printing a.016.vim a.020.devel ${MOVE_MODULES}"
+DELDIR="usr/share/doc usr/share/devhelp usr/share/gtk-doc usr/share/wallpapers"
+KERNEL="/etc/mkinitcpio.d/kernel26.kver"
+VMLINUZ="boot/vmlinuz26"
+CDLABEL="wolvix"
+PUBLISHER="http://godane.wordpress.com/"
+AUTHOR="Christopher Rogers aka Godane"
+NOLZMA=n
+MKOPTION="-comp lzma -b 256k"

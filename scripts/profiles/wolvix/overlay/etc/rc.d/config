@@ -1,0 +1,46 @@
+#!/bin/bash
+
+. /usr/lib/liblinuxlive
+
+VOL=$(cmdline_value "vol")
+if [ "$VOL" != "" ]; then
+   echo "Setting sound volume: ${VOL}%"
+   for SCONTROL in {"Master","PCM","Front","Surround","Center","CD","Video"}; do
+     /usr/bin/amixer -q sset $SCONTROL ${VOL}% unmute 2>/dev/null
+   done
+else
+   echo "Setting sound volume: 90%"
+   for SCONTROL in {"Master","PCM","Front","Surround","Center","CD","Video"}; do
+     /usr/bin/amixer -q sset $SCONTROL 90% unmute 2>/dev/null
+   done
+fi
+
+# keyb: Override default keyboard layout
+keyb="`cmdline_value keyb`"
+if [ "$keyb" ]; then
+   if [ -x /bin/loadkeys ]; then
+ 	/bin/loadkeys $keyb
+   fi
+fi
+
+session="`cmdline_value session`"
+if [ "$session" != "" ]; then
+	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/X11/xinit/xinitrc
+	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/skel/.xinitrc
+fi
+
+# lang: Override default language
+lang="`cmdline_value lang`"
+if [ "$lang" ]; then
+    locale-gen
+    # Make firefox match OS locale
+    #if [ -f /usr/lib/firefox-3.0/defaults/preferences/firefox-I10n.js ]; then
+    # 	echo "pref("general.useragent.locale", "$lang")" > /usr/lib/firefox-3.0/defaults/preferences/firefox-I10n.js
+    #fi
+fi
+
+timezone="`cmdline_value timezone`"
+if [ "$timezone" != "" ]; then
+	#sed -i "s/^.*TIMEZONE=.*/TIMEZONE=$timezone/" /etc/rc.conf # sed doesn't like / in variables
+	ln -sf /usr/share/zoneinfo/$timezone /etc/localtime 
+fi

@@ -1,0 +1,15 @@
+show_frame=true
+fg_set=false
+bg_set=false
+timezone=
+width_set=false
+height_set=false
+show0=true
+data0=%H:%M
+font0=Sans Bold 8
+show1=false
+show2=true
+data2=%Y-%m-%d
+font2=Sans Bold 8
+tooltip=%A %d %B %Y/%V
+hlb_timing=false

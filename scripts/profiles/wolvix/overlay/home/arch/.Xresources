@@ -1,0 +1,27 @@
+Xcursor.theme: pSlackware-24
+
+Xft.dpi: 96 
+xterm*background: black
+xterm*foreground: #f5f5f5
+xterm*cursorColor: #f5f5f5
+xterm*borderColor: white
+xterm*scrollColor: black
+xterm*visualBell: true
+xterm*saveLines: 4096
+xterm*allowSendEvents: True
+xterm*sessionMgt: false
+xterm*rightScrollBar: true
+xterm*font: 9x15
+!xterm*eightBitInput:  false
+!xterm*metaSendsEscape: true
+
+aterm*background: black
+aterm*foreground: #f5f5f5
+aterm*cursorColor: #f5f5f5
+aterm*saveLines: 4096
+aterm*scrollBar: false
+aterm*scrollBar_right: true
+aterm*transparent: true
+aterm*shading: 60
+aterm*fading: 80
+aterm*font: 9x15

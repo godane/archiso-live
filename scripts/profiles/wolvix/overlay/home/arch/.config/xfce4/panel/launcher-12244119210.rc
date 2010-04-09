@@ -1,0 +1,12 @@
+[Global]
+MoveFirst=false
+ArrowPosition=0
+
+[Entry 0]
+Name=Wolvix Control Panel
+Comment=A suit of admin utilities to configure Wolvix
+Icon=/usr/share/pixmaps/wolvix-control-panel.png
+Exec=gksu wolvix-control-panel
+Terminal=false
+StartupNotify=false
+

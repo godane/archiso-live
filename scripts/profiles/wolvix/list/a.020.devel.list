@@ -1,0 +1,9 @@
+base-devel
+doxygen
+ccache
+cmake
+gdb
+nasm
+gperf
+intltool
+kernel26-headers
