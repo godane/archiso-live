@@ -1,0 +1,48 @@
+# The Bar && Font
+i: /usr/share/pixmaps/barback3d.png
+t: /usr/share/fonts/TTF/DejaVuSans/8
+c:
+
+i: /usr/share/icons/Tango/32x32/apps/terminal.png
+c: lxterminal
+t: Terminal
+
+i: /usr/share/icons/Tango/32x32/apps/file-manager.png
+c: pcmanfm
+t: File Manager
+
+i: /usr/share/icons/Tango/32x32/apps/browser.png
+c: firefox
+t: Web Browser
+
+i: /usr/share/icons/Tango/32x32/apps/email.png
+c: claws-mail
+t: Email Client
+
+i: /usr/share/icons/Tango/32x32/apps/internet-group-chat.png
+c: pidgid
+t: Instant Messenger
+
+i: /usr/share/icons/Tango/32x32/apps/text-editor.png
+c: leafpad
+t: Text Editor
+
+i: /usr/share/icons/Tango/32x32/categories/applications-office.png
+c: abiword
+t: Word Processor
+
+i: /usr/share/icons/Tango/32x32/mimetypes/image.png
+c: mirage
+t: Image Browser
+
+i: /usr/share/icons/Tango/32x32/mimetypes/audio-x-generic.png
+c: audacious
+t: Audio Player
+
+i: /usr/share/icons/Tango/32x32/categories/applications-multimedia.png
+c: vlc
+t: Video Player
+
+i: /usr/share/icons/Tango/32x32/status/audio-volume-medium.png
+c: aumix
+t: Volume Control

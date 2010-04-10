@@ -1,0 +1,65 @@
+
+    [submenu] (Development) {} <>
+        [exec] (Geany) {geany} <>
+    [end]
+    [submenu] (Editors) {} <>
+        [exec] (Leafpad) {leafpad} <>
+    [end]
+    [submenu] (Graphics) {} <>
+		[exec] (gtkam) {gtkam} <>
+        [exec] (Mirage) {mirage} <>
+        [exec] (mtPaint) {mtpaint} <>
+    [end]
+    [submenu] (Multimedia) {} <>
+        [exec] (Audacious) {audacious} <>
+		        [exec] (EasyTAG) {easytag} <>
+		[exec] (GnomeBaker) {gnomebaker} <>
+        [exec] (Grip) {grip} <>
+        [exec] (ISO Master) {isomaster} <>
+        [exec] (MPlayer) {gmplayer} <>
+        [exec] (streamtuner) {streamtuner} <>
+        [exec] (Xine) {xine} <>
+		[separator] () {} <>
+		[exec] (Volume Control) {aumix} <>
+    [end]
+    [submenu] (Network) {} <>
+        [exec] (Claws Mail) {claws-mail} <>
+        [exec] (FireFox) {firefox} <>
+        [exec] (gFTP) {gftp} <>
+        [exec] (Grsync) {grsync} <>
+        [exec] (Midori) {midori} <>
+        [exec] (Pidgin) {pidgin} <>
+        [exec] (Transmission) {transmission} <>
+        [exec] (Wicd) {wicd-client --no-tray} <>
+		[exec] (Wifi-radar) {gksu wifi-radar} <>
+        [exec] (X-Chat) {xchat} <>
+    [end]
+    [submenu] (Office) {} <>
+	[exec] (AbiWord) {abiword} <>
+        [exec] (Evince) {evince} <>
+        [exec] (NoteCase) {notecase} <>
+        [exec] (Osmo) {osmo} <>
+    [end]
+    [submenu] (Shells) {} <>
+	[exec] (LXTerminal) {lxterminal} <>
+	[exec] (Terminator) {terminator} <>
+        [exec] (Xterm) {xterm} <>
+        [exec] (XTerm [Unicode]) {uxterm} <>
+    [end]
+    [submenu] (System) {} <>
+		[exec] (Gparted) {gksu gparted} <>
+		[exec] (Gslapt) {gksu gslapt} <>
+		[exec] (htop) {xterm -e htop} <>
+        [exec] (PCManFM) {pcmanfm} <>
+		[exec] (Touchpad) {gsynaptics} <>
+		[separator] () {} <>
+        [exec] (Wolvix Control Panel) {gksu /usr/sbin/wolvix-control-panel} <>
+        
+    [end]
+    [submenu] (Utilities) {} <>
+        [exec] (Galculator) {galculator} <>
+	[exec] (Gucharmap) {gucharmap} <>
+        [exec] (Xarchiver) {xarchiver} <>
+        [exec] (Xpad) {xpad} <>
+    [end]
+[end]

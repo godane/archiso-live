@@ -25,3 +25,14 @@ obconf
 obmenu
 openbox
 wbar
+#lxde
+lxde-common
+lxde-icon-theme
+lxpanel
+lxsession-lite
+lxappearance
+lxrandr
+lxterminal
+#fonts
+ttf-dejavu
+ttf-freefont

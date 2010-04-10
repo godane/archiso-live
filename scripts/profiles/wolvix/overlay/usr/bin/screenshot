@@ -1,1 +1,9 @@
-/usr/share/wolvix/scripts/screenshotr_toptomer²Õ»*·
+#!/bin/sh
+#
+# Simple screen shot script.
+# Author Wolven  <http://wolvix.org>
+
+NAME="screenshot_`date +%F`_`date +%H`-`date +%M`-`date +%S`"
+import -window root $NAME.png 
+
+#eof
