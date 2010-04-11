@@ -82,7 +82,7 @@ _find_device() {
                 BOOT_MOUNT="${bootmnt}"
                 break
             elif [ "x${from}" != "x" ]; then
-                from=$(${from##*/})
+                from=${from##*/}
                 if [ -f "${bootmnt}/${from}/base.lzm" ]; then
                     found=1
                     msg "${device}"; echo
