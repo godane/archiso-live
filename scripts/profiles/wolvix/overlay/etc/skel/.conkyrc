@@ -86,7 +86,7 @@ draw_graph_borders yes
 stippled_borders 8
 
 # border margins
-border_margin 4
+#border_margin 4
 
 # border width
 border_width 1
@@ -127,7 +127,7 @@ override_utf8_locale yes
 
 
 # Add spaces to keep things from moving about?  This only affects certain objects.
-use_spacer yes
+use_spacer left
 
 #   mldonkey_hostname     Hostname for mldonkey stuff, defaults to localhost
 #   mldonkey_port         Mldonkey port, 4001 default
@@ -154,4 +154,4 @@ use_spacer yes
 
 TEXT
 ${color FFFFCC}CPU: ${color }$cpu% ${color D3D3D3}- ${color FFFFCC}MEM: ${color }$memperc% ${color D3D3D3}- ${color FFFFCC}File System: ${color }${fs_bar 8,64 /} ${color D3D3D3}- ${color FFFFCC}Upload: ${color }${upspeedgraph eth0 8,64 000000 ffffff} ${color D3D3D3}- ${color FFFFCC}Download: ${color }${downspeedgraph eth0 8,64 000000 ffffff}
-${color FFFFCC}Audacious: ${color }${audacious_title} 
+${color FFFFCC}Audacious: ${color }${audacious_title 92} 

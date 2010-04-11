@@ -62,7 +62,7 @@ style "theme-default"
         contrast = 1.0
         glazestyle = 0 # 0 = flat hilight, 1 = curved hilight, 2 = concave style, 3 = top curved hilight, 4 = beryl style
         gradients = FALSE
-        hilight_ratio = 1.1
+        highlight_shade = 1.1
         listviewheaderstyle = 2 # 0 = flat, 1 = glassy, 2 = raised
         listviewstyle = 0 # 0 = nothing, 1 = dotted
         menubaritemstyle = 0 # 0 = menuitem look, 1 = button look
@@ -153,7 +153,7 @@ style "theme-menubar-item"
         contrast = 1.0
         glazestyle = 3 # 0 = flat hilight, 1 = curved hilight, 2 = concave style, 3 = top curved hilight, 4 = beryl style
         gradients = FALSE
-        hilight_ratio = 1.0
+        highlight_shade = 1.0
         listviewheaderstyle = 2 # 0 = flat, 1 = glassy, 2 = raised
         listviewstyle = 0 # 0 = nothing, 1 = dotted
         menubaritemstyle = 0 # 0 = menuitem look, 1 = button look
@@ -178,7 +178,7 @@ style "theme-tree" = "theme-default"
         contrast = 1.0
         glazestyle = 3 # 0 = flat hilight, 1 = curved hilight, 2 = concave style, 3 = top curved hilight, 4 = beryl style
         gradients = FALSE
-        hilight_ratio = 1.2
+        highlight_shade = 1.2
         listviewheaderstyle = 2 # 0 = flat, 1 = glassy, 2 = raised
         listviewstyle = 0 # 0 = nothing, 1 = dotted
         menubaritemstyle = 0 # 0 = menuitem look, 1 = button look
@@ -217,7 +217,7 @@ style "theme-progressbar" = "theme-wide"
         contrast = 1.0
         glazestyle = 3 # 0 = flat hilight, 1 = curved hilight, 2 = concave style, 3 = top curved hilight, 4 = beryl style
         gradients = FALSE
-        hilight_ratio = 1.2
+        highlight_shade = 1.2
         listviewheaderstyle = 2 # 0 = flat, 1 = glassy, 2 = raised
         listviewstyle = 0 # 0 = nothing, 1 = dotted
         menubaritemstyle = 0 # 0 = menuitem look, 1 = button look
