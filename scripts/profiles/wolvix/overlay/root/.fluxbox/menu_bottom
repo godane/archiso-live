@@ -1,0 +1,10 @@
+#
+
+    [separator] () {} <>
+    [submenu] (Log Out) {} <>
+        [exit] (Exit Fluxbox) {} <>
+        [separator] () {} <>
+        [exec] (Reboot Computer) {shutdown -r now} <>
+        [exec] (Shutdown Computer) {shutdown -h now} <>
+    [end]
+[end]

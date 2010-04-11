@@ -5,7 +5,7 @@ avidemux-gtk
 #kino
 pitivi
 rawstudio
-inkscape
+#inkscape
 devede
 xchm
 deluge
@@ -15,6 +15,7 @@ xchm
 audacity
 lmms
 hydrogen
-blender
+#blender
 #cinelerra-cv
 miro
+synfigstudio

@@ -18,6 +18,7 @@ hydrogen
 blender
 cinelerra-cv
 miro
+synfigstudio
 #games
 gnome-games
 #libs
@@ -46,3 +47,14 @@ fltk
 gtkglext
 gtkglextmm
 libglademm
+allegro
+freealut
+ftgl
+glpng
+tcl
+silly
+cegui
+ode
+devil
+glew
+tre

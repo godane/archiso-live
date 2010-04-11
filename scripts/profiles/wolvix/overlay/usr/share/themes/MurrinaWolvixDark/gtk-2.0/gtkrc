@@ -1,0 +1,281 @@
+# Theme Name:	Murrina-WolvixDark
+# Version:	0.1
+# Author:	Wolven	http://wolvix.org
+#
+# Notes:	This theme created from the Murrina-BlueGray and the Murrina-TangoGray themes.
+
+style "theme-default"
+{
+  GtkButton      ::default_border    = { 0, 0, 0, 0 }
+  GtkRange       ::trough_border     = 0
+  GtkPaned       ::handle_size       = 6
+  GtkRange       ::slider_width      = 15
+  GtkRange       ::stepper_size      = 15
+  
+  GtkScrollbar   ::min_slider_length = 30
+  GtkCheckButton ::indicator_size    = 14
+  GtkMenuBar     ::internal-padding  = 0
+  GtkTreeView    ::expander_size     = 14
+  GtkExpander    ::expander_size     = 16
+  GtkScale       ::slider-length     = 27
+  #GtkToolbar     ::button-relief     = GTK_RELIEF_NORMAL
+  #GtkMenuBar     ::shadow-type       = GTK_SHADOW_IN
+  #GtkScrollbar   ::has-forward-stepper = 0
+  #GtkScrollbar   ::has-backward-stepper = 0
+  #GtkScrollbar   ::has-secondary-backward-stepper = 1
+  
+  xthickness = 1
+  ythickness = 1
+
+  fg[NORMAL]        = "#d3d7cf" # very dark brown
+  fg[PRELIGHT]      = "#eeeeec" # text on buttons (hover)
+  fg[ACTIVE]        = "#eeeeec" # text on unfocused tabs
+  fg[SELECTED]      = "#d3d7cf" # selected text on lists
+  fg[INSENSITIVE]   = "#babdb6" # greyed "unused" text
+
+  bg[NORMAL]		= "#2e3436" # entire background
+  bg[PRELIGHT]		= "#555753" # button prelights
+  bg[ACTIVE]		= "#555753" # selected taskbar items
+  bg[SELECTED]		= "#555753" # ???
+  bg[INSENSITIVE]	= "#2e3436" # greyed buttons
+
+  base[NORMAL]		= "#181B1C" # window background
+  base[PRELIGHT]	= "#555753" # menubar outline colour
+  base[ACTIVE]		= "#555753" # selected item background (out of focus)
+  base[SELECTED]	= "#555753" # selected hilight,tab/slider background, & menu stripe
+  base[INSENSITIVE]	= "#babdb6" # greyed sliders
+
+  text[NORMAL]		= "#d3d7cf" # text in general
+  text[PRELIGHT]	= "#d3d7cf" # hover text (on buttons)
+  text[ACTIVE]		= "#babdb6" # greyed text out of use (on highlight)
+  text[SELECTED]	= "#babdb6" # selected text (on highlight)
+  text[INSENSITIVE]	= "#888a85" # greyed text
+
+    GtkTreeView::odd_row_color  = "#1F2224"
+    GtkTreeView::even_row_color = "#181B1C"
+    GtkIMHtmlr::hyperlink-color = "#204a87"
+    GnomeHRef::link_color       = "#204a87"
+
+    engine "murrine"
+    {
+        animation = TRUE # FALSE = disabled, TRUE = enabled
+        contrast = 1.0
+        glazestyle = 0 # 0 = flat hilight, 1 = curved hilight, 2 = concave style, 3 = top curved hilight, 4 = beryl style
+        gradients = FALSE
+        hilight_ratio = 1.1
+        listviewheaderstyle = 2 # 0 = flat, 1 = glassy, 2 = raised
+        listviewstyle = 0 # 0 = nothing, 1 = dotted
+        menubaritemstyle = 0 # 0 = menuitem look, 1 = button look
+        menubarstyle = 2 # 0 = flat, 1 = glassy, 2 = gradient, 3 = striped
+        menuitemstyle = 1 # 0 = flat, 1 = glassy, 2 = striped
+        menustyle = 0
+        roundness = 2 # 0 = squared, 1 = old default, more will increase roundness
+        scrollbar_color = "#555753"
+        scrollbarstyle = 2 # Enable or disable circles, stripes, handles
+   }
+}
+
+
+style "theme-wide" = "theme-default"
+{
+  xthickness = 2
+  ythickness = 2
+}
+
+style "theme-wider" = "theme-default"
+{
+  xthickness = 3
+  ythickness = 3
+}
+
+style "theme-button" = "theme-wider"
+{
+ bg[NORMAL]   	   = "#2e3436"
+ bg[ACTIVE]			= "#555753"
+}
+
+style "theme-range" = "theme-default"
+{
+  xthickness = 3
+  ythickness = 3
+}
+
+style "theme-notebook" = "theme-wide"
+{
+  bg[NORMAL] = "#2e3436"
+  bg[SELECTED] = "#555753"
+  
+}
+
+style "theme-tasklist" = "theme-default"
+{
+  xthickness = 5
+  ythickness = 3
+}
+
+style "theme-menu" = "theme-default"
+{
+  xthickness = 2
+  ythickness = 1
+  bg[NORMAL] = "#2e3436"
+}
+
+style "theme-menu-item" = "theme-default"
+{
+  xthickness = 2
+  ythickness = 3
+  fg[NORMAL] 	= "#d3d7cf" 
+  fg[PRELIGHT] 	= "#eeeeec" 
+  fg[INSENSITIVE]  = "#555753"
+  bg[SELECTED]	   = "#555753"
+}
+
+style "theme-menubar" = "theme-default"
+{
+  xthickness = 2
+  ythickness = 2
+}
+
+style "theme-menubar" = "theme-default"
+{
+    bg[NORMAL] = "#555753"
+}
+
+style "theme-menubar-item"
+{
+    ythickness = 4
+	fg[PRELIGHT] = "#eeeeec" 
+	bg[PRELIGHT] = "#555753" 
+
+    engine "murrine"
+    {
+        animation = TRUE # FALSE = disabled, TRUE = enabled
+        contrast = 1.0
+        glazestyle = 3 # 0 = flat hilight, 1 = curved hilight, 2 = concave style, 3 = top curved hilight, 4 = beryl style
+        gradients = FALSE
+        hilight_ratio = 1.0
+        listviewheaderstyle = 2 # 0 = flat, 1 = glassy, 2 = raised
+        listviewstyle = 0 # 0 = nothing, 1 = dotted
+        menubaritemstyle = 0 # 0 = menuitem look, 1 = button look
+        menubarstyle = 2 # 0 = flat, 1 = glassy, 2 = gradient, 3 = striped
+        menuitemstyle = 1 # 0 = flat, 1 = glassy, 2 = striped
+        menustyle = 0
+        roundness = 2 # 0 = squared, 1 = old default, more will increase roundness
+        scrollbar_color = "#555753"
+        scrollbarstyle = 2 # Enable or disable circles, stripes, handles
+   }
+}
+
+style "theme-tree" = "theme-default"
+{
+    xthickness = 2
+    ythickness = 2
+	bg[NORMAL]        = "#555753"
+
+    engine "murrine"
+    {
+        animation = TRUE # FALSE = disabled, TRUE = enabled
+        contrast = 1.0
+        glazestyle = 3 # 0 = flat hilight, 1 = curved hilight, 2 = concave style, 3 = top curved hilight, 4 = beryl style
+        gradients = FALSE
+        hilight_ratio = 1.2
+        listviewheaderstyle = 2 # 0 = flat, 1 = glassy, 2 = raised
+        listviewstyle = 0 # 0 = nothing, 1 = dotted
+        menubaritemstyle = 0 # 0 = menuitem look, 1 = button look
+        menubarstyle = 2 # 0 = flat, 1 = glassy, 2 = gradient, 3 = striped
+        menuitemstyle = 1 # 0 = flat, 1 = glassy, 2 = striped
+        menustyle = 0
+        roundness = 2 # 0 = squared, 1 = old default, more will increase roundness
+        scrollbar_color = "#555753"
+        scrollbarstyle = 2 # Enable or disable circles, stripes, handles
+   }
+}
+
+style "theme-frame-title" = "theme-default"
+{
+  fg[NORMAL] 			= "#d3d7cf"
+}
+
+style "theme-tooltips" = "theme-default"
+{
+  xthickness = 4
+  ythickness = 4
+  bg[NORMAL] 			= "#eeeeec"
+}
+
+style "theme-progressbar" = "theme-wide"
+{
+    xthickness = 1
+    ythickness = 1
+  fg[PRELIGHT]  = "#ffffff"
+  bg[NORMAL]        = "#888a85"
+  bg[SELECTED]	    = "#2e3436"
+
+    engine "murrine"
+    {
+        animation = TRUE # FALSE = disabled, TRUE = enabled
+        contrast = 1.0
+        glazestyle = 3 # 0 = flat hilight, 1 = curved hilight, 2 = concave style, 3 = top curved hilight, 4 = beryl style
+        gradients = FALSE
+        hilight_ratio = 1.2
+        listviewheaderstyle = 2 # 0 = flat, 1 = glassy, 2 = raised
+        listviewstyle = 0 # 0 = nothing, 1 = dotted
+        menubaritemstyle = 0 # 0 = menuitem look, 1 = button look
+        menubarstyle = 2 # 0 = flat, 1 = glassy, 2 = gradient, 3 = striped
+        menuitemstyle = 1 # 0 = flat, 1 = glassy, 2 = striped
+        menustyle = 0
+        roundness = 2 # 0 = squared, 1 = old default, more will increase roundness
+        scrollbar_color = "#555753"
+        scrollbarstyle = 2 # Enable or disable circles, stripes, handles
+   }
+}
+
+style "theme-combo" = "theme-button"
+{
+}
+
+style "metacity-frame" = "theme-default"
+{
+  bg[SELECTED]  = "#181B1C"
+
+  # Focused title text color
+  fg[SELECTED]  = "#d3d7cf"
+}
+class "MetaFrames" 	  style "metacity-frame"
+class "GtkWindow"      style "metacity-frame"
+
+# widget styles
+class "GtkWidget"      style "theme-default"
+class "GtkButton"      style "theme-button"
+class "GtkScale"       style "theme-range"
+class "GtkCombo"       style "theme-button"
+class "GtkRange"       style "theme-wide"
+class "GtkFrame"       style "theme-wide"
+class "GtkMenu"        style "theme-menu"
+class "GtkEntry"       style "theme-wider"
+class "GtkMenuItem"    style "theme-menu-item"
+class "GtkNotebook"    style "theme-notebook"
+class "GtkProgressBar" style "theme-progressbar"
+class "*MenuBar*"      style "theme-menubar"
+
+widget_class "*MenuItem.*" style "theme-menu-item"
+widget_class "*MenuBar.*"  style "theme-menubar-item"
+
+# combobox stuff
+widget_class "*.GtkComboBox.GtkButton" style "theme-combo"
+widget_class "*.GtkCombo.GtkButton"    style "theme-combo"
+
+# tooltips stuff
+widget_class "*.tooltips.*.GtkToggleButton" style "theme-tasklist"
+widget "gtk-tooltips" 							  style "theme-tooltips"
+
+# treeview stuff
+widget_class "*.GtkTreeView.GtkButton" style "theme-tree"
+widget_class "*.GtkCTree.GtkButton" 	style "theme-tree"
+widget_class "*.GtkList.GtkButton" 	style "theme-tree"
+widget_class "*.GtkCList.GtkButton" 	style "theme-tree"
+widget_class "*.GtkFrame.GtkLabel" 	style "theme-frame-title"
+
+# notebook stuff
+widget_class "*.GtkNotebook.*.GtkEventBox" style "theme-notebook"
+widget_class "*.GtkNotebook.*.GtkViewport" style "theme-notebook"

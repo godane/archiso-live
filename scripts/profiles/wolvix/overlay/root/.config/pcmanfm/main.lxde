@@ -1,0 +1,15 @@
+[General]
+big_icon_size=32
+small_icon_size=24
+terminal=lxterminal
+
+[Window]
+width=640
+height=480
+splitter_pos=160
+maximized=0
+
+[Desktop]
+show_wallpaper=1
+wallpaper=/usr/share/xfce4/backdrops/wolvix-reflection.svg
+bg2=35432,49147,21356

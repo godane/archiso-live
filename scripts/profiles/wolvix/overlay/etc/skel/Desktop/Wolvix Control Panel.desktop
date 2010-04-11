@@ -1,0 +1,12 @@
+
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Type=Application
+Name=Wolvix Control Panel
+Comment=Suite of admin utils for Wolvix
+Categories=Application;
+Exec=gksu /usr/sbin/wolvix-control-panel
+Icon=wolvix-control-panel
+Terminal=false
+StartupNotify=false

@@ -7,12 +7,17 @@ install ()
     if [ "x${MODULES}" != "x" ]; then
         MODULES="${MODULES} usb_storage sd_mod sr_mod"
     fi
+
     BINARIES=""
-    #FILES="/usr/lib/liblinuxlive"
     FiLES=""
-    add_dir /real_root
     add_dir /tmpfs
     add_dir /bootmnt
+    add_dir /tmpfs.sqfs
+
+    add_binary /lib/udev/cdrom_id
+
+    add_file /lib/udev/rules.d/60-cdrom_id.rules
+
     SCRIPT="archiso"
 }
 
