@@ -6,32 +6,29 @@
         [exec] (Leafpad) {leafpad} <>
     [end]
     [submenu] (Graphics) {} <>
-		[exec] (gtkam) {gtkam} <>
+	[exec] (gtkam) {gtkam} <>
         [exec] (Mirage) {mirage} <>
         [exec] (mtPaint) {mtpaint} <>
     [end]
     [submenu] (Multimedia) {} <>
         [exec] (Audacious) {audacious} <>
-		        [exec] (EasyTAG) {easytag} <>
-		[exec] (GnomeBaker) {gnomebaker} <>
-        [exec] (Grip) {grip} <>
+	[exec] (Asunder) {asunder} <>
+	[exec] (EasyTAG) {easytag} <>
+	[exec] (Recorder) {recorder} <>
         [exec] (ISO Master) {isomaster} <>
-        [exec] (MPlayer) {gmplayer} <>
+        [exec] (Vlc) {vlc} <>
         [exec] (streamtuner) {streamtuner} <>
-        [exec] (Xine) {xine} <>
-		[separator] () {} <>
-		[exec] (Volume Control) {aumix} <>
+	[separator] () {} <>
+	[exec] (Volume Control) {aumix} <>
     [end]
     [submenu] (Network) {} <>
         [exec] (Claws Mail) {claws-mail} <>
         [exec] (FireFox) {firefox} <>
         [exec] (gFTP) {gftp} <>
         [exec] (Grsync) {grsync} <>
-        [exec] (Midori) {midori} <>
         [exec] (Pidgin) {pidgin} <>
         [exec] (Transmission) {transmission} <>
         [exec] (Wicd) {wicd-client --no-tray} <>
-		[exec] (Wifi-radar) {gksu wifi-radar} <>
         [exec] (X-Chat) {xchat} <>
     [end]
     [submenu] (Office) {} <>
@@ -47,12 +44,13 @@
         [exec] (XTerm [Unicode]) {uxterm} <>
     [end]
     [submenu] (System) {} <>
-		[exec] (Gparted) {gksu gparted} <>
-		[exec] (Gslapt) {gksu gslapt} <>
-		[exec] (htop) {xterm -e htop} <>
+	[exec] (Gparted) {gksu gparted} <>
+	[exec] (Gslapt) {gksu gslapt} <>
+	[exec] (htop) {xterm -e htop} <>
         [exec] (PCManFM) {pcmanfm} <>
-		[exec] (Touchpad) {gsynaptics} <>
-		[separator] () {} <>
+	[exec] (Touchpad) {gsynaptics} <>
+	[exec] (Hardinfo) {hardinfo} <>
+	[separator] () {} <>
         [exec] (Wolvix Control Panel) {gksu /usr/sbin/wolvix-control-panel} <>
         
     [end]
