@@ -1,7 +1,7 @@
-aufs2 standalone patch for linux-2.6.
+aufs2 standalone patch for linux-2.6.33
 
 diff --git a/fs/namei.c b/fs/namei.c
-index ca3c04b..90cb1d1 100644
+index 1d12d37..7cb8e5d 100644
 --- a/fs/namei.c
 +++ b/fs/namei.c
 @@ -349,6 +349,7 @@ int deny_write_access(struct file * file)
@@ -12,7 +12,7 @@ index ca3c04b..90cb1d1 100644
  
  /**
   * path_get - get a reference to a path
-@@ -1206,6 +1207,7 @@ struct dentry *lookup_hash(struct nameidata *nd)
+@@ -1216,6 +1217,7 @@ struct dentry *lookup_hash(struct nameidata *nd)
  		return ERR_PTR(err);
  	return __lookup_hash(&nd->last, nd->path.dentry, nd);
  }
@@ -20,7 +20,7 @@ index ca3c04b..90cb1d1 100644
  
  int __lookup_one_len(const char *name, struct qstr *this,
  		struct dentry *base, int len)
-@@ -1228,6 +1230,7 @@ int __lookup_one_len(const char *name, struct qstr *this,
+@@ -1238,6 +1240,7 @@ int __lookup_one_len(const char *name, struct qstr *this,
  	this->hash = end_name_hash(hash);
  	return 0;
  }
@@ -40,6 +40,75 @@ index c768f73..0fd78c3 100644
  
  static int event;
  static DEFINE_IDA(mnt_id_ida);
+diff --git a/fs/notify/group.c b/fs/notify/group.c
+index 0e16771..3fab10a 100644
+--- a/fs/notify/group.c
++++ b/fs/notify/group.c
+@@ -22,6 +22,7 @@
+ #include <linux/srcu.h>
+ #include <linux/rculist.h>
+ #include <linux/wait.h>
++#include <linux/module.h>
+ 
+ #include <linux/fsnotify_backend.h>
+ #include "fsnotify.h"
+@@ -169,6 +170,7 @@ void fsnotify_put_group(struct fsnotify_group *group)
+ 	fsnotify_recalc_global_mask();
+ 	fsnotify_destroy_group(group);
+ }
++EXPORT_SYMBOL(fsnotify_put_group);
+ 
+ /*
+  * Simply run the fsnotify_groups list and find a group which matches
+@@ -252,3 +254,4 @@ struct fsnotify_group *fsnotify_obtain_group(unsigned int group_num, __u32 mask,
+ 
+ 	return group;
+ }
++EXPORT_SYMBOL(fsnotify_obtain_group);
+diff --git a/fs/notify/inode_mark.c b/fs/notify/inode_mark.c
+index 3165d85..4586162 100644
+--- a/fs/notify/inode_mark.c
++++ b/fs/notify/inode_mark.c
+@@ -106,6 +106,7 @@ void fsnotify_put_mark(struct fsnotify_mark_entry *entry)
+ 	if (atomic_dec_and_test(&entry->refcnt))
+ 		entry->free_mark(entry);
+ }
++EXPORT_SYMBOL(fsnotify_put_mark);
+ 
+ /*
+  * Recalculate the mask of events relevant to a given inode locked.
+@@ -216,6 +217,7 @@ void fsnotify_destroy_mark_by_entry(struct fsnotify_mark_entry *entry)
+ 	if (unlikely(atomic_dec_and_test(&group->num_marks)))
+ 		fsnotify_final_destroy_group(group);
+ }
++EXPORT_SYMBOL(fsnotify_destroy_mark_by_entry);
+ 
+ /*
+  * Given a group, destroy all of the marks associated with that group.
+@@ -282,6 +284,7 @@ struct fsnotify_mark_entry *fsnotify_find_mark_entry(struct fsnotify_group *grou
+ 	}
+ 	return NULL;
+ }
++EXPORT_SYMBOL(fsnotify_find_mark_entry);
+ 
+ /*
+  * Nothing fancy, just initialize lists and locks and counters.
+@@ -298,6 +301,7 @@ void fsnotify_init_mark(struct fsnotify_mark_entry *entry,
+ 	entry->inode = NULL;
+ 	entry->free_mark = free_mark;
+ }
++EXPORT_SYMBOL(fsnotify_init_mark);
+ 
+ /*
+  * Attach an initialized mark entry to a given group and inode.
+@@ -353,6 +357,7 @@ int fsnotify_add_mark(struct fsnotify_mark_entry *entry,
+ 
+ 	return ret;
+ }
++EXPORT_SYMBOL(fsnotify_add_mark);
+ 
+ /**
+  * fsnotify_unmount_inodes - an sb is unmounting.  handle any watched inodes.
 diff --git a/fs/open.c b/fs/open.c
 index 040cef7..453b782 100644
 --- a/fs/open.c

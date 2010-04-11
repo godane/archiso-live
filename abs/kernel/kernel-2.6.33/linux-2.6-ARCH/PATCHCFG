@@ -17,8 +17,8 @@ PATCHES=(
 
          # add aufs2 support, in reference to:
          # http://aufs.sourceforge.net
-         aufs2-base-20100224.patch%1
-         aufs2-standalone-20100224.patch%1
+         aufs2-base-20100410.patch%1
+         aufs2-standalone-20100410.patch%1
          # squashfs with lzma
          0001-Squashfs-move-zlib-decompression-wrapper-code-into.patch%1
          0002-Squashfs-Factor-out-remaining-zlib-dependencies-int.patch%1
@@ -31,7 +31,7 @@ PATCHES=(
          0009-Squashfs-force-lzma-wrapper-to-be-retained.patch%1
         )
 # Name of the resulting patch (will be bzipped afterwards)
-PATCHNAME="patch-2.6.33.2-1-ARCH"
+PATCHNAME="patch-2.6.33.2-2-ARCH"
 
 # Run this before applying patches
 pre_apply() {

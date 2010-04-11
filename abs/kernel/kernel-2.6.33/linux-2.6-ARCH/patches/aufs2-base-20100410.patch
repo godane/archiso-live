@@ -1,10 +1,10 @@
-aufs2 base patch for linux-2.6.
+aufs2 base patch for linux-2.6.33
 
 diff --git a/fs/namei.c b/fs/namei.c
-index d62fdc8..ca3c04b 100644
+index a4855af..1d12d37 100644
 --- a/fs/namei.c
 +++ b/fs/namei.c
-@@ -1197,7 +1197,7 @@ out:
+@@ -1207,7 +1207,7 @@ out:
   * needs parent already locked. Doesn't follow mounts.
   * SMP-safe.
   */
@@ -13,7 +13,7 @@ index d62fdc8..ca3c04b 100644
  {
  	int err;
  
-@@ -1207,7 +1207,7 @@ static struct dentry *lookup_hash(struct nameidata *nd)
+@@ -1217,7 +1217,7 @@ static struct dentry *lookup_hash(struct nameidata *nd)
  	return __lookup_hash(&nd->last, nd->path.dentry, nd);
  }
  
