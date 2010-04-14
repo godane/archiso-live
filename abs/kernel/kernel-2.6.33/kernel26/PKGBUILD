@@ -7,8 +7,8 @@ pkgname=('kernel26' 'kernel26-firmware' 'kernel26-headers') # Build stock -ARCH 
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.33
 pkgver=${_basekernel}.2
-pkgrel=1live
-_patchname="patch-${pkgver}-1-ARCH"
+pkgrel=2live
+_patchname="patch-${pkgver}-2-ARCH"
 arch=(i686 x86_64)
 license=('GPL2')
 url="http://www.kernel.org"
@@ -19,7 +19,7 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         # standard config files for mkinitcpio ramdisk
         kernel26.preset)
 md5sums=('c3883760b18d50e8d78819c54d579b00'
-         'b10a3a1e92c473106d807f6d33ed0be1'
+         '3481c3d896afea0c905de4136a38807d'
          '6020647d2fef771f7ac33317c60930ac'
          '1f24529018de11b9a9f4f30041bd9c0f'
          '25584700a0a679542929c4bed31433b6')
@@ -180,6 +180,8 @@ package_kernel26-headers() {
   mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/fs/xfs
   mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/mm
   cp fs/xfs/xfs_sb.h ${pkgdir}/usr/src/linux-${_kernver}/fs/xfs/xfs_sb.h
+  cp kernel/mutex-debug.h ${pkgdir}/usr/src/linux-${_kernver}/kernel/mutex-debug.h
+  cp kernel/mutex.h ${pkgdir}/usr/src/linux-${_kernver}/kernel/mutex.h
   # add headers vor virtualbox
   # in reference to:
   # http://bugs.archlinux.org/task/14568

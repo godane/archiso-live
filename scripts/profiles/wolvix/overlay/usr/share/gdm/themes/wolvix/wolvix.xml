@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE greeter SYSTEM "greeter.dtd">
+<greeter>
+
+  <!-- background -->
+  <item type="pixmap">
+    <normal file="background.svg"/>
+    <pos y="0" x="0" width="100%" height="100%"/>
+  </item>
+
+  <!-- bottom bar -->
+  <item type="rect">
+    <normal color="#2e3436"/>
+    <pos y="100%" x="0" width="100%" height="48" anchor="sw"/>
+    <box xpadding="10" spacing="10" orientation="horizontal">
+      <!-- reboot -->
+      <item type="rect" id="reboot_button" button="true">
+        <show type="reboot" modes="console"/>
+        <pos y="50%" width="box" height="box" anchor="w"/>
+        <box xpadding="0" spacing="2" orientation="horizontal">
+          <item type="pixmap">
+            <normal file="icon-reboot.png"/>
+            <prelight file="icon-reboot-prelight.png"/>
+            <active file="icon-reboot-prelight.png"/>
+          </item>
+          <item type="label">
+            <normal font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <prelight font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <active font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <pos y="50%" anchor="w"/>
+            <stock type="reboot"/>
+          </item>
+        </box>
+      </item>
+      <!-- halt -->
+      <item type="rect" id="halt_button" button="true">
+        <show type="halt" modes="console"/>
+        <pos y="50%" width="box" height="box" anchor="w"/>
+        <box xpadding="0" spacing="2" orientation="horizontal">
+          <item type="pixmap">
+            <normal file="icon-shutdown.png"/>
+            <prelight file="icon-shutdown-prelight.png"/>
+            <active file="icon-shutdown-prelight.png"/>
+          </item>
+          <item type="label">
+            <normal font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <prelight font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <active font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <pos y="50%" anchor="w"/>
+            <stock type="halt"/>
+          </item>
+        </box>
+      </item>
+      <!-- quit / disconnect -->
+      <item type="rect" id="disconnect_button" button="true">
+        <normal/>
+        <show modes="flexi,remote"/>
+        <pos y="50%" width="box" height="box" anchor="w"/>
+        <box xpadding="0" spacing="2" orientation="horizontal">
+          <item type="pixmap">
+            <normal file="icon-shutdown.png"/>
+            <prelight file="icon-shutdown-prelight.png"/>
+            <active file="icon-shutdown-prelight.png"/>
+          </item>
+          <item type="label">
+            <normal font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <prelight font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <active font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <pos y="50%" anchor="w"/>
+            <stock type="disconnect"/>
+            <show modes="remote"/>
+          </item>
+          <item type="label">
+            <normal font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <prelight font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <active font="Bitstream Vera Sans 10" color="#ffffff"/>
+            <pos y="50%" anchor="w"/>
+            <stock type="quit"/>
+            <show modes="flexi"/>
+          </item>
+        </box>
+      </item>
+    </box>
+  </item>
+  
+  <!-- hostname and clock -->
+  <item type="rect">
+    <pos x="100%" y="100%" width="box" height="42" anchor="se"/>
+    <box xpadding="10" spacing="10" orientation="horizontal">
+      <item type="label">
+        <pos x="100%" y="50%" anchor="e"/>
+        <normal font="Bitstream Vera Sans Bold 10" color="#ffffff"/>
+        <text>%h //</text>
+      </item>
+      <item type="label" id="clock">
+        <pos x="100%" y="50%" anchor="e"/>
+        <normal font="Bitstream Vera Sans 10" color="#ffffff"/>
+        <text>%c</text>
+      </item>
+    </box>
+  </item>
+  
+  
+  <!-- password box -->
+  <item type="rect">
+    <pos x="70%" y="55%" width="box" height="box" anchor="c"/>
+    <box xpadding="0" ypadding="0" spacing="5" orientation="vertical">
+      <item type="rect">
+        <pos x="0" y="0" width="box" height="box" expand="true"/>
+        <normal color="#ffffff" alpha="0"/>
+        <box xpadding="50" ypadding="15" spacing="10" orientation="vertical">
+          <item type="label" id="pam-prompt">
+            <pos x="0"/>
+            <normal font="Bitstream Vera Sans Bold 10" color="#ffffff"/>
+            <stock type="username-label"/>
+          </item>
+          <item type="rect">
+            <normal color="#523921"/>
+            <pos width="160" height="24"/>
+            <fixed>
+              <item type="entry" id="user-pw-entry">
+                <pos y="1" x="1" width="-2" height="-2" anchor="nw"/>
+              </item>
+            </fixed>
+          </item>
+          <!-- timer warning -->
+          <item type="label" id="timed-label">
+            <show type="timed"/>
+            <normal font="Bitstream Vera Sans Bold 10" color="#ffffff"/>
+            <stock type="timed-label"/>
+          </item>
+        </box>
+      </item>
+      <item type="rect">
+        <pos x="0" y="0" width="100%" height="box" expand="true"/>
+        <normal color="#ffffff" alpha="0"/>
+        <box xpadding="10" ypadding="8" spacing="10" orientation="horizontal" homogeneous="true">
+          <!-- language -->
+          <item type="rect" id="language_button" button="true">
+            <pos x="50%" y="50%" width="box" height="box" anchor="c"/>
+            <box xpadding="0" spacing="2" orientation="horizontal">
+              <item type="pixmap">
+                <pos width="24" height="24"/>
+                <normal file="icon-language.png"/>
+                <prelight file="icon-language-prelight.png"/>
+                <active file="icon-language-prelight.png"/>
+              </item>
+              <item type="label">
+                <normal font="Bitstream Vera Sans 9" color="#ffffff"/>
+                <prelight font="Bitstream Vera Sans 9" color="#ffffff"/>
+                <active font="Bitstream Vera Sans 9" color="#ffffff"/>
+                <pos y="50%" anchor="w"/>
+                <stock type="language"/>
+              </item>
+            </box>
+          </item>
+          <!-- session -->
+          <item type="rect" id="session_button" button="true">
+            <pos x="50%" y="50%" width="box" height="box" anchor="c"/>
+            <box xpadding="0" spacing="2" orientation="horizontal">
+              <item type="pixmap">
+                <pos width="24" height="24"/>
+                <normal file="icon-session.png"/>
+                <prelight file="icon-session-prelight.png"/>
+                <active file="icon-session-prelight.png"/>
+              </item>
+              <item type="label">
+                <normal font="Bitstream Vera Sans 9" color="#ffffff"/>
+                <prelight font="Bitstream Vera Sans 9" color="#ffffff"/>
+                <active font="Bitstream Vera Sans 9" color="#ffffff"/>
+                <pos y="50%" anchor="w"/>
+                <stock type="session"/>
+              </item>
+            </box>
+          </item>
+        </box>
+      </item>
+    </box>
+  </item>
+
+
+  <!-- caps lock warning -->
+  <item type="label" id="caps-lock-warning">
+    <pos x="50%" y="90%" anchor="c"/>
+    <normal font="Bitstream Vera Sans Bold 11" color="#ffffff"/>
+    <stock type="caps-lock-warning"/>
+  </item>
+
+
+  <!-- pam error -->
+  <item type="label" id="pam-error">
+    <pos x="50%" y="90%" anchor="c" />
+    <normal font="Bitstream Vera Sans Bold 10" color="#ffffff"/>
+    <text></text>
+  </item>
+
+</greeter>

@@ -1,0 +1,89 @@
+    [exec] (Run Program...) {gexec}  <>
+        [separator] () {} <>
+    [exec] (Terminal) {lxterminal} <> 
+    [exec] (File Manager) {pcmanfm} <>
+    [exec] (Web Browser) {firefox} <>
+    [separator] () {} <>
+	[submenu] (Fluxbox) {}  <>
+            [config] (Configure) {} <>
+	    [submenu] (Backgrounds)
+	        [submenu] (System) {Choose a background...} <>
+	            [wallpapers] (/usr/share/fluxbox/backgrounds)
+	        [end]
+	        [submenu] (User) {Choose a background...} <>
+	            [wallpapers] (~/.fluxbox/backgrounds)
+	        [end]
+	    [end]
+            [submenu] (System Styles) {Choose a style...} <>
+                [stylesdir] (/usr/share/fluxbox/styles) {} <>
+            [end]
+            [submenu] (User Styles) {Choose a style...} <>
+                [stylesdir] (~/.fluxbox/styles) {} <>
+            [end]
+            [workspaces] (Workspace List) {} <>
+            [submenu] (Tools) {} <>
+                [exec] (Window name) {xprop WM_CLASS|cut -d \" -f 2|xmessage -file - -center} <>
+                [exec] (Screenshot - JPG) {import screenshot.jpg && display -resize 50% screenshot.jpg} <>
+                [exec] (Screenshot - PNG) {import screenshot.png && display -resize 50% screenshot.png} <>
+            [end]
+            [commanddialog] (Fluxbox Command) {} <>
+            [reconfig] (Reload config) {} <>
+            [restart] (Restart) {} <>
+        [end]
+	[submenu] (Desktop) {} <>
+		[submenu] (Launcher Bar) <>
+			[exec] (wbar Top Center) {launch_wbar_top} <>
+			[exec] (wbar Bottom Center) {launch_wbar_bottom} <>
+			[separator] () {} <>
+			[exec] (Kill wbar) {killall wbar} <>
+		[end]
+		[submenu] (System Monitor) <>
+			[exec] (Conky All Corners) {launch_conky} <>
+			[exec] (Conky Top Left Corner) {conky --config=$HOME/.conky/top_left} <>
+			[exec] (Conky Top Right Corner) {conky --config=$HOME/.conky/top_right} <>
+			[exec] (Conky Bottom Left Corner) {conky --config=$HOME/.conky/bottom_left} <>
+			[exec] (Conky Bottom Right Corner) {conky --config=$HOME/.conky/bottom_right} <>
+			[separator] () {} <>
+			[exec] (Run Conky) {conky} <>
+			[exec] (Kill Conky) {killall conky} <>
+		[end]
+	[end]
+    [submenu] (Settings) {} <>
+		[exec] (Change GTK Theme) {gtk-chtheme} <>
+		[exec] (Configure Fluxbox) {fluxbare} <>
+		[separator] () {} <>
+        [submenu] (Display Settings) {} <>
+            [exec] (Resolution = 640x480) {xrandr -s 640x480} <>
+            [exec] (Resolution = 800x600) {xrandr -s 800x600} <>
+            [exec] (Resolution = 1024x768) {xrandr -s 1024x768} <>
+            [exec] (Resolution = 1280x1024) {xrandr -s 1280x1024} <> 
+            [exec] (Resolution = 1600x1200) {xrandr -s 1600x1200} <>
+        [end]
+        [submenu] (Keyboard Layout) {} <>
+            [exec] (Brazilian keyboard layout) {setxkbmap br} <>
+            [exec] (British keyboard layout) {setxkbmap gb} <>
+            [exec] (Danish keyboard layout) {setxkbmap dk} <>
+            [exec] (Finnish kayboard layout) {setxkbmap fi} <>
+            [exec] (French keyboard layout) {setxkbmap fr} <>
+            [exec] (German keyboard layout) {setxkbmap de} <>
+            [exec] (Icelandic keyboard layout) {setxkbmap is} <>
+            [exec] (Italian keyboard layout) {setxkbmap it} <>
+            [exec] (North American keyboard layout) {setxkbmap us} <>
+            [exec] (Norwegian keyboard layout) {setxkbmap no} <>
+            [exec] (Spanish keyboard layout) {setxkbmap es} <>
+            [exec] (Swedish keyboard layout) {setxkbmap se} <>
+        [end]
+		[submenu] (Screen Blank) {} <>
+			[exec] (Blank Screen: Off) {xset s off}
+			[exec] (Blank Screen: 10min) {xset s blank;xset s 600} <>
+			[exec] (Blank Screen: 15min) {xset s blank;xset s 900} <>
+			[exec] (Blank Screen: 20min) {xset s blank;xset s 1200} <>
+			[exec] (Blank Screen: 30min) {xset s blank;xset s 1800} <>
+			[exec] (Blank Screen: 45min) {xset s blank;xset s 2700} <>
+			[exec] (Blank Screen: 60min) {xset s blank;xset s 3600} <>
+			[separator] () {} <>
+			[exec] (Turn Off Screen) {sleep 3; xset dpms force off} <>
+		[end]
+    [end]
+    [separator] () {} <>
+#

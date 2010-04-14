@@ -1,0 +1,12 @@
+[Entry 0]
+Name=Text Editor
+Comment=Edit text files
+Icon=accessories-text-editor
+Exec=mousepad
+Terminal=false
+StartupNotify=true
+
+[Global]
+MoveFirst=false
+ArrowPosition=0
+

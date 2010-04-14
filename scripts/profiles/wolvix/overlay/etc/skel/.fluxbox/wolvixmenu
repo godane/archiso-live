@@ -1,0 +1,5 @@
+[begin] (wolvix)
+[include] (~/.fluxbox/menu_top)
+[include] (~/.fluxbox/menu_mid)
+[include] (~/.fluxbox/menu_bottom)
+[end]

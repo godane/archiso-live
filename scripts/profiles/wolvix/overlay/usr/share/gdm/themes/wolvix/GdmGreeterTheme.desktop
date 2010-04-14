@@ -1,0 +1,11 @@
+# This is not really a .desktop file like the rest, but it's useful to treat
+# it as such
+
+[GdmGreeterTheme]
+Encoding=UTF-8
+Greeter=wolvix.xml
+Name=Wolvix
+Description=Wolvix GNU/Linux GDM theme
+Author=Wolven
+Copyright=(c) 2008 Wolvix.org
+Screenshot=screenshot.png

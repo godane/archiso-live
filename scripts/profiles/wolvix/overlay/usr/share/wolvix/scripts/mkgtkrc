@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# This script is intended to run at Fluxbox start up to make sure a GTK+2
+# theme is set by .gtkrc-2.0 to be used with the Fluxbox style.
+#
+# Author: Wolven	<http://wolvix.org>
+
+# Look for .gtkrc-2.0.removed file renamed by the rmgtkrc.sh script.
+# If found and no .gtkrc-2.0 is found, rename it back to .gtkrc-2.0.
+if [ -e "$HOME/.gtkrc-2.0.removed" ] && [ ! -e "$HOME/.gtkrc-2.0" ]; then
+  mv $HOME/.gtkrc-2.0.removed $HOME/.gtkrc-2.0
+fi
+
+# Replace "/changeme/" with the users home dir in ~/.fluxbox/gtkrc-2.0
+if [ -e "$HOME/.fluxbox/gtkrc-2.0" ]; then
+  sed -i "s|/changeme/|$HOME/|g" $HOME/.fluxbox/gtkrc-2.0
+fi
+
+# Look for .gtkrc-2.0. If not found create a symlink to gtkrc-2.0 in
+# ~/.fluxbox.
+if [ ! -e "$HOME/.gtkrc-2.0" ] && [ -e "$HOME/.fluxbox/gtkrc-2.0" ]; then
+  ln -sf $HOME/.fluxbox/gtkrc-2.0 $HOME/.gtkrc-2.0
+fi
+
+# Look for .gtkrc.mine. If not found create a symlink to gtkrc.mine in
+# ~/.fluxbox
+if [ ! -e "$HOME/.gtkrc.mine" ] && [ -e "$HOME/.fluxbox/gtkrc.mine" ]; then
+	ln -sf $HOME/.fluxbox/gtkrc.mine $HOME/.gtkrc.mine
+fi

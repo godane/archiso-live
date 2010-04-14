@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# This script is intened to run at Xfce startup to prevent the GTK+2 theme
+# defined in .gtkrc-2.0 overriding the GTK+2 theme set by Xfce.
+#
+# Author: Wolven	<http://wolvix.org>
+
+# Look for .gtkrc-2.0. If found rename it.
+if [ -e "$HOME/.gktrc-2.0" ]; then
+  mv $HOME/.gtkrc-2.0 $HOME/.gtkrc-2.0.removed
+fi

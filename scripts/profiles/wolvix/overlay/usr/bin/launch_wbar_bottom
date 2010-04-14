@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Launch wbar bottom center
+
+killall wbar
+wbar -above-desk -isize 28 -idist 5 -zoomf 1.5 -bpress -pos bottom
+exit 1

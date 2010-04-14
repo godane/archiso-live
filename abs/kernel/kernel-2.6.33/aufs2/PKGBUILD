@@ -1,7 +1,7 @@
 # $Id$
 # Maintainer: Paul Mattal <pjmattal@elys.com>
 pkgname=aufs2
-pkgver=2.6.33_20100224
+pkgver=2.6.33_20100410
 pkgrel=1live
 _kernver=${pkgver%_*}-ARCH
 pkgdesc="Another Unionfs Implementation"
@@ -21,6 +21,10 @@ build() {
      config.mk || return 1
   sed -i 's|CONFIG_AUFS_BRANCH_MAX_1023 =.*|CONFIG_AUFS_BRANCH_MAX_1023 = y|' \
      config.mk || return 1
+  sed -i 's|CONFIG_AUFS_HNOTIFY =.*|CONFIG_AUFS_HNOTIFY = y|' \
+     config.mk || return 1
+  #sed -i 's|CONFIG_AUFS_HFSNOTIFY =.*|CONFIG_AUFS_HFSNOTIFY = y|' \
+  #   config.mk || return 1
   sed -i 's|CONFIG_AUFS_HINOTIFY =.*|CONFIG_AUFS_HINOTIFY = y|' \
      config.mk || return 1
   sed -i 's|CONFIG_AUFS_EXPORT =.*|CONFIG_AUFS_EXPORT = y|' \
@@ -51,4 +55,4 @@ build() {
   # install include files
   install -D -m 644 include/linux/aufs_type.h $pkgdir/usr/src/linux-$_kernver/include/linux/aufs_type.h || return 1
 } 
-md5sums=('230e0a6469984205b2003c2ee616252c')
+md5sums=('4e0523d8649a2aee0dcd3b37460cc77a')

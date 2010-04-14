@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Run four instances of Conky. One for each corner of the desktop.
+#
+# Author: Wolven	<http://wolvix.org>
+
+# Kill any running Conkys
+killall conky
+
+# Launch four different configurations
+conky --config=$HOME/.conky/top_left		# Top Left
+conky --config=$HOME/.conky/top_right		# Top Right
+conky --config=$HOME/.conky/bottom_left		# Bottom Left
+conky --config=$HOME/.conky/bottom_right	# Bottom Right
+
+exit 1
