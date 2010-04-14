@@ -1,4 +1,4 @@
-avidemux
+avidemux-gtk
 bluefish
 #blender
 catfish
@@ -9,7 +9,7 @@ devede
 dia
 gimp
 glabels
-glade3
+glade
 gnome-commander
 gnome-ppx
 gnormalize
@@ -40,10 +40,3 @@ xchm
 xfburn
 xsane
 zim
-#deps
-net-snmp
-scrot
-libwebkit
-perl-mp3-info
-imagemagick
-#cddb_get

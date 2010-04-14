@@ -1,4 +1,5 @@
 base-devel
+kernel26-headers
 doxygen
 ccache
 cmake
@@ -6,4 +7,13 @@ gdb
 nasm
 gperf
 intltool
-kernel26-headers
+git
+subversion
+cvs
+mercurial
+bzrtools
+scons
+gdb
+distcc
+ruby
+abs

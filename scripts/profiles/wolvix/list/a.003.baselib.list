@@ -34,3 +34,6 @@ pcre
 popt
 taglib
 wavpack
+nss
+imagemagick
+scrot
