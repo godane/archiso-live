@@ -34,5 +34,5 @@ xdg-utils
 enchant
 fluidsynth
 ladspa
-avidemux-cli
 rpmextract
+rsnapshot

@@ -6,7 +6,7 @@ aumix
 claws-mail
 conky
 easytag
-evince
+epdfview
 galculator
 geany
 gftp
@@ -31,7 +31,9 @@ scrot
 streamtuner
 terminator
 transmission-gtk
-vlc
+mplayer
+gnome-mplayer
+gecko-mediaplayer
 wicd
 xarchiver
 xchat

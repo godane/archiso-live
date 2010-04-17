@@ -2,7 +2,7 @@
 Name=Video Player
 Comment=Play movie and video files
 Icon=applications-multimedia
-Exec=vlc
+Exec=gnome-mplayer
 Terminal=false
 StartupNotify=false
 

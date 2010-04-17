@@ -42,8 +42,10 @@ xsane
 zim
 #deps
 net-snmp
-#scrot
 libwebkit
 perl-mp3-info
-#imagemagick
-#cddb_get
+sdl_perl
+glew
+libmms
+physfs
+quesoglc
