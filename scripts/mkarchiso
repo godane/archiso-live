@@ -199,6 +199,9 @@ check()
 mksquash ()
 {
 	start=$(date +%s)
+	local MOD
+	local DIR
+
 	for DIR in $MODULES; do
 		MOD="$(basename $DIR).${EXT}"
 		info "Building module $MOD"
@@ -407,7 +410,7 @@ command_install () {
 				fi
 			done
 
-			if [ -e "$(pwd)/list/${mod}.removelist" ]; then
+			if [ -f "$(pwd)/list/${mod}.removelist" ]; then
 				cat "$(pwd)/list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
 					info "Removing package $pkgname"
 					pacman -R -d -n --noprogressbar --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname &> /dev/null
@@ -429,7 +432,7 @@ command_install () {
 			remove "${union}/usr/share/icons/hicolor/icon-theme.cache"
 			remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
 			remove "${union}/usr/share/icons/nuoveXT2/icon-theme.cache"
-        fi
+		fi
 
 		# remove the initcpio images that were generated for the host system
 		find "${union}/boot" -name *.img -delete
@@ -494,6 +497,25 @@ command_install () {
 	info "Unmounting union."
 	umount -l ${union}
 
+	for MODULE in ${MODULES}; do
+		if [ -f "$(pwd)/list/rmlocale" ]; then
+			cat "$(pwd)/list/rmlocale" | grep -v "^#" | while read rmlocale; do
+				if [ -d "${moduledir}/${MODULE}/usr/share/locale/${rmlocale}" ]; then
+					info "Removing locale $rmlocale"
+					rm -Rf ${moduledir}/${MODULE}/usr/share/locale/${rmlocale}
+				fi
+			done
+		fi
+
+		if [ -f "$(pwd)/list/rmfolder" ]; then
+			cat "$(pwd)/list/rmfolder" | grep -v "^#" | while read rmfolder; do
+				if [ -d "${moduledir}/${MODULE}/${rmfolder}" ]; then
+					info "Removing folder $rmfolder"
+					rm -Rf ${moduledir}/${MODULE}/${rmfolder}
+				fi
+			done
+		fi
+	done
 	info "Updating kernel module dependencies"
 	kernelver=$(_kversion)
 	depmod -a -b "${INSTROOT}" "${kernelver}"
@@ -536,6 +558,9 @@ command_squash () {
 	info "Creating modules procede..."
 
 	# edit modules to the ones that updated or changed
+
+	local MOD
+	local DIR
 
 	find ${packlist} -size +0 -name "*.list" > ${packlist}/updated.list
 	sed -i "s|${packlist}/updated.list||g" ${packlist}/updated.list
