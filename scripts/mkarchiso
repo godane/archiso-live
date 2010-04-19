@@ -506,16 +506,18 @@ command_install () {
 				fi
 			done
 		fi
-
-		if [ -f "$(pwd)/list/rmfolder" ]; then
-			cat "$(pwd)/list/rmfolder" | grep -v "^#" | while read rmfolder; do
-				if [ -d "${moduledir}/${MODULE}/${rmfolder}" ]; then
-					info "Removing folder $rmfolder"
-					rm -Rf ${moduledir}/${MODULE}/${rmfolder}
+		
+		if [ -f "$(pwd)/list/remove" ]; then
+			cat "$(pwd)/list/remove" | grep -v "^#" | while read remove; do
+				if [ -e "${moduledir}/${MODULE}/${remove}" ]; then
+					info "Removing $remove"
+					rm -Rf ${moduledir}/${MODULE}/${remove}
 				fi
 			done
 		fi
+
 	done
+
 	info "Updating kernel module dependencies"
 	kernelver=$(_kversion)
 	depmod -a -b "${INSTROOT}" "${kernelver}"
