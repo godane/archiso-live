@@ -38,3 +38,6 @@ wicd
 xarchiver
 xchat
 xpad
+#depends
+libcanberra
+perl-locale-gettext
