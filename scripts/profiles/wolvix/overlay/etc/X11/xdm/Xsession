@@ -131,6 +131,9 @@ xfce)
 lxde)
 	exec startlxde
 	;;
+fvwm)
+	exec fvwm-crystal
+	;;
 lxlauncher)
 	exec lxlauncher
 	;;
