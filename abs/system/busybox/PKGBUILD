@@ -4,7 +4,7 @@
 
 pkgname=busybox
 pkgver=1.16.1
-pkgrel=1
+pkgrel=2
 pkgdesc="Utilities for rescue and embedded systems"
 arch=("i686" "x86_64")
 url="http://busybox.net"
@@ -14,7 +14,7 @@ options=()
 source=($url/downloads/$pkgname-$pkgver.tar.bz2 \
 	config)
 md5sums=('319486ec65078d07fde26eb620fecde7'
-         'af495755ce5fa5a68a33d61062a6c826')
+         '5a07cb68557b203eec4626f8703340c1')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"
