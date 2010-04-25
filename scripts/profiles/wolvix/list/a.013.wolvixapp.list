@@ -1,6 +1,6 @@
 avidemux-gtk
 bluefish
-#blender
+blender
 catfish
 comix
 darkice
@@ -11,14 +11,14 @@ gimp
 glabels
 glade
 gnome-commander
-gnome-ppx
+gnome-ppp
 gnormalize
 gnumeric
 gpodder
 gthumb
 gtkpod
 homebank
-#inkscape
+inkscape
 kino
 liferea
 medit
@@ -35,7 +35,7 @@ rawstudio
 sane
 scite
 virtualbox-ose
-wvdial
+vlc
 xchm
 xfburn
 xsane

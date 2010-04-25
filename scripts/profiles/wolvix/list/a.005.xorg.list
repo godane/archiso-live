@@ -33,6 +33,8 @@ lxsession-lite
 lxappearance
 lxrandr
 lxterminal
+#fvwm
+fvwm-crystal
 #fonts
 ttf-dejavu
 ttf-freefont

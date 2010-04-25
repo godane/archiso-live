@@ -16,7 +16,7 @@
 	[exec] (EasyTAG) {easytag} <>
 	[exec] (Recorder) {recorder} <>
         [exec] (ISO Master) {isomaster} <>
-        [exec] (Vlc) {vlc} <>
+        [exec] (Gnome-Mplayer) {gnome-mplayer} <>
         [exec] (streamtuner) {streamtuner} <>
 	[separator] () {} <>
 	[exec] (Volume Control) {aumix} <>

@@ -12,6 +12,7 @@ getmail
 gnupg
 gnupg2
 gnutls
+gnu-netcat
 gpgme
 icmpinfo
 inetd
@@ -28,6 +29,7 @@ mutt
 nc
 ncftp
 net-tools
+nmap
 inetutils #netkit-ftp
 nfs-utils
 ntp
