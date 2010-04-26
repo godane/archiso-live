@@ -1,11 +1,17 @@
 #ROOT_MOD="a.001.core"
-#MOVE_MODULES="a.011.xfce a.012.wolvixdep a.013.wolvixapp a.014.thunderbird a.015.printing a.016.vim a.020.devel"
-MODULES="a.000.core-slitaz"
+#MOVE_MODULES=""
+MODULES="a.000.core-slitaz a.001.devel"
 KERNEL="/etc/mkinitcpio.d/kernel26.kver"
-VMLINUZ="boot/vmlinuz26"
-CDLABEL="wolvix"
+CDLABEL="slitaz"
 PUBLISHER="http://godane.wordpress.com/"
 AUTHOR="Christopher Rogers aka Godane"
-NOLZMA=n
-MKOPTION="-comp lzma -b 256k"
 OS="slitaz"
+SLITAZ_RELEASE="stable"
+if [ "${SLITAZ_RELEASE}" = "stable" ]; then
+	ALL_kver=2.6.30.6-slitaz
+	NOLZMA=n
+elif [ "${SLITAZ_RELEASE}" = "cooking" ]; then
+	ALL_kver=2.6.33.2-slitaz
+	NOLZMA=y
+fi
+VMLINUZ="boot/vmlinuz-${ALL_kver}"

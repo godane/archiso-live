@@ -55,7 +55,7 @@ misc
 meta
 non-free"
 
-RELEASE="cooking"
+RELEASE=$(cat ${LOCALSTATE}/slitaz-release)
 
 # Initialize some variables to use words rather than numbers for functions
 # and actions.
@@ -1717,7 +1717,7 @@ list of packages to install. Example : tazpkg install-list packages.list\n"
 			exit 0
 		fi
 		rm /var/lib/tazpkg/mirror
-		#echo "$RELEASE" > $(pwd)/slitaz-release
+		echo "$RELEASE" > ${LOCALSTATE}/slitaz-release
 		tazpkg recharge && tazpkg upgrade
 
 		# Install missing depends

@@ -11,7 +11,7 @@ fi
 WORKDIR=.working-${ARCH}
 DATE="$(date +%F)"
 CDNAME="slitaz"
-ISONAME=$CDNAME-${DATE}-${ARCH}.iso
+ISONAME=$CDNAME-${DATE}-${ARCH}-${SLITAZ_RELEASE}.iso
 
 
 makeinstall()
