@@ -208,12 +208,12 @@ debug "generating module dependency files"
 depmod -b $INITRD_TREE $KERNEL
 
 debug "compressing usr in initrd"
-mksquashfs $INITRD_TREE/usr $INITRD_TREE/usr.lzm >/dev/null 2>&1
+mksquashfs $INITRD_TREE/usr $INITRD_TREE/usr.lzm -comp gzip >/dev/null 2>&1
 chmod ago-x $INITRD_TREE/usr.lzm
 rm -Rf $INITRD_TREE/usr/*
 
 debug "compressing net in initrd"
-mksquashfs $INITRD_TREE/$LMK/kernel/drivers $INITRD_TREE/drivers.lzm >/dev/null 2>&1
+mksquashfs $INITRD_TREE/$LMK/kernel/drivers $INITRD_TREE/drivers.lzm -comp gzip >/dev/null 2>&1
 chmod ago-x $INITRD_TREE/drivers.lzm
 rm -Rf $INITRD_TREE/$LMK/kernel/drivers/*
 
