@@ -321,11 +321,11 @@ command_livebackup_imgprepare()
 }
 
 install_slitaz_union () {
-
+	
 	cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
 		tazpkg get-install $pkgname --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
 	done
-	
+
 	if [ "${SLITAZ_RELEASE}" = "stable" ]; then
 		find ${union}/lib/modules/${ALL_kver} -name "*.ko.gz" -exec unlzma -S .gz '{}' '{}' \;
 	elif [ "${SLITAZ_RELEASE}" = "cooking" ]; then
@@ -460,8 +460,9 @@ command_install () {
 
 		mkdir -p ${LOCALSTATE}/installed/
 		mkdir -p ${CACHE_DIR}
-		#echo ${SLITAZ_RELEASE} > ${LOCALSTATE}/slitaz-release
-		tazpkg set-release ${SLITAZ_RELEASE}
+		if [ "${SLITAZ_UPDATE}" = "yes" ]; then
+			tazpkg set-release ${SLITAZ_RELEASE}
+		fi
 	fi
 
 	for mod in ${MODULES}; do
@@ -565,15 +566,10 @@ command_install () {
 	find ${moduledir} -type f -name ".wh.*" -exec rm {} \;
 	find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
 
-	info "Removing sync subfolders from modules."
-	find ${moduledir}/*/var/lib/pacman/sync -type d -exec rm -rf {} \; 2>/dev/null
-
-	# TODO: this might belong somewhere else
-	#mkdir -p "${IMGROOT}/addons"
-	#if [ -d "${ADDON_DIR}" ]; then
-		#info "Copying addons from ${ADDON_DIR}..."
-		#cp -r ${ADDON_DIR}/* "${IMGROOT}/addons"
-	#fi
+	if [ "${OS}" = "archlinux" ]; then
+		info "Removing sync subfolders from modules."
+		find ${moduledir}/*/var/lib/pacman/sync -type d -exec rm -rf {} \; 2>/dev/null
+	fi
 }
 
 command_overlay () {
