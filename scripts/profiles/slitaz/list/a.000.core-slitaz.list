@@ -87,7 +87,9 @@ xorg-server
 xorg-xf86-input-mouse
 xorg-xf86-input-keyboard
 xorg-xf86-video-vesa
+xorg-xf86-input-synaptics
 xorg-setxkbmap
+synergy
 mhwaveedit
 osmo
 isomaster
@@ -101,6 +103,8 @@ epdfview
 libunique
 midori
 module-init-tools
+htop
+lighttpd
 #kernel
 linux-acpi
 linux-agp
