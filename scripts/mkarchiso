@@ -21,6 +21,7 @@ EXCLUDE="${PROFILE}/exclude"
 ARCH=i686
 #ARCH=x86_64
 OS="archlinux"
+SLITAZ_LOCALREPO = ""
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
@@ -323,7 +324,18 @@ command_livebackup_imgprepare()
 install_slitaz_union () {
 	
 	cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
-		tazpkg get-install $pkgname --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
+		pkgnameorig=$pkgname
+		if [ -d ${SLITAZ_LOCALREPO} ]; then
+			basepkg=$(find ${SLITAZ_LOCALREPO}/${pkgname}-[0-9]*.tazpkg 2> /dev/null | tail -1)
+			if [  "${basepkg}" != "" ]; then
+				info "localpkg ${basepkg}"
+				tazpkg install ${basepkg} --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
+			elif [ "${basepkg}" = "" ]; then
+				tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
+			fi
+		else
+			tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
+		fi
 	done
 
 	if [ "${SLITAZ_RELEASE}" = "stable" ]; then
