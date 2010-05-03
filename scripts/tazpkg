@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Tazpkg - Tiny autonomous zone packages manager.
 #
 # This is a lightwight packages manager for *.tazpkg files, all written in
@@ -21,7 +21,7 @@ VERSION=3.2.2
 # Script variables #
 ####################
 
-#. $(pwd)/tazpkg.conf
+
 
 # Auto-installation of packages dependencies.
 AUTO_INSTALL_DEPS="yes"
@@ -55,7 +55,15 @@ misc
 meta
 non-free"
 
-RELEASE=$(cat ${LOCALSTATE}/slitaz-release)
+#if [ -f /etc/slitaz/tazpkg.conf
+#	source /etc/slitaz/tazpkg.conf
+#fi
+
+if [ -f /etc/slitaz-release ]; then
+	RELEASE=$(cat /etc/slitaz-release)
+else
+	RELEASE=$(cat ${LOCALSTATE}/slitaz-release)
+fi
 
 # Initialize some variables to use words rather than numbers for functions
 # and actions.
@@ -1658,6 +1666,7 @@ Maintainer : $MAINTAINER"
 		if [ "$DO_CHECK" = "yes" ]; then
 			check_for_installed_package $ROOT
 		fi
+		AUTO_INSTALL_DEPS="no"
 		install_package $ROOT ;;
 	install-list|get-install-list)
 		# Install a set of packages from a list.
@@ -2446,6 +2455,7 @@ EOT
 	get-install)
 		# Download and install a package.
 		#
+		AUTO_INSTALL_DEPS="yes"
 		check_root
 		check_for_package_on_cmdline
 		check_for_packages_list

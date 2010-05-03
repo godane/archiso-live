@@ -21,7 +21,7 @@ EXCLUDE="${PROFILE}/exclude"
 ARCH=i686
 #ARCH=x86_64
 OS="archlinux"
-SLITAZ_LOCALREPO = ""
+SLITAZ_LOCALREPO=""
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
@@ -325,28 +325,32 @@ install_slitaz_union () {
 	
 	cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
 		pkgnameorig=$pkgname
-		if [ -d ${SLITAZ_LOCALREPO} ]; then
-			basepkg=$(find ${SLITAZ_LOCALREPO}/${pkgname}-[0-9]*.tazpkg 2> /dev/null | tail -1)
-			if [  "${basepkg}" != "" ]; then
-				info "localpkg ${basepkg}"
-				tazpkg install ${basepkg} --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
-			elif [ "${basepkg}" = "" ]; then
+		if [ ! -d ${union}/var/lib/tazpkg/installed/${pkgname} ]; then
+			if [ -d ${SLITAZ_LOCALREPO} ]; then
+				#find -name "${SLITAZ_LOCALREPO}/*.tazpkg" | sed "s|$SLITAZ_LOCALREPO}/||g" > ${SLITAZ_LOCALREPO}/local-packages.list
+				basepkg=$(find ${SLITAZ_LOCALREPO}/${pkgname}-[0-9]*.tazpkg 2> /dev/null | tail -1)
+				if [  "${basepkg}" != "" ]; then
+					info "localpkg ${basepkg}"
+					tazpkg install ${basepkg} --root=$(pwd)/${union}  | tee -a ${buildlog}/${mod}-current.log
+					sleep 1
+				elif [ "${basepkg}" = "" ]; then
+					tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
+					sleep 1
+				fi
+			else
 				tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
+				sleep 1
 			fi
 		else
-			tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
+			info "${pkgname} installed"
 		fi
 	done
 
-	if [ "${SLITAZ_RELEASE}" = "stable" ]; then
-		find ${union}/lib/modules/${ALL_kver} -name "*.ko.gz" -exec unlzma -S .gz '{}' '{}' \;
-	elif [ "${SLITAZ_RELEASE}" = "cooking" ]; then
-		find ${union}/lib/modules/${ALL_kver} -name "*.ko.gz" > ${work_dir}/compressed-kernel-modules.list
-		cat "${work_dir}/compressed-kernel-modules.list" | while read compressed; do
-			lzma-alone d ${compressed} ${compressed%.*}
-		done
-		find . -name "*.ko.gz" -exec rm '{}' \;
-	fi
+	find ${union}/lib/modules/${ALL_kver} -name "*.ko.gz" > ${work_dir}/compressed-kernel-modules.list
+	cat "${work_dir}/compressed-kernel-modules.list" | while read compressed; do
+		lzma-alone d ${compressed} ${compressed%.*} &> /dev/null
+	done
+	find . -name "*.ko.gz" -exec rm '{}' \;
 }
 
 install_arch_union () {
@@ -541,8 +545,9 @@ command_install () {
 	if [ -e "$(pwd)/isolinux" ]; then
 		cp -r "$(pwd)/isolinux" "${IMGROOT}"
 	fi
-
-	pacman -Q -r ${union} > ${PKGFILE}
+	if [ "${OS}" = "archlinux" ]; then
+		pacman -Q -r ${union} > ${PKGFILE}
+	fi
 
 	# Unmount union
 	info "Unmounting union."
@@ -582,6 +587,7 @@ command_install () {
 		info "Removing sync subfolders from modules."
 		find ${moduledir}/*/var/lib/pacman/sync -type d -exec rm -rf {} \; 2>/dev/null
 	fi
+
 }
 
 command_overlay () {
@@ -606,10 +612,10 @@ command_squash_slitaz () {
 
         for DIR in $MODULES; do
 		MOD="$(basename $DIR).${EXT}"
-		#if [ ! "$(find "$IMGROOT/$CDNAME" -name "$MOD")" ]; then
+		if [ ! "$(find "$IMGROOT/$CDNAME" -name "$MOD")" ]; then
 			mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${MKOPTION}
 			chmod 0755 ${moduleplace}/$MOD
-		#fi
+		fi
 	done
 }
 
@@ -701,13 +707,17 @@ command_img () {
 
 		bootflags="-b boot/grub/stage2_eltorito"
 	elif [ "$BOOT" = "syslinux" ]; then
-		if ! pacman -Qi syslinux >/dev/null 2>&1; then
-			error "$BOOT not found on host system. Cannot install!"
-			exit 1
+		if [ "${OS}" = "archlinux" ]; then
+			if ! pacman -Qi syslinux >/dev/null 2>&1; then
+				error "$BOOT not found on host system. Cannot install!"
+				exit 1
+			fi
 		fi
 
 		mkdir -p "${IMGROOT}/boot/isolinux"
-		cp /usr/lib/syslinux/* "${IMGROOT}/boot/isolinux"
+		if [ -d /usr/lib/syslinux ]; then
+			cp /usr/lib/syslinux/* "${IMGROOT}/boot/isolinux"
+		fi
 		
 		# DO NOT REMOVE
 		# Its used for livebackup option even though INSTROOT will be null
@@ -743,7 +753,7 @@ command_img () {
 		-A "${CDLABEL}" -V "${CDLABEL}" \
 		-o "${imgname}" "${IMGROOT}"
 		# This adds USB support
-		isohybrid "${imgname}"
+		#isohybrid "${imgname}"
 		md5sum "${imgname}" > "${imgname}".md5
 	else
 		error "Invalid image type '$IMG_TYPE' specified"
