@@ -1,16 +1,19 @@
+linux
 busybox
+file
 cairo-xcb
-slim
 slitaz-boot-scripts
 slitaz-configs
 slitaz-icon
 slitaz-menus
 slitaz-polar-cursors
+slim
 cdrkit
 clearlooks
 conspy
 dialog
 dropbear
+libcomerr
 e2fsprogs
 gamin
 get-wifi-firmware
@@ -21,10 +24,6 @@ hicolor-icon-theme
 isapnptools
 kbd-busybox
 leafpad
-libcomerr
-libxml2
-linux-wireless
-linux-sound
 locale-de
 locale-es
 locale-fr
@@ -95,6 +94,7 @@ osmo
 isomaster
 gcolor2
 lostirc
+parted
 gparted
 beaver
 lua
@@ -105,6 +105,8 @@ midori
 module-init-tools
 htop
 lighttpd
+sudo
+zip
 #kernel
 linux-acpi
 linux-agp
@@ -145,7 +147,7 @@ linux-netfilter
 linux-reiserfs
 linux-sched
 linux-scsi
-#linux-sound
+linux-sound
 linux-squashfs
 linux-udf
 linux-usb-misc
@@ -154,5 +156,5 @@ linux-usbip
 linux-uwb
 linux-video
 linux-wimax
-#linux-wireless
+linux-wireless
 squashfs
