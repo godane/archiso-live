@@ -1,13 +1,13 @@
 #ROOT_MOD="a.001.core"
 #MOVE_MODULES=""
-MODULES="a.000.core-slitaz a.001.xvideo a.002.xlibs a.003.xapps a.004.devel"
+MODULES="a.000.kernel a.001.base a.002.core a.003.xvideo a.004.xlibs a.005.xapps a.006.devel"
 KERNEL="/etc/mkinitcpio.d/kernel26.kver"
 CDLABEL="slitaz"
 PUBLISHER="http://godane.wordpress.com/"
 AUTHOR="Christopher Rogers aka Godane"
 OS="slitaz"
-SLITAZ_LOCALREPO=/mnt/sda3/slitaz-repo
-SLITAZ_UPDATE="yes"
+SLITAZ_LOCALREPO=/mnt/live/mnt/sda3/slitaz-repo
+SLITAZ_UPDATE="no"
 SLITAZ_RELEASE="stable"
 if [ "${SLITAZ_RELEASE}" = "stable" ]; then
 	#ALL_kver=2.6.30.6-slitaz

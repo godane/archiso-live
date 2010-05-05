@@ -19,6 +19,8 @@ pygtk
 python-pil
 gnutls
 speex
+imlib2
+jack-audio-connection-kit
 ffmpeg
 libmpeg2
 libsdl-image
@@ -31,3 +33,5 @@ libmodplug
 libupnp
 libraw1394
 flac
+libdvdcss
+libvlc

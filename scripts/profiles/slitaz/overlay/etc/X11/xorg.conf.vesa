@@ -16,9 +16,9 @@ Section "Files"
 EndSection
 
 Section "Module"
+	Load  "dbe"
 	Load  "dri"
 	Load  "extmod"
-	Load  "dbe"
 	Load  "glx"
 	Load  "freetype"
 EndSection
@@ -54,7 +54,6 @@ Section "Device"
 	Driver      "vesa"
 	VendorName  "Unknown Vendor"
 	BoardName   "Unknown Board"
-	BusID       "PCI:1:5:0"
 EndSection
 
 Section "Screen"
