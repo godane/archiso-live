@@ -180,7 +180,7 @@ copy2root()
 
 remove()
 {
-	rm -vRf "$@"
+	rm -Rf "$@"
 	return
 }
 
@@ -332,14 +332,14 @@ install_slitaz_union () {
 				if [  "${basepkg}" != "" ]; then
 					info "localpkg ${basepkg}"
 					tazpkg install ${basepkg} --root=$(pwd)/${union}  | tee -a ${buildlog}/${mod}-current.log
-					sleep 1
+					#sleep 1
 				elif [ "${basepkg}" = "" ]; then
 					tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
-					sleep 1
+					#sleep 1
 				fi
 			else
 				tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
-				sleep 1
+				#sleep 1
 			fi
 		else
 			info "${pkgname} installed"

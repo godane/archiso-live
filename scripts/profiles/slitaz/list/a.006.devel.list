@@ -83,6 +83,7 @@ autoconf
 automake
 patch
 git
+flex
 mercurial
 perl
 python

@@ -34,4 +34,10 @@ libupnp
 libraw1394
 flac
 libdvdcss
+libavc1394
+libtheroa
+lame
+xorg-libXv
+faad2
+glibc-locale
 libvlc
