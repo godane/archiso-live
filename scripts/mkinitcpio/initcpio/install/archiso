@@ -16,7 +16,7 @@ install ()
 
     add_binary /lib/udev/cdrom_id
 
-    add_file /lib/udev/rules.d/60-cdrom_id.rules
+    add_file $CWD/rootfs/lib/udev/rules.d/60-cdrom_id.rules
 
     SCRIPT="archiso"
 }
