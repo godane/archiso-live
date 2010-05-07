@@ -753,7 +753,7 @@ command_img () {
 		-A "${CDLABEL}" -V "${CDLABEL}" \
 		-o "${imgname}" "${IMGROOT}"
 		# This adds USB support
-		#isohybrid "${imgname}"
+		isohybrid "${imgname}"
 		md5sum "${imgname}" > "${imgname}".md5
 	else
 		error "Invalid image type '$IMG_TYPE' specified"
