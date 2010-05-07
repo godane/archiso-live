@@ -36,12 +36,10 @@ rcopy()
    DEST="$2"
    if [ -L "$SOURCE" ]; then
       REALPATH=$(readlink -f "$SOURCE")
-      #cp --parent -a "$REALPATH" "$DEST"
-      cp -a "$REALPATH" "$DEST"
+      cp --parent -a "$REALPATH" "$DEST"
       ln -sf "$REALPATH" "$DEST/$SOURCE"
    else
-      #cp --parent -a "$SOURCE" "$DEST"
-      cp -a "$SOURCE" "$DEST"
+      cp --parent -a "$SOURCE" "$DEST"
    fi
    if [ "$?" -ne 0 ]; then
       echo ""
