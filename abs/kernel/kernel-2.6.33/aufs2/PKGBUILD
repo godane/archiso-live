@@ -1,7 +1,7 @@
 # $Id$
 # Maintainer: Paul Mattal <pjmattal@elys.com>
 pkgname=aufs2
-pkgver=2.6.33_20100410
+pkgver=2.6.33_20100506
 pkgrel=1live
 _kernver=${pkgver%_*}-ARCH
 pkgdesc="Another Unionfs Implementation"
@@ -55,4 +55,4 @@ build() {
   # install include files
   install -D -m 644 include/linux/aufs_type.h $pkgdir/usr/src/linux-$_kernver/include/linux/aufs_type.h || return 1
 } 
-md5sums=('4e0523d8649a2aee0dcd3b37460cc77a')
+md5sums=('e76b10806fd931505906dc21e136394d')

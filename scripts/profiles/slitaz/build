@@ -1,0 +1,81 @@
+#!/bin/bash
+
+source config
+
+if [ "${2}" = "i686" -o "${2}" = "x86_64" ]; then
+	ARCH=$2
+else
+	ARCH=i686
+fi
+
+WORKDIR=.working-${ARCH}
+DATE="$(date +%F)"
+CDNAME="slitaz"
+ISONAME=$CDNAME-${DATE}-${ARCH}-${SLITAZ_RELEASE}.iso
+
+
+makeinstall()
+{
+	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f install "${WORKDIR}"
+}
+
+livebackup()
+{
+	mkarchiso -c $CDNAME -m $1 -n -f livebackup "${WORKDIR}" "${ISONAME}"
+}
+
+makeiso() 
+{
+	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f all "${WORKDIR}" "${ISONAME}"
+}
+
+makeisoall()
+{
+	makeiso i686
+	makeiso x86_64
+}
+
+makesquashfs()
+{
+	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f squash "${WORKDIR}"
+}
+
+makeimg()
+{
+	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f imgprepare "${WORKDIR}"
+	mkarchiso -c $CDNAME -m $1 -a ${ARCH} -f img "${WORKDIR}" "${ISONAME}"
+}
+
+clean()
+{
+	rm -rf "${WORKDIR}" "${ISONAME}"
+}
+
+
+if [ "${1}" = "makeinstall" ]; then
+	makeinstall $2
+fi
+
+if [ "${1}" = "livebackup" ]; then
+	livebackup $2
+fi
+
+if [ "${1}" = "makeiso" ]; then
+	makeiso $2
+fi
+
+if [ "${1}" = "makeisoall" ]; then
+	makeisoall
+fi
+
+if [ "${1}" = "makeimg" ]; then
+	makeimg $2
+fi
+
+if [ "${1}" = "clean" ]; then
+	clean
+fi
+
+if [ "${1}" = "squash" ]; then
+	makesquashfs $2
+fi

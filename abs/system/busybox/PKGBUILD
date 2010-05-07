@@ -3,8 +3,8 @@
 # Contributor: Jens Pranaitis <jens@jenux.homelinux.org>
 
 pkgname=busybox
-pkgver=1.15.3
-pkgrel=1
+pkgver=1.16.1
+pkgrel=2
 pkgdesc="Utilities for rescue and embedded systems"
 arch=("i686" "x86_64")
 url="http://busybox.net"
@@ -13,8 +13,8 @@ makedepends=("make" "gcc" "sed" "ncurses")
 options=()
 source=($url/downloads/$pkgname-$pkgver.tar.bz2 \
 	config)
-md5sums=('6059ac9456de6fb18dc8ee4cd0ec9240'
-         '4ff97fee538c89166ce5707f93f44540')
+md5sums=('319486ec65078d07fde26eb620fecde7'
+         '5a07cb68557b203eec4626f8703340c1')
 
 build() {
   cd "$srcdir/$pkgname-$pkgver"

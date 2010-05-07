@@ -20,6 +20,8 @@ OVERLAY="${PROFILE}/overlay"
 EXCLUDE="${PROFILE}/exclude"
 ARCH=i686
 #ARCH=x86_64
+OS="archlinux"
+SLITAZ_LOCALREPO=""
 
 error () { echo -e "\033[1;31;40m!!! \033[1;37;40m$@\033[1;0m"; }
 warn ()  { echo -e "\033[1;33;40m*** \033[1;37;40m$@\033[1;0m"; }
@@ -30,16 +32,16 @@ ROOT_MOD="$(ls -1 ${PROFILE}/list | head -1)"
 CDNAME="livecd"
 LIVELINUX="../../linux-live/initrd"
 
+if [ -f "${PROFILE}/config" ]; then
+	. ${PROFILE}/config
+fi
+
 if [ "${NOLZMA}" = "y" ]; then
 	EXT="sqfs"
 	MKOPTION="-comp gzip"
 else
 	EXT="lzm"
 	MKOPTION="-comp lzma -b 256k"
-fi
-
-if [ -f "${PROFILE}/config" ]; then
-	. ${PROFILE}/config
 fi
 
 APPNAME=$(basename "${0}")
@@ -107,10 +109,12 @@ if [ "$EUID" != "0" ]; then
 	exit 1
 fi
 
-if [ -f "${PROFILE}/pacman.conf-${ARCH}" ]; then
-	PACMANCONF="${PROFILE}/pacman.conf-${ARCH}"
-else
-	PACMANCONF="/etc/pacman.conf"
+if [ "${OS}" = "archlinux" ]; then
+    if [ -f "${PROFILE}/pacman.conf-${ARCH}" ]; then
+        PACMANCONF="${PROFILE}/pacman.conf-${ARCH}"
+    else
+        PACMANCONF="/etc/pacman.conf"
+    fi
 fi
 
 command_name="${1}"
@@ -161,8 +165,12 @@ PKGFILE="${IMGROOT}/packages.list"
 
 _kversion ()
 {
-	source ${INSTROOT}${KERNEL}
-	echo ${ALL_kver}
+	if [ -f ${INSTROOT}${KERNEL} ]; then
+		source ${INSTROOT}${KERNEL}
+		echo ${ALL_kver}
+	else
+		echo ${ALL_kver}
+	fi
 }
 
 copy2root()
@@ -172,11 +180,11 @@ copy2root()
 
 remove()
 {
-	rm -vRf "$@"
+	rm -Rf "$@"
 	return
 }
 
-check()
+check_arch()
 {
 	if [ ! "$(pacman -Q aufs2)" ]; then
 		error "Aufs2 needs to be installed."
@@ -199,6 +207,9 @@ check()
 mksquash ()
 {
 	start=$(date +%s)
+	local MOD
+	local DIR
+
 	for DIR in $MODULES; do
 		MOD="$(basename $DIR).${EXT}"
 		info "Building module $MOD"
@@ -308,7 +319,101 @@ command_livebackup_imgprepare()
 	basedir=${INSTROOT}
 	[ "${INSTROOT:0:1}" != "/" ] && basedir="$(pwd)/${INSTROOT}"
 	mkinitramfs -c "${CPIOCONFIG}" -k "${kernelver}" -g "${IMGROOT}/boot/initrd.img"
+}
 
+install_slitaz_union () {
+	
+	cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
+		pkgnameorig=$pkgname
+		if [ ! -d ${union}/var/lib/tazpkg/installed/${pkgname} ]; then
+			if [ -d ${SLITAZ_LOCALREPO} ]; then
+				#find -name "${SLITAZ_LOCALREPO}/*.tazpkg" | sed "s|$SLITAZ_LOCALREPO}/||g" > ${SLITAZ_LOCALREPO}/local-packages.list
+				basepkg=$(find ${SLITAZ_LOCALREPO}/${pkgname}-[0-9]*.tazpkg 2> /dev/null | tail -1)
+				if [  "${basepkg}" != "" ]; then
+					info "localpkg ${basepkg}"
+					tazpkg install ${basepkg} --root=$(pwd)/${union}  | tee -a ${buildlog}/${mod}-current.log
+					#sleep 1
+				elif [ "${basepkg}" = "" ]; then
+					tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
+					#sleep 1
+				fi
+			else
+				tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
+				#sleep 1
+			fi
+		else
+			info "${pkgname} installed"
+		fi
+	done
+
+	find ${union}/lib/modules/${ALL_kver} -name "*.ko.gz" > ${work_dir}/compressed-kernel-modules.list
+	cat "${work_dir}/compressed-kernel-modules.list" | while read compressed; do
+		lzma-alone d ${compressed} ${compressed%.*} &> /dev/null
+	done
+	find . -name "*.ko.gz" -exec rm '{}' \;
+}
+
+install_arch_union () {
+
+    if [ -e "${union}/var/lib/pacman/db.lck" ]; then
+        rm -f ${union}/var/lib/pacman/db.lck
+    fi
+
+    mkdir -p "${union}/var/lib/pacman"
+    # Remove /var/lib/pacman/local folder in case it just there.
+    # This will not remove it if anything is in /var/lib/pacman/local folder. 
+    # Only if its a empty folder.
+    if [ ! -d "${INSTROOT}/var/lib/pacman/sync/core" ]; then
+        pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
+        rmdir --ignore-fail-on-non-empty ${INSTROOT}/var/lib/pacman/local
+    fi
+
+    if [ -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
+        pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.old
+        pacman -Su -f --needed --noconfirm --config "${PACMANCONF}" -fr "${union}"
+    elif [ ! -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
+        touch ${packlist}/${mod}.old
+
+        cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
+            info "Installing package $pkgname"
+            pacman -S -f --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname | tee -a ${buildlog}/${mod}-current.log
+            if [ $? -ne 0 ]; then
+                warn "Package $pkgname not correctly installed"
+                cat ${buildlog}/${mod}-current.log >> ${buildlog}/${mod}-errors.log
+            fi
+        done
+
+        if [ -e "$(pwd)/list/${mod}.removelist" ]; then
+            cat "$(pwd)/list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
+                info "Removing package $pkgname"
+                pacman -R -d -n --noprogressbar --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname &> /dev/null
+            done
+        fi
+    fi
+    
+    pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.new
+
+    if [ -f ${packlist}/${mod}.old ]; then
+        packagediff.py ${packlist}/${mod}.old ${packlist}/${mod}.new > ${packlist}/${mod}.list
+    fi
+
+    # Cleanup
+    info "Cleaning up image root files..."
+    find "${union}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
+
+    # delete a lot of unnecessary cache/log files
+    # We don't have to delete stuff from /usr/share/doc if we are building archpwn module
+    if [ "${mod:4:7}" = "archpwn" ]; then
+        kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/ initrd"
+    else
+        kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd ${DELDIR}"
+    fi
+
+    for x in ${kill_dirs}; do
+        if [ -e "${union}/${x}" ]; then
+            rm -Rf "${union}/${x}"
+	fi
+    done
 
 }
 
@@ -358,9 +463,22 @@ command_install () {
 
 	mkdir -p ${packlist}
 	
-	# in case of if you have to kill mkarchiso cause of something
-	if [ -d "${INSTROOT}/var/lib/pacman/sync" ]; then
-		rm -R "${INSTROOT}/var/lib/pacman/sync"
+	if [ "${OS}" = "archlinux" ]; then
+		# in case of if you have to kill mkarchiso cause of something
+		if [ -d "${INSTROOT}/var/lib/pacman/sync" ]; then
+			rm -R "${INSTROOT}/var/lib/pacman/sync"
+		fi
+	fi
+
+	if [ "${OS}" = "slitaz" ]; then
+		LOCALSTATE="/var/lib/tazpkg"
+		CACHE_DIR="/var/cache/tazpkg"
+
+		mkdir -p ${LOCALSTATE}/installed/
+		mkdir -p ${CACHE_DIR}
+		if [ "${SLITAZ_UPDATE}" = "yes" ]; then
+			tazpkg set-release ${SLITAZ_RELEASE}
+		fi
 	fi
 
 	for mod in ${MODULES}; do
@@ -370,55 +488,17 @@ command_install () {
 		info "Adding ${lastbr} as lower branch of union."
 		mount -o remount,mod:${lastbr}=rr+wh aufs ${union}
 		lastbr="${moduledir}/${mod}"
-
-		if [ -e "${union}/var/lib/pacman/db.lck" ]; then
-			rm -f ${union}/var/lib/pacman/db.lck
-		fi
 	
-		mkdir -p "${union}/var/lib/pacman"	
-
 		# Added /dev folder and basic devices nodes
 		mkdir -p "${union}/dev"
 		mknod ${union}/dev/console c 5 1 >/dev/null
 		mknod ${union}/dev/null c 1 3 >/dev/null
 		mknod ${union}/dev/zero c 1 5 >/dev/null
 		
-		# Remove /var/lib/pacman/local folder in case it just there.
-		# This will not remove it if anything is in /var/lib/pacman/local folder. 
-		# Only if its a empty folder.
-		if [ ! -d "${INSTROOT}/var/lib/pacman/sync/core" ]; then
-			pacman -Sy --noprogressbar --noconfirm --config "${PACMANCONF}" -fr "${union}"
-			rmdir --ignore-fail-on-non-empty ${INSTROOT}/var/lib/pacman/local
-		fi
-
-		if [ -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
-			pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.old
-			pacman -Su -f --needed --noconfirm --config "${PACMANCONF}" -fr "${union}"
-		elif [ ! -d ${moduledir}/${mod}/var/lib/pacman/local ]; then
-			touch ${packlist}/${mod}.old
-
-			cat "$(pwd)/list/${mod}.list" | grep -v "^#" | while read pkgname; do
-				info "Installing package $pkgname"
-				pacman -S -f --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname | tee -a ${buildlog}/${mod}-current.log
-
-				if [ $? -ne 0 ]; then
-					warn "Package $pkgname not correctly installed"
-					cat ${buildlog}/${mod}-current.log >> ${buildlog}/${mod}-errors.log
-				fi
-			done
-
-			if [ -e "$(pwd)/list/${mod}.removelist" ]; then
-				cat "$(pwd)/list/${mod}.removelist" | grep -v "^#" | while read pkgname; do
-					info "Removing package $pkgname"
-					pacman -R -d -n --noprogressbar --needed --noconfirm --config "${PACMANCONF}" -r "$union" $pkgname &> /dev/null
-				done
-			fi
-		fi
-
-		pacman -Q -r ${moduledir}/${mod} > ${packlist}/${mod}.new
-
-		if [ -f ${packlist}/${mod}.old ]; then
-			packagediff.py ${packlist}/${mod}.old ${packlist}/${mod}.new > ${packlist}/${mod}.list
+		if [ "${OS}" = "archlinux" ]; then
+			install_arch_union
+		elif [ "${OS}" = "slitaz" ]; then
+			install_slitaz_union
 		fi
 
 		if [ -e "${union}/etc/ld.so.conf" ]; then
@@ -429,7 +509,7 @@ command_install () {
 			remove "${union}/usr/share/icons/hicolor/icon-theme.cache"
 			remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
 			remove "${union}/usr/share/icons/nuoveXT2/icon-theme.cache"
-        fi
+		fi
 
 		# remove the initcpio images that were generated for the host system
 		find "${union}/boot" -name *.img -delete
@@ -444,28 +524,6 @@ command_install () {
 			chown -R root:root "${OVERLAY}/root"
 			chmod -R 700 "${OVERLAY}/root"
 		fi
-
-		# Cleanup
-		info "Cleaning up image root files..."
-		find "${union}" -name *.pacnew -name *.pacsave -name *.pacorig -delete
-
-		# delete a lot of unnecessary cache/log files
-		# We don't have to delete stuff from /usr/share/doc if we are building archpwn module
-
-		if [ "${mod:4:7}" = "archpwn" ]; then
-			kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/ initrd"
-		else
-			kill_dirs="var/cache/man var/cache/pacman var/log/* var/mail tmp/* initrd ${DELDIR}"
-		fi
-
-		for x in ${kill_dirs}; do
-			if [ -e "${union}/${x}" ]; then
-				rm -Rf "${union}/${x}"
-			fi
-		done
-
-		# pacman DBs are big, delete all sync dbs
-		#rm -rf ${mod}/var/lib/pacman/sync/*
 
 		# copy over kernel and grub configs for boot
 		if [ "$BOOT" = "grub" -o "$BOOT" = "grub-gfx" ]; then
@@ -487,12 +545,34 @@ command_install () {
 	if [ -e "$(pwd)/isolinux" ]; then
 		cp -r "$(pwd)/isolinux" "${IMGROOT}"
 	fi
-
-	pacman -Q -r ${union} > ${PKGFILE}
+	if [ "${OS}" = "archlinux" ]; then
+		pacman -Q -r ${union} > ${PKGFILE}
+	fi
 
 	# Unmount union
 	info "Unmounting union."
 	umount -l ${union}
+
+	for MODULE in ${MODULES}; do
+		if [ -f "$(pwd)/list/rmlocale" ]; then
+			cat "$(pwd)/list/rmlocale" | grep -v "^#" | while read rmlocale; do
+				if [ -d "${moduledir}/${MODULE}/usr/share/locale/${rmlocale}" ]; then
+					info "Removing locale $rmlocale"
+					rm -Rf ${moduledir}/${MODULE}/usr/share/locale/${rmlocale}
+				fi
+			done
+		fi
+		
+		if [ -f "$(pwd)/list/remove" ]; then
+			cat "$(pwd)/list/remove" | grep -v "^#" | while read remove; do
+				if [ -e "${moduledir}/${MODULE}/${remove}" ]; then
+					info "Removing $remove"
+					rm -Rf ${moduledir}/${MODULE}/${remove}
+				fi
+			done
+		fi
+
+	done
 
 	info "Updating kernel module dependencies"
 	kernelver=$(_kversion)
@@ -503,15 +583,11 @@ command_install () {
 	find ${moduledir} -type f -name ".wh.*" -exec rm {} \;
 	find ${moduledir} -type d -name ".wh.*" -exec rm -rf {} \;
 
-	info "Removing sync subfolders from modules."
-	find ${moduledir}/*/var/lib/pacman/sync -type d -exec rm -rf {} \; 2>/dev/null
+	if [ "${OS}" = "archlinux" ]; then
+		info "Removing sync subfolders from modules."
+		find ${moduledir}/*/var/lib/pacman/sync -type d -exec rm -rf {} \; 2>/dev/null
+	fi
 
-	# TODO: this might belong somewhere else
-	#mkdir -p "${IMGROOT}/addons"
-	#if [ -d "${ADDON_DIR}" ]; then
-		#info "Copying addons from ${ADDON_DIR}..."
-		#cp -r ${ADDON_DIR}/* "${IMGROOT}/addons"
-	#fi
 }
 
 command_overlay () {
@@ -530,12 +606,28 @@ command_overlay () {
 	chmod 0755 "${IMGROOT}/${CDNAME}/optional/overlay.${EXT}"
 }
 
+command_squash_slitaz () {
+	info "Generating SquashFS image"
+	info "Creating modules procede..."
+
+        for DIR in $MODULES; do
+		MOD="$(basename $DIR).${EXT}"
+		if [ ! "$(find "$IMGROOT/$CDNAME" -name "$MOD")" ]; then
+			mksquashfs ${moduledir}/$DIR ${moduleplace}/$MOD -noappend ${MKOPTION}
+			chmod 0755 ${moduleplace}/$MOD
+		fi
+	done
+}
+
 # Squash is the next step.
-command_squash () {
+command_squash_arch () {
 	info "Generating SquashFS image"
 	info "Creating modules procede..."
 
 	# edit modules to the ones that updated or changed
+
+	local MOD
+	local DIR
 
 	find ${packlist} -size +0 -name "*.list" > ${packlist}/updated.list
 	sed -i "s|${packlist}/updated.list||g" ${packlist}/updated.list
@@ -615,13 +707,17 @@ command_img () {
 
 		bootflags="-b boot/grub/stage2_eltorito"
 	elif [ "$BOOT" = "syslinux" ]; then
-		if ! pacman -Qi syslinux >/dev/null 2>&1; then
-			error "$BOOT not found on host system. Cannot install!"
-			exit 1
+		if [ "${OS}" = "archlinux" ]; then
+			if ! pacman -Qi syslinux >/dev/null 2>&1; then
+				error "$BOOT not found on host system. Cannot install!"
+				exit 1
+			fi
 		fi
 
 		mkdir -p "${IMGROOT}/boot/isolinux"
-		cp /usr/lib/syslinux/* "${IMGROOT}/boot/isolinux"
+		if [ -d /usr/lib/syslinux ]; then
+			cp /usr/lib/syslinux/* "${IMGROOT}/boot/isolinux"
+		fi
 		
 		# DO NOT REMOVE
 		# Its used for livebackup option even though INSTROOT will be null
@@ -665,48 +761,65 @@ command_img () {
 	fi
 }
 
-if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
-	check
-	command_install
-fi
+    if [ "${command_name}" = "install" -o "${command_name}" = "all" ]; then
+        #check_arch
+        command_install
+    fi
 
-if [ "${command_name}" = "overlay" -o "${command_name}" = "all" ]; then
-	check
-	command_overlay
-fi
+    if [ "${command_name}" = "overlay" -o "${command_name}" = "all" ]; then
+        #check_arch
+        command_overlay
+    fi
 
-if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
-	check
-	command_squash
-fi
+if [ "${OS}" = "archlinux" ]; then
+    if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
+        #check_arch
+        command_squash_arch
+    fi
 
-if [ "${command_name}" = "imgprepare" -o "${command_name}" = "all" ]; then
-	check
-	command_imgprepare
-fi
+    if [ "${command_name}" = "imgprepare" -o "${command_name}" = "all" ]; then
+        #check_arch
+        command_imgprepare
+    fi
 
-if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
-	check
+    if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
+	#check_arch
 	command_img
-fi
+    fi
 
-if [ "${command_name}" = "livebackup" ]; then
-	check
-	command_livebackup
-	if [ -d "${OVERLAY}" ]; then
-		command_overlay
+    if [ "${command_name}" = "livebackup" ]; then
+        check_arch
+        command_livebackup
+        if [ -d "${OVERLAY}" ]; then
+            command_overlay
 	fi
-	command_livebackup_imgprepare
-	command_img
-fi
+        command_livebackup_imgprepare
+        command_img
+    fi
 
-if [ "${command_name}" = "liveimg" ]; then
-	check
-	if [ -d "${OVERLAY}" ]; then
-		command_overlay
-	fi
-	command_livebackup_imgprepare
+    if [ "${command_name}" = "liveimg" ]; then
+        check_arch
+        if [ -d "${OVERLAY}" ]; then
+            command_overlay
+        fi
+        command_livebackup_imgprepare
+        command_img
+    fi
+elif [ "${OS}" = "slitaz" ]; then
+    if [ "${command_name}" = "squash" -o "${command_name}" = "all" ]; then
+        #check_arch
+        command_squash_slitaz
+    fi
+
+    if [ "${command_name}" = "imgprepare" -o "${command_name}" = "all" ]; then
+        #check_arch
+        command_imgprepare
+    fi
+
+    if [ "${command_name}" = "img" -o "${command_name}" = "all" ]; then
+	#check_arch
 	command_img
+    fi
 fi
 
 # vim:ts=4:sw=4:et:

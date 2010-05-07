@@ -204,6 +204,11 @@ archiso_mount_handler() {
         launch_interactive_shell
     fi
 
+    if [ -d /hooks ]; then
+        mkdir -p ${newroot}/hooks
+        cp -R /hooks ${newroot}
+    fi
+
     echo "aufs / aufs defaults 0 0" > ${newroot}/etc/fstab
     _mnt_move ${BOOT_MOUNT} ${newroot}/mnt/${BOOT_MOUNT##*/}
 

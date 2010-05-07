@@ -1,0 +1,370 @@
+#!/bin/sh
+# tazarch: tool to convert arch linux pkgbuild to slitaz receipt
+#
+# Arch PKGBUILD details: http://www.archlinux.org/pacman/PKGBUILD.5.html
+# Slitaz receipt details: http://www.slitaz.org/en/doc/cookbook/receipts.html
+# Sed / Regular expression reference: http://docstore.mik.ua/orelly/unix/sedawk/
+#
+# (C) 2007-2009 SliTaz - GNU General Public License.
+#
+# Authors : Rohit Joshi <jozee@slitaz.org>
+
+VERSION="30Oct09"
+
+# UPDATES: 
+# ARCH URLs : arch linux changed their repos
+# 
+
+# To do
+#1) parse_arrays have few style_problems that are currently ignored
+#pkgbuild can have optional variables
+
+PACKAGE=$1
+ARCHWOK="/home/slitaz/archwok"
+MATCHLIST="/var/lib/tazarch/match_pkgname.list"
+PKGBUILD="PKGBUILD"
+
+# style error WEB_SITE, WGET_URL: dar, gsopcast
+  
+download_arch_pkg()
+{
+	# find and assign repos automatically
+	for REPO in core extra community aur ; do
+	  # packages can have "any" architecture instead of i686
+		ARCH="i686"; wget -s "http://www.archlinux.org/packages/$REPO/$ARCH/$PACKAGE/" 2> /dev/null && break
+		ARCH="any"; wget -s "http://www.archlinux.org/packages/$REPO/$ARCH/$PACKAGE/" 2> /dev/null && break	
+	done
+	
+	#echo "$REPO"-"$ARCH"	
+	# find & assign the latest revision
+	#URL="http://repos.archlinux.org/wsvn/packages/$PACKAGE/repos/$REPO-${ARCH}"
+  	#REVISION=`wget -O - $URL 2>/dev/null | grep href= | grep PKGBUILD| grep revision= |  sed 's/<[^>]*>//g' | sed 's/[^0-9]*//g'`
+	#echo $REVISION
+	
+	case "$REPO"-"$ARCH" in 
+  		core-i686|core-any) 		                 	
+					URL="http://repos.archlinux.org/wsvn/packages/$PACKAGE/repos/$REPO-${ARCH}/PKGBUILD?op=dl&rev=0"
+					;;	    
+		extra-i686|extra-any) 					
+					URL="http://repos.archlinux.org/wsvn/packages/$PACKAGE/repos/$REPO-${ARCH}/PKGBUILD?op=dl&rev=0"
+					;;
+	   community-i686|community-any) 
+   					URL="http://repos.archlinux.org/wsvn/community/$PACKAGE/repos/$REPO-${ARCH}/PKGBUILD?op=dl&rev=0"
+					;;		
+   		aur-i686|aur-any) URL="http://aur.archlinux.org/packages/$PACKAGE/$PACKAGE/PKGBUILD";;   
+	esac
+	echo "downloading PKGBUILD in $REPO repos from $URL "
+	wget $URL
+	mv PKGBUILD* PKGBUILD
+	cp $PKGBUILD backup_pkgbuild
+}
+use_backup_pkgbuild()
+{
+	echo "using backup pkgbuild"	
+	cp backup_pkgbuild PKGBUILD
+}
+
+parse_variables()
+{
+	#echo "parsing global variables"	
+	# Equate the PKGBUILD variables with RECEIPT info
+	sed -i 's|pkgname|PACKAGE|g' $PKGBUILD
+	# fix the bad PKGBUILD syntax
+	sed -i "s|${PACKAGE}-|\$PACKAGE-|g" $PKGBUILD
+	sed -i 's|pkgver|VERSION|g' $PKGBUILD
+	sed -i 's|pkgdesc=|SHORT_DESC=|' $PKGBUILD	
+	sed -i 's|url=|WEB_SITE=|' $PKGBUILD	
+}
+
+parse_build_variables()
+{
+ 	#echo "parsing build variables"
+	# transform build() -> compile_rules()
+	sed -i 's|build()|compile_rules()|' $PKGBUILD
+	#replace src dir
+	sed -i 's|startdir/src/$PACKAGE-$VERSION|src|g' $PKGBUILD
+	sed -i 's|startdir/src/${PACKAGE}-${VERSION}|src|g' $PKGBUILD
+	sed -i 's|{startdir}/src/${PACKAGE}-${VERSION}|src|g' $PKGBUILD
+	sed -i 's|srcdir/$PACKAGE-$VERSION|src|g' $PKGBUILD
+	sed -i 's|srcdir/${PACKAGE}-${VERSION}|src|g' $PKGBUILD
+	sed -i 's|{srcdir}/${PACKAGE}-${VERSION}|src|g' $PKGBUILD
+
+	# replace pkg dir
+	sed -i 's|startdir/pkg|PWD/_pkg|g' $PKGBUILD
+	sed -i 's|{startdir}/pkg|PWD/_pkg|g' $PKGBUILD
+	sed -i 's|pkgdir|PWD/_pkg|g' $PKGBUILD	
+	sed -i 's|{pkgdir}|PWD/_pkg|g' $PKGBUILD	
+	
+}
+
+parse_arrays()
+{
+	#echo "parsing array variables"
+	
+	# simple substitution
+	sed -i 's|makedepends=|BUILD_DEPENDS=|' $PKGBUILD
+	sed -i 's|optdepends=|SUGGESTED=|' $PKGBUILD
+	sed -i 's|depends=|DEPENDS=|' $PKGBUILD
+	sed -i 's|source=|WGET_URL=|' $PKGBUILD
+	# need to verify these
+	sed -i 's|backup=|CONFIG_FILES=|' $PKGBUILD
+	sed -i 's|provides=|PROVIDE=|' $PKGBUILD
+	
+	# Translate arrays format in PKGBUILD to arrays format in RECEIPT
+	#To do: Improve deleting comments; it will lines with words like C# or C-statement like #include <stdio.h>
+	sed -i 's/#.*//g' $PKGBUILD	#delete comments
+	# delete single quotes in arrays 
+	# To do: we need to limit the addressing to first occurence of )$ (end of this array) and not the last )$ (end of some other array)
+	sed -i "/=(/,/')$/{s/'//g}" $PKGBUILD 
+	# delete trailing whitespace (spaces, tabs) from end of each line
+    sed -i 's/[ \t]*$//'  $PKGBUILD  
+	# insert \ at the end in arrays if separated in multiple lines /)$/b end;
+	sed -i '/=(/{:loop;/)$/b end; s/$/\\/; N; b loop; :end;}' $PKGBUILD	
+	# concatenate arrays if separated in multiple lines by using \ as the last character of line
+	# To do: globally concatenating \ is not good as ./configure options can have \ too; limit this to array addressing
+	sed -i ':loop;/\\$/N;s/\\\n//g;t loop' $PKGBUILD
+	# delete any remaining \ in array (in case '\' was already in the PKGBUILD)
+	sed -i '/=(/,/)$/{s/\\//g}' $PKGBUILD 
+	# transform array: =(.*) -> =".*"
+	sed -i 's|=(\(.*\))|="\1"|' $PKGBUILD		
+		
+}
+
+remove_unwanted_lines()
+{
+	# Remove unwanted lines
+	#echo "removing unwanted files"
+	sed -i '/pkgrel=/d' $PKGBUILD
+	sed -i '/license=/d' $PKGBUILD
+	sed -i '/arch=/d' $PKGBUILD
+	sed -i '/options=/d' $PKGBUILD
+	sed -i '/groups=/d' $PKGBUILD
+	sed -i '/noextract=/d' $PKGBUILD
+	# need to verify: do we have 'conflicts' and 'replaces' equivalent
+	sed -i '/conflicts=/d' $PKGBUILD
+	sed -i '/replaces=/d' $PKGBUILD
+	# pkgbuild can have md5sums, sha1sums, sha256sums, sha384sums, sha512sums
+	sed -i '/[0-9]sums=/d' $PKGBUILD
+	#sed -i '/md5sums=/d' $PKGBUILD
+	# some pkgbuilds can have compiler flags options; ignore these as it can be inside if-then loop; 
+	# just echo to remove them manually
+	#sed -i 's/.*FLAGS.*/ /g' $PKGBUILD
+	if grep "FLAGS" $PKGBUILD ; then
+		echo "PKGBUILD contains extra compiler FLAGS, maybe for x86_64 architecture; you can remove those lines without any problems"
+	fi
+	
+}
+
+parse_wget_url()
+{
+	#echo "parsing WGET_URL"
+	# any file from source array can be WGET_URL equivalent; assuming the right file will contain $VERSION or $PACKAGE
+	WGET_URL=`grep "WGET_URL" "$PKGBUILD" | cut -d "=" -f 2| sed 's/"//g' | sed 's/ /\n/g' | grep "VERSION"`
+	if [ "$WGET_URL" = "" ]; then  
+		WGET_URL=`grep "WGET_URL" "$PKGBUILD" | cut -d "=" -f 2| sed 's/"//g' | sed 's/ /\n/g' | grep "$PACKAGE"`
+	fi
+	#echo $WGET_URL
+	TARBALL=`basename $WGET_URL`
+	#echo $TARBALL	
+}
+
+style_into_slitaz_format()
+{
+	# change into Slitaz format
+	#echo "styling into slitaz format"
+	# delete multiple blank lines
+	sed -i '/^$/d;' $PKGBUILD
+	# add SliTaz package receipt comment
+	sed -i "s|PACKAGE=|# SliTaz package receipt.\n\nPACKAGE=|" $PKGBUILD
+	# add Rules to configure and make the package	
+	sed -i "s|compile_rules()|# Rules to configure and make the package.\n\ncompile_rules()|" $PKGBUILD
+	# style WGET_URL: dirname/TARBALL, add TAGS
+	#echo "WGET_URL=${WGET_URL%/*}"
+	sed -i "s|WGET_URL=.*|WGET_URL=\"${WGET_URL%/*}/\$TARBALL\"\nTAGS=\"\"\n|" $PKGBUILD
+    # add CATEGORY
+	sed -i "s|SHORT_DESC=|CATEGORY=\"misc\"\nSHORT_DESC=|" $PKGBUILD
+	# add MAINTAINER
+	sed -i "s|SHORT_DESC=|MAINTAINER=\"devel@slitaz.org\"\nSHORT_DESC=|" $PKGBUILD
+	# add DEPENDS=""
+	if ! grep -q "DEPENDS=" $PKGBUILD; then
+		sed -i "s|WEB_SITE=|DEPENDS=\"\"\nWEB_SITE=|" $PKGBUILD
+	fi
+	# add BUILD_DEPENDS=""
+	if ! grep -q "BUILD_DEPENDS=" $PKGBUILD; then
+		sed -i "s|WEB_SITE=|BUILD_DEPENDS=\"\"\nWEB_SITE=|" $PKGBUILD
+	fi
+	# add TARBALL
+	sed -i "s|WGET_URL=|TARBALL=\"$TARBALL\"\nWGET_URL=|" $PKGBUILD
+	# style "PACKAGE"
+	sed -i '/PACKAGE=".*"/!{s/\(PACKAGE=\)\(.*\)$/\1"\2"/}' $PKGBUILD
+	# style "VERSION"
+	sed -i '/VERSION=".*"/!{s/\(VERSION=\)\(.*\)$/\1"\2"/}' $PKGBUILD
+	# style "WEB_SITE"
+	sed -i '/WEB_SITE=".*"/!{s/\(WEB_SITE=\)\(.*\)$/\1"\2"/}' $PKGBUILD
+	# style "SHORT_DESC"
+	sed -i '/SHORT_DESC=".*"/!{s/\(SHORT_DESC=\)\(.*\)$/\1="\2"/}' $PKGBUILD
+	
+	# replace "return 1" to && or just remove it
+	#sed -i 's/|| return 1/\&\&/g' $PKGBUILD
+	sed -i 's/|| return 1//g' $PKGBUILD
+	
+	#Slitaz doesnot use install statement in Receipt and rather we do it in genpkg rules
+	#sed -i 's/[^#]install/#install/g' $PKGBUILD
+	 
+
+	style_wget_url
+
+}
+
+style_wget_url()
+{
+	# Style WGET_URL
+	# SF_MIRROR
+	sed -i 's|http://downloads.sourceforge.net/sourceforge|$SF_MIRROR|' $PKGBUILD
+	# find $WEB_SITE pattern in WGET_URL and replace it; # remove trailing /
+	WEB_SITE=`grep "WEB_SITE" "$PKGBUILD" | cut -d "\"" -f 2| sed 's:/$::'`
+	#echo "$WEB_SITE"
+	#if [ ${WEB_SITE##/*} = "$WEB_SITE" ] ; then WEB_SITE=${WEB_SITE%/*}; fi
+	sed -i "s|WGET_URL=\"$WEB_SITE\(.*\)|WGET_URL=\"\$WEB_SITE\1|" $PKGBUILD
+}
+
+update_build_depends()
+{
+	# DEPENDS and BUILD_DEPENDS: 
+	# Check if PACKAGE names are similar in SLITAZ repos and/or find/replace the equivalent pkg name
+	# check for each $DEPENDS, ${PACKAGE}-dev in repos; if so add it to BUILD_DEPENDS
+    #echo "updating depends and build_depends"
+	. "$PWD/$PKGBUILD"
+	tmp_del=""
+	tmp_add=""
+	for pkg in $BUILD_DEPENDS ; do
+		if [ ! "$pkg" = "" ] ; then
+		    tmp_pkg=`echo "$pkg" | sed 's/\(.*\)>=.*/\1/'`
+			if [ ! "$pkg" = "$tmp_pkg" ] ; then tmp_del="$pkg"; pkg=$tmp_pkg; tmp_add="$pkg"; sed -i "s|$tmp_del|$tmp_add|" $PKGBUILD; fi
+			# need to be exact match: "^$pkg[ ]" e.g. perl but not perlxml
+			if grep -q "^$pkg[ ]" $MATCHLIST; then
+			      tmp_del="$pkg"
+				# echo "tmp_del is $pkg" ;
+			      pkg=`grep "^$pkg" $MATCHLIST | cut -d "|" -f 2 | sed 's/ //g'`
+				  tmp_add="$pkg"			      
+			else 
+				if ! grep -q "^$pkg" /var/lib/tazpkg/packages.list; then
+			   		echo "$pkg in BUILD_DEPENDS is either missing or of different name in Slitaz repos"			   
+				fi 
+			fi
+   	    fi
+		if [ ! "$tmp_del" = "" ] ; then 
+		   #echo "changing $tmp_del to $tmp_add";
+		   # update BUILD_DEPENDS
+		   sed -i "s|$tmp_del|$tmp_add|" $PKGBUILD; 
+		fi
+	done
+	. "$PWD/$PKGBUILD"
+	
+	for pkg in $DEPENDS ; do
+		tmp_del="";	tmp_add="";
+	   	if [ ! "$pkg" = "" ] ; then
+		    tmp_pkg=`echo "$pkg" | sed 's/\(.*\)>=.*/\1/'`
+			if [ ! "$pkg" = "$tmp_pkg" ] ; then tmp_del="$pkg"; pkg=$tmp_pkg; tmp_add="$pkg"; sed -i "s|$tmp_del|$tmp_add|" $PKGBUILD; fi
+			# need to be exact match: "^$pkg[ ]" e.g. perl but not perlxml
+			if grep -q "^$pkg[ ]" $MATCHLIST; then
+			      tmp_del="$pkg"
+				#  echo "tmp_del is $pkg" ;
+			      pkg=`grep "^$pkg" $MATCHLIST | cut -d "|" -f 2 | sed 's/ //g'`
+				  tmp_add="$pkg"			      
+			else 
+			    if ! grep -q "^$pkg" /var/lib/tazpkg/packages.list ; then			   
+      				echo "$pkg in DEPENDS is either missing or of different name in Slitaz repos"
+			     fi
+			fi 
+			devel="${pkg}-dev"
+			if grep -q "^$devel" /var/lib/tazpkg/packages.list; then
+	  			BUILD_DEPENDS="$BUILD_DEPENDS ${pkg}-dev "
+			fi
+		fi	
+		if [ ! "$tmp_del" = "" ] ; then 
+		   # echo "changing $tmp_del to $tmp_add";
+			# update DEPENDS
+			sed -i "s|$tmp_del|$tmp_add|" $PKGBUILD; 
+		fi	
+	done
+	
+	# pkgs that are in arch build toolkit but not in Slitaz's toolkit	
+	EXTRA_BUILD_PKGS="autoconf automake glibc python"
+	for pkg in $EXTRA_BUILD_PKGS ; do
+		if grep -q "^$pkg" $PWD/$PKGBUILD; then
+	  		BUILD_DEPENDS="$BUILD_DEPENDS $pkg"
+		fi
+	done
+    # also fix packages such as xorg libs
+	# update BUILD_DEPENDS
+	sed -i "s|BUILD_DEPENDS=.*|BUILD_DEPENDS=\"${BUILD_DEPENDS}\"|" $PKGBUILD	
+}
+
+add_gen_pkg_rules()
+{
+	#echo "add gen_pkg_rules"
+	cat >> $PKGBUILD <<"EOT"
+	
+# Rules to gen a SliTaz package suitable for Tazpkg.
+genpkg_rules()
+{
+	mkdir -p $fs/usr/lib $fs/usr/share
+	cp -a $_pkg/usr/bin $fs/usr
+	cp -a $_pkg/usr/lib/*so* $fs/usr/lib/
+	cp -a $_pkg/usr/share/$PACKAGE $fs/usr/share
+	#cp -a $_pkg/usr/share/pixmaps $fs/usr/share
+	#cp -a $_pkg/usr/lib/$PACKAGE/*so* $fs/usr/lib/$PACKAGE
+	#cp -a $_pkg/usr/share/locale/fr $fs/usr/share/locale
+	
+	# Some *.so files are not stripped automatically by tazwok
+	#strip -s $fs/usr/lib/$PACKAGE/plugins/*.so
+}
+EOT
+}
+
+
+# Add pre-install / post-install functions
+# install=$PACKAGE.install; download the file from PKGBUILD dir; mv it to "stuff"; echo to add pre-install/post-install()
+add_install()
+{
+  #echo "checking pre/post install"	
+  if grep -q "install=" $PKGBUILD ; then 
+  	echo "Receipt may need pre/post_install(); please check install file in Arch repos"
+  fi
+  
+  # remove this line from receipt
+  sed -i '/install=/d' $PKGBUILD
+}
+# Patches: Download patch file; mv it to "stuff"; echo to add/correct patch file as per slitaz format
+check_patch()
+{
+  #echo "checking for patches"
+  if grep -q "patch" $PKGBUILD ; then 
+  	echo "Receipt may need a patch; please check patch file in Arch repos"
+  fi
+}
+
+mkdir -p $ARCHWOK && cd $ARCHWOK
+
+mkdir -p $PWD/$PACKAGE && cd $PACKAGE
+
+if [ -f $PWD/backup_pkgbuild ] ; then 
+	use_backup_pkgbuild
+else 
+	download_arch_pkg	
+fi
+
+parse_variables
+parse_build_variables
+parse_arrays
+remove_unwanted_lines
+parse_wget_url
+style_into_slitaz_format
+update_build_depends
+add_gen_pkg_rules
+add_install
+check_patch
+
+if [ -f $PWD/receipt ] ; then rm receipt ; fi
+mv $PKGBUILD receipt

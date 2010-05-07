@@ -1,6 +1,8 @@
 # vim: set ft=sh:
 run_hook ()
 {
+    msg ":: update modules.dep..."
+    depmod -a
     msg ":: Triggering uevents..."
     /sbin/udevadm trigger
     /sbin/udevadm settle

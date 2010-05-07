@@ -2,7 +2,7 @@ autofs
 bind
 bluez
 bridge-utils
-bsd-finger
+netkit-bsd-finger
 curl
 cyrus-sasl
 dhcpcd
@@ -12,6 +12,7 @@ getmail
 gnupg
 gnupg2
 gnutls
+gnu-netcat
 gpgme
 icmpinfo
 inetd
@@ -23,12 +24,13 @@ libgcrypt
 libgpg-error
 links
 lynx
-mtr
+mtr-cli
 mutt
 nc
 ncftp
 net-tools
-netkit-ftp
+nmap
+inetutils #netkit-ftp
 nfs-utils
 ntp
 openldap
