@@ -509,6 +509,7 @@ command_install () {
 			remove "${union}/usr/share/icons/hicolor/icon-theme.cache"
 			remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
 			remove "${union}/usr/share/icons/nuoveXT2/icon-theme.cache"
+			remove "${union}/usr/share/icons/gnome/icon-theme.cache"
 		fi
 
 		# remove the initcpio images that were generated for the host system
@@ -557,7 +558,7 @@ command_install () {
 		if [ -f "$(pwd)/list/rmlocale" ]; then
 			cat "$(pwd)/list/rmlocale" | grep -v "^#" | while read rmlocale; do
 				if [ -d "${moduledir}/${MODULE}/usr/share/locale/${rmlocale}" ]; then
-					info "Removing locale $rmlocale"
+					info "Removing locale $rmlocale from ${MODULE}"
 					rm -Rf ${moduledir}/${MODULE}/usr/share/locale/${rmlocale}
 				fi
 			done
@@ -566,12 +567,12 @@ command_install () {
 		if [ -f "$(pwd)/list/remove" ]; then
 			cat "$(pwd)/list/remove" | grep -v "^#" | while read remove; do
 				if [ -e "${moduledir}/${MODULE}/${remove}" ]; then
-					info "Removing $remove"
+					info "Removing $remove from ${MODULE}"
 					rm -Rf ${moduledir}/${MODULE}/${remove}
 				fi
 			done
 		fi
-		info "Removing .pyc from ${MODULE}"
+		info "Removing .pyc files from ${MODULE}"
 		RMPYC=$(find ${moduledir}/${MODULE}/ -name "*.pyc")
 		rm -Rf ${RMPYC}
 	done
