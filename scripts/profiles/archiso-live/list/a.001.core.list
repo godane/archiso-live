@@ -1,5 +1,6 @@
 base
 mkinitcpio
+cpio
 archiso-installer
 inetutils
 crda
@@ -64,6 +65,7 @@ gnu-netcat
 wipe
 tor
 privoxy
+pacgraph
 # Forensic
 dcfldd
 ddrescue
