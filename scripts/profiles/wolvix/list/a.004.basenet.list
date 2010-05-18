@@ -14,8 +14,8 @@ gnupg2
 gnutls
 gnu-netcat
 gpgme
-icmpinfo
-inetd
+#icmpinfo
+#inetd
 iptables
 iputils
 irssi
@@ -30,7 +30,7 @@ nc
 ncftp
 net-tools
 nmap
-inetutils #netkit-ftp
+inetutils
 nfs-utils
 ntp
 openldap

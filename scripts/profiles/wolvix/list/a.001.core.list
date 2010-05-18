@@ -1,4 +1,6 @@
 base
+mkinitcpio
+cpio
 chakra-hardware-detection
 syslinux
 time

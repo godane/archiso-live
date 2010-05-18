@@ -27,7 +27,7 @@ ladspa
 laptop-mode-tools
 lm_sensors
 lsof
-lsscsi
+#lsscsi
 mc
 most
 mpg321
