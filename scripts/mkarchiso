@@ -575,6 +575,11 @@ command_install () {
 		info "Removing .pyc files from ${MODULE}"
 		RMPYC=$(find ${moduledir}/${MODULE}/ -name "*.pyc")
 		rm -Rf ${RMPYC}
+		info "Uncompressing .gz files in ${MODULE}"
+		find ${moduledir}/${MODULE}/ -name "*.gz" -type f -exec gunzip {} \;
+		if [ -f ${moduledir}/${MODULE}/usr/share/fonts/misc/fonts.dir ]; then
+			sed -i "s|.pcf.gz|.pcf|g" ${moduledir}/${MODULE}/usr/share/fonts/misc/fonts.dir
+		fi
 	done
 
 	info "Updating kernel module dependencies"
