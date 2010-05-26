@@ -2,19 +2,20 @@
 #Maintainer: Ionut Biru <ibiru@archlinux.org>
 pkgbase=('virtualbox-ose')
 pkgname=('virtualbox-ose' 'virtualbox-modules' 'virtualbox-ose-additions' 'virtualbox-ose-additions-modules')
-pkgver=3.1.6
-pkgrel=2live
+pkgver=3.1.8
+pkgrel=1live
 arch=('i686')
 url='http://virtualbox.org'
 license=('GPL' 'custom')
 makedepends=('libstdc++5' 'bin86' 'dev86' 'iasl' 'libxslt' 'libxml2'
              'libxcursor' 'qt' 'libidl2' 'sdl_ttf' 'alsa-lib' 'pulseaudio'
-             'hal' 'libxtst' 'xalan-c' 'sdl' 'libxmu' 'curl' 'python' 'kernel26-headers>=2.6.33' 'mesa')
+             'hal' 'libxtst' 'xalan-c' 'sdl' 'libxmu' 'curl' 'python' 'kernel26-headers>=2.6.33' 'mesa' 'libxrandr')
 source=(http://download.virtualbox.org/virtualbox/$pkgver/VirtualBox-$pkgver-OSE.tar.bz2
-        '60-virtualbox.rules' '60-vboxguest.rules' 'LocalConfig.kmk')
+        '60-virtualbox.rules' '60-vboxguest.rules' 'LocalConfig.kmk' 'gcc45.patch')
 
 build() {
     cd "$srcdir/VirtualBox-${pkgver}_OSE"
+    patch -Np0 -i ${srcdir}/gcc45.patch || return 1
 
     cp "$srcdir/LocalConfig.kmk" .
     sed -i 's/python2.4/python2.6/g' configure
@@ -92,6 +93,18 @@ package_virtualbox-ose() {
             "$pkgdir/usr/share/licenses/virtualbox-ose/LICENSE" || return 1
     install -D -m 0644 "$srcdir/60-virtualbox.rules" \
             "$pkgdir/lib/udev/rules.d/60-virtualbox.rules" || return 1
+
+    #python sdk
+    mkdir -p ${pkgdir}/usr/lib/virtualbox/sdk/bindings/xpcom/python/
+    pushd sdk/installer
+    VBOX_INSTALL_PATH="/usr/lib/virtualbox" python vboxapisetup.py install --root "${pkgdir}" || return 1
+    popd
+    pushd sdk/bindings/xpcom/python
+    cp -r xpcom ${pkgdir}/usr/lib/virtualbox/sdk/bindings/xpcom/python/
+    chmod 644 ${pkgdir}/usr/lib/virtualbox/sdk/bindings/xpcom/python/xpcom/*.py
+    chmod 644 ${pkgdir}/usr/lib/virtualbox/sdk/bindings/xpcom/python/xpcom/server/*.py
+    chmod 644 ${pkgdir}/usr/lib/virtualbox/sdk/bindings/xpcom/python/xpcom/client/*.py
+    popd
 }
 
 package_virtualbox-modules(){
@@ -119,10 +132,10 @@ package_virtualbox-ose-additions(){
     install -m755 VBoxClient VBoxControl VBoxService "$pkgdir/usr/bin" || return 1
     install -m755 mount.vboxsf "$pkgdir/sbin" || return 1
 
-    install -m755 "$srcdir"/VirtualBox-${pkgver}_OSE/src/VBox/Additions/x11/Installer/VBoxRandR.sh \
-	   "$pkgdir"/usr/bin/VBoxRandR || return 1
+#    install -m644 "$srcdir"/VirtualBox-${pkgver}_OSE/src/VBox/Additions/x11/Installer/50-vboxmouse.conf \
+#          "$pkgdir"/etc/xorg.conf.d/50-vboxmouse.conf || return 1
     install -m755 -D "$srcdir"/VirtualBox-${pkgver}_OSE/src/VBox/Additions/x11/Installer/98vboxadd-xclient \
-	   "$pkgdir"/etc/X11/xinit/xinitrc.d/98vboxadd-xclient.sh || return 1
+	   "$pkgdir"/usr/bin/VBoxClient-all || return 1
     install -m755 -D "$srcdir"/VirtualBox-${pkgver}_OSE/src/VBox/Additions/x11/Installer/vboxclient.desktop \
 	   "$pkgdir"/etc/xdg/autostart/vboxclient.desktop || return 1
     install -D vboxmouse_drv_17.so \
@@ -147,9 +160,9 @@ package_virtualbox-ose-additions-modules(){
     install -D -m644 vboxguest.ko \
 	"$pkgdir/lib/modules/$_kernver/misc/vboxguest.ko" || return 1
 
-    cd ../vboxvfs
-    install -D -m644 vboxvfs.ko \
-    	"$pkgdir/lib/modules/$_kernver/misc/vboxvfs.ko" || return  1
+    cd ../vboxsf
+    install -D -m644 vboxsf.ko \
+    	"$pkgdir/lib/modules/$_kernver/misc/vboxsf.ko" || return  1
 
     cd ../vboxvideo
     install -D -m644 vboxvideo.ko \
@@ -160,7 +173,8 @@ package_virtualbox-ose-additions-modules(){
 
     sed -i -e "s/KERNEL_VERSION='.*'/KERNEL_VERSION='${_kernver}'/" "$startdir/virtualbox-ose-additions-modules.install" || return 1
 }
-md5sums=('6cb3c8161ad878c2a2732137c1621dc4'
+md5sums=('93b5caaac8571591c21b679987cbe518'
          '641bd2d65f0183ef5897d8dd0322f7bc'
          'ed1341881437455d9735875ddf455fbe'
-         '2d65145285050d9e0e47fed01f4001bf')
+         '2d65145285050d9e0e47fed01f4001bf'
+         'd6f441a8e0e6aec995a240d2c664b754')

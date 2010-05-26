@@ -332,14 +332,14 @@ install_slitaz_union () {
 				if [  "${basepkg}" != "" ]; then
 					info "localpkg ${basepkg}"
 					tazpkg install ${basepkg} --root=$(pwd)/${union}  | tee -a ${buildlog}/${mod}-current.log
-					#sleep 1
+					sleep 1
 				elif [ "${basepkg}" = "" ]; then
 					tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
-					#sleep 1
+					sleep 1
 				fi
 			else
 				tazpkg get-install $pkgnameorig --root=$(pwd)/${union} | tee -a ${buildlog}/${mod}-current.log
-				#sleep 1
+				sleep 1
 			fi
 		else
 			info "${pkgname} installed"
@@ -509,6 +509,7 @@ command_install () {
 			remove "${union}/usr/share/icons/hicolor/icon-theme.cache"
 			remove "${union}/usr/share/icons/Rodent/icon-theme.cache"
 			remove "${union}/usr/share/icons/nuoveXT2/icon-theme.cache"
+			remove "${union}/usr/share/icons/gnome/icon-theme.cache"
 		fi
 
 		# remove the initcpio images that were generated for the host system
@@ -557,7 +558,7 @@ command_install () {
 		if [ -f "$(pwd)/list/rmlocale" ]; then
 			cat "$(pwd)/list/rmlocale" | grep -v "^#" | while read rmlocale; do
 				if [ -d "${moduledir}/${MODULE}/usr/share/locale/${rmlocale}" ]; then
-					info "Removing locale $rmlocale"
+					info "Removing locale $rmlocale from ${MODULE}"
 					rm -Rf ${moduledir}/${MODULE}/usr/share/locale/${rmlocale}
 				fi
 			done
@@ -566,12 +567,19 @@ command_install () {
 		if [ -f "$(pwd)/list/remove" ]; then
 			cat "$(pwd)/list/remove" | grep -v "^#" | while read remove; do
 				if [ -e "${moduledir}/${MODULE}/${remove}" ]; then
-					info "Removing $remove"
+					info "Removing $remove from ${MODULE}"
 					rm -Rf ${moduledir}/${MODULE}/${remove}
 				fi
 			done
 		fi
-
+		info "Removing .pyc files from ${MODULE}"
+		RMPYC=$(find ${moduledir}/${MODULE}/ -name "*.pyc")
+		rm -Rf ${RMPYC}
+		info "Uncompressing .gz files in ${MODULE}"
+		find ${moduledir}/${MODULE}/ -name "*.gz" -type f -exec gunzip {} \;
+		if [ -f ${moduledir}/${MODULE}/usr/share/fonts/misc/fonts.dir ]; then
+			sed -i "s|.pcf.gz|.pcf|g" ${moduledir}/${MODULE}/usr/share/fonts/misc/fonts.dir
+		fi
 	done
 
 	info "Updating kernel module dependencies"

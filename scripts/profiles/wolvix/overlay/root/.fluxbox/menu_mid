@@ -45,7 +45,6 @@
     [end]
     [submenu] (System) {} <>
 	[exec] (Gparted) {gksu gparted} <>
-	[exec] (Gslapt) {gksu gslapt} <>
 	[exec] (htop) {xterm -e htop} <>
         [exec] (PCManFM) {pcmanfm} <>
 	[exec] (Touchpad) {gsynaptics} <>

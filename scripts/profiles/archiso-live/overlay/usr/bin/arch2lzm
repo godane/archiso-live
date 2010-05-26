@@ -245,7 +245,7 @@ addlist()
 	else
 		pacman -Sw -d "$PKGNAME" --noconfirm
 		PKG=$(ls /var/cache/pacman/pkg/$PKGNAME-[0-9]*.pkg.tar.*z)
-		#PKG=$(ls /var/cache/pacman/pkg/*.pkg.tar.gz)
+		#PKG=$(ls /var/cache/pacman/pkg/*.pkg.tar.*z)
 		pacman -U -f -d -r $UNION $PKG
 	fi
 	done
@@ -277,7 +277,7 @@ pkg()
 	
 	echo "Creating module ..."
 
-	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.*z).lzm"
+	DESTINATION="$(pwd)/${PKG%.pkg.tar.*z}.lzm"
 	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
 	
 	if [ $? -ne 0 ]; then 
@@ -305,7 +305,7 @@ aur()
 	
 	echo "Creating module ..."
 
-	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.*z).lzm"
+	DESTINATION="$(pwd)/${PKG%.pkg.tar.*z}.lzm"
 	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
 	
 	if [ $? -ne 0 ]; then 
@@ -325,7 +325,7 @@ local()
 	
 	echo "Creating module ..."
 
-	DESTINATION="$(pwd)/$(basename $PKG .pkg.tar.*z).lzm"
+	DESTINATION="$(pwd)/${PKG%.pkg.tar.*z}.lzm"
 	/sbin/mksquashfs $TMPDIR $DESTINATION -b 128kB > mksquashfs.log
 
 	if [ $? -ne 0 ]; then 

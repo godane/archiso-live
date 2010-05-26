@@ -73,6 +73,16 @@ else
 	echo "Unable to configure sound card."
 fi
 
+if [ "$VESA" = "yes" ]; then
+	if [ -f /etc/X11/xorg.conf.vesa ]; then
+		HOME=/root
+		cp -f /etc/X11/xorg.conf.vesa /etc/X11/xorg.conf
+		sed -i 's|/usr/bin/Xvesa|/usr/bin/Xorg|' /etc/slim.conf
+		sed -i s/"^xserver_arguments"/'\#xserver_arguments'/ /etc/slim.conf
+		tazx config-xorg
+	fi
+fi
+
 # Xorg auto configuration.
 if [ ! -s /etc/X11/xorg.conf -a -x /usr/bin/Xorg ]; then
 	echo "Configuring Xorg..."
@@ -84,15 +94,7 @@ if [ ! -s /etc/X11/xorg.conf -a -x /usr/bin/Xorg ]; then
 	sed -i s/"^xserver_arguments"/'\#xserver_arguments'/ /etc/slim.conf
 	tazx config-xorg
 fi
-if [ "$VESA" = "yes" ]; then
-	if [ -f /etc/X11/xorg.conf.vesa ]; then
-		HOME=/root
-		cp -f /etc/X11/xorg.conf.vesa /etc/X11/xorg.conf
-		sed -i 's|/usr/bin/Xvesa|/usr/bin/Xorg|' /etc/slim.conf
-		sed -i s/"^xserver_arguments"/'\#xserver_arguments'/ /etc/slim.conf
-		tazx config-xorg
-	fi
-fi
+
 # Screen size config for slim/Xvesa (last config dialog before login).
 #
 # NOTE: Xvesa is unmaintained, package will be removed and all related

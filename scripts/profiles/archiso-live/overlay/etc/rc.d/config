@@ -23,11 +23,11 @@ if [ "$keyb" ]; then
    fi
 fi
 
-session="`cmdline_value session`"
-if [ "$session" != "" ]; then
-	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/X11/xinit/xinitrc
-	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/skel/.xinitrc
-fi
+#session="`cmdline_value session`"
+#if [ "$session" != "" ]; then
+#	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/X11/xinit/xinitrc
+#	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/skel/.xinitrc
+#fi
 
 # lang: Override default language
 lang="`cmdline_value lang`"

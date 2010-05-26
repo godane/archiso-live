@@ -1,9 +1,11 @@
 cairo-xcb
+libcomerr
+e2fsprogs
+slim
 slitaz-configs
 slitaz-icon
 slitaz-menus
 slitaz-polar-cursors
-slim
 clearlooks
 conspy
 gamin

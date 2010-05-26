@@ -1,14 +1,19 @@
 binutils
+bash
+coreutils
 glibc-dev
+mpfr
 gcc
 make
 linux-headers
 slitaz-toolchain
 #slitaz-dev-pkgs
+m4
 bison
 bzip2-dev
 libtool
 libcroco
+perl
 perl-xml-parser
 perl-xml-simple
 ncursesw-dev
@@ -87,7 +92,6 @@ flex
 mercurial
 perl
 python
-postfix
 tazbb
 tazpkg-web
 linux-source-module
