@@ -13,6 +13,7 @@ gdbm
 gmime
 gmp
 lcms
+lzo2
 libaio
 libao
 libcaca

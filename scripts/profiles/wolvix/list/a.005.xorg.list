@@ -12,6 +12,7 @@ xterm
 xorg-video-drivers
 -d xf86-video-nouveau
 xorg-input-drivers
+dbus
 mesa
 synaptics
 #mini desktop
@@ -21,6 +22,8 @@ fluxbox
 fluxconf
 gtk-chtheme
 menumaker
+slim
+#archlinux-themes-slim
 #obconf
 #obmenu
 #openbox
@@ -32,9 +35,10 @@ wbar
 #lxsession-lite
 #lxappearance
 #lxrandr
-#lxterminal
+lxterminal
 #fvwm
 #fvwm-crystal
 #fonts
 ttf-dejavu
 ttf-freefont
+imagemagick

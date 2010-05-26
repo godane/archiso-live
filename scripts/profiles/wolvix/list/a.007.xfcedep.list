@@ -21,8 +21,7 @@ libart-lgpl
 libglade
 libnotify
 libxklavier
-slim
-archlinux-themes-slim
+lm_sensors
 shared-mime-info
 startup-notification
 vte
