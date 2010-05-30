@@ -22,7 +22,7 @@ fuse
 gawk
 gettext
 gzip
-grub
+grub2
 hal
 jfsutils
 kbd

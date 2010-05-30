@@ -7,6 +7,7 @@ curl
 cyrus-sasl
 dhcpcd
 dirmngr
+dnsutils
 ethtool
 getmail
 gnupg
