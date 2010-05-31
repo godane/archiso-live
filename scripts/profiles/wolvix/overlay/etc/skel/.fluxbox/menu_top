@@ -2,7 +2,7 @@
         [separator] () {} <>
     [exec] (Terminal) {lxterminal} <> 
     [exec] (File Manager) {pcmanfm} <>
-    [exec] (Web Browser) {firefox} <>
+    [exec] (Web Browser) {midori} <>
     [separator] () {} <>
 	[submenu] (Fluxbox) {}  <>
             [config] (Configure) {} <>

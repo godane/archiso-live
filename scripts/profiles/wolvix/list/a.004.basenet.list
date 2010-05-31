@@ -49,3 +49,11 @@ openslp
 wireless_tools
 pptpclient
 pptpd
+#server
+lighttpd
+apache
+darkhttpd
+cherokee
+squid
+tor
+privoxy

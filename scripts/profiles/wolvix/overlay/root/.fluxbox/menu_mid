@@ -13,7 +13,6 @@
     [submenu] (Multimedia) {} <>
         [exec] (Audacious) {audacious} <>
 	[exec] (Asunder) {asunder} <>
-	[exec] (EasyTAG) {easytag} <>
 	[exec] (Recorder) {recorder} <>
         [exec] (ISO Master) {isomaster} <>
         [exec] (Gnome-Mplayer) {gnome-mplayer} <>
@@ -22,18 +21,16 @@
 	[exec] (Volume Control) {aumix} <>
     [end]
     [submenu] (Network) {} <>
-        [exec] (Claws Mail) {claws-mail} <>
-        [exec] (FireFox) {firefox} <>
         [exec] (gFTP) {gftp} <>
         [exec] (Grsync) {grsync} <>
-        [exec] (Pidgin) {pidgin} <>
+        [exec] (Midori) {midori} <>
         [exec] (Transmission) {transmission} <>
         [exec] (Wicd) {wicd-client --no-tray} <>
         [exec] (X-Chat) {xchat} <>
     [end]
     [submenu] (Office) {} <>
 	[exec] (AbiWord) {abiword} <>
-        [exec] (Evince) {evince} <>
+        [exec] (Epdfview) {epdfview} <>
         [exec] (NoteCase) {notecase} <>
         [exec] (Osmo) {osmo} <>
     [end]

@@ -28,6 +28,7 @@ slim
 #obmenu
 #openbox
 wbar
+conky
 #lxde
 #lxde-common
 #lxde-icon-theme
