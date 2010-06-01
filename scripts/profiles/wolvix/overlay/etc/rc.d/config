@@ -24,7 +24,7 @@ if [ "$keyb" ]; then
 fi
 
 session="`cmdline_value session`"
-if [ "$session" != "" ]; then
+if [ -f /etc/X11/xinit/xinitrc.${session} ]; then
 	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/X11/xinit/xinitrc
 	cp -af "/etc/X11/xinit/xinitrc.${session}" /etc/skel/.xinitrc
 fi

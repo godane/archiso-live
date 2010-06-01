@@ -12,7 +12,7 @@ c: pcmanfm
 t: File Manager
 
 i: /usr/share/icons/Tango/32x32/apps/browser.png
-c: firefox
+c: midori
 t: Web Browser
 
 i: /usr/share/icons/Tango/32x32/apps/email.png
@@ -20,7 +20,7 @@ c: claws-mail
 t: Email Client
 
 i: /usr/share/icons/Tango/32x32/apps/internet-group-chat.png
-c: pidgid
+c: xchat
 t: Instant Messenger
 
 i: /usr/share/icons/Tango/32x32/apps/text-editor.png

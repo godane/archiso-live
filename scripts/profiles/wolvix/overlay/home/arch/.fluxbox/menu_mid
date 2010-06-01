@@ -6,6 +6,7 @@
         [exec] (Leafpad) {leafpad} <>
     [end]
     [submenu] (Graphics) {} <>
+	[exec] (Comix) {comix} <>
 	[exec] (gtkam) {gtkam} <>
         [exec] (Mirage) {mirage} <>
         [exec] (mtPaint) {mtpaint} <>
@@ -13,6 +14,7 @@
     [submenu] (Multimedia) {} <>
         [exec] (Audacious) {audacious} <>
 	[exec] (Asunder) {asunder} <>
+	[exec] (Easytag) {easytag} <>
 	[exec] (Recorder) {recorder} <>
         [exec] (ISO Master) {isomaster} <>
         [exec] (Gnome-Mplayer) {gnome-mplayer} <>
@@ -21,6 +23,7 @@
 	[exec] (Volume Control) {aumix} <>
     [end]
     [submenu] (Network) {} <>
+	[exec] (Claws-Mail) {claws-mail} <>
         [exec] (gFTP) {gftp} <>
         [exec] (Grsync) {grsync} <>
         [exec] (Midori) {midori} <>
@@ -41,6 +44,7 @@
         [exec] (XTerm [Unicode]) {uxterm} <>
     [end]
     [submenu] (System) {} <>
+	[exec] (Catfish} {catfish} <>
 	[exec] (Gparted) {gksu gparted} <>
 	[exec] (htop) {xterm -e htop} <>
         [exec] (PCManFM) {pcmanfm} <>
