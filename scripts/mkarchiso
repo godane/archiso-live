@@ -18,6 +18,7 @@ PROFILE=$(pwd)
 CPIOCONFIG="${PROFILE}/archiso-mkinitcpio.conf"
 OVERLAY="${PROFILE}/overlay"
 EXCLUDE="${PROFILE}/exclude"
+RMSTUFF="n"
 ARCH=i686
 #ARCH=x86_64
 OS="archlinux"
@@ -554,33 +555,35 @@ command_install () {
 	info "Unmounting union."
 	umount -l ${union}
 
-	for MODULE in ${MODULES}; do
-		if [ -f "$(pwd)/list/rmlocale" ]; then
-			cat "$(pwd)/list/rmlocale" | grep -v "^#" | while read rmlocale; do
-				if [ -d "${moduledir}/${MODULE}/usr/share/locale/${rmlocale}" ]; then
-					info "Removing locale $rmlocale from ${MODULE}"
-					rm -Rf ${moduledir}/${MODULE}/usr/share/locale/${rmlocale}
-				fi
-			done
-		fi
+	if [ "${RMSTUFF}" = "y" ]; then
+		for MODULE in ${MODULES}; do
+			if [ -f "$(pwd)/list/rmlocale" ]; then
+				cat "$(pwd)/list/rmlocale" | grep -v "^#" | while read rmlocale; do
+					if [ -d "${moduledir}/${MODULE}/usr/share/locale/${rmlocale}" ]; then
+						info "Removing locale $rmlocale from ${MODULE}"
+						rm -Rf ${moduledir}/${MODULE}/usr/share/locale/${rmlocale}
+					fi
+				done
+			fi
 		
-		if [ -f "$(pwd)/list/remove" ]; then
-			cat "$(pwd)/list/remove" | grep -v "^#" | while read remove; do
-				if [ -e "${moduledir}/${MODULE}/${remove}" ]; then
-					info "Removing $remove from ${MODULE}"
-					rm -Rf ${moduledir}/${MODULE}/${remove}
-				fi
-			done
-		fi
-		info "Removing .pyc files from ${MODULE}"
-		RMPYC=$(find ${moduledir}/${MODULE}/ -name "*.pyc")
-		rm -Rf ${RMPYC}
-		info "Uncompressing .gz files in ${MODULE}"
-		find ${moduledir}/${MODULE}/ -name "*.gz" -type f -exec gunzip -qf {} \;
-		if [ -f ${moduledir}/${MODULE}/usr/share/fonts/misc/fonts.dir ]; then
-			sed -i "s|.pcf.gz|.pcf|g" ${moduledir}/${MODULE}/usr/share/fonts/misc/fonts.dir
-		fi
-	done
+			if [ -f "$(pwd)/list/remove" ]; then
+				cat "$(pwd)/list/remove" | grep -v "^#" | while read remove; do
+					if [ -e "${moduledir}/${MODULE}/${remove}" ]; then
+						info "Removing $remove from ${MODULE}"
+						rm -Rf ${moduledir}/${MODULE}/${remove}
+					fi
+				done
+			fi
+			info "Removing .pyc files from ${MODULE}"
+			RMPYC=$(find ${moduledir}/${MODULE}/ -name "*.pyc")
+			rm -Rf ${RMPYC}
+			info "Uncompressing .gz files in ${MODULE}"
+			find ${moduledir}/${MODULE}/ -name "*.gz" -type f -exec gunzip -qf {} \;
+			if [ -f ${moduledir}/${MODULE}/usr/share/fonts/misc/fonts.dir ]; then
+				sed -i "s|.pcf.gz|.pcf|g" ${moduledir}/${MODULE}/usr/share/fonts/misc/fonts.dir
+			fi
+		done
+	fi
 
 	info "Updating kernel module dependencies"
 	kernelver=$(_kversion)
