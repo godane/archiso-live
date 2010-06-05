@@ -49,7 +49,7 @@ xf86-video-tdfx
 xf86-video-trident
 xf86-video-tseng
 xf86-video-v4l
-#xf86-video-vmware
+xf86-video-vmware
 xf86-video-voodoo
 synaptics
 freeglut
