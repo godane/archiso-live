@@ -12,6 +12,7 @@ xterm
 xorg-video-drivers
 -d xf86-video-nouveau
 xorg-input-drivers
+xf86-video-vmware
 dbus
 mesa
 synaptics
@@ -43,3 +44,7 @@ lxterminal
 ttf-dejavu
 ttf-freefont
 imagemagick
+gtk-engine-murrine
+murrine-themes-collection
+desktop-file-utils
+tango-icon-theme
