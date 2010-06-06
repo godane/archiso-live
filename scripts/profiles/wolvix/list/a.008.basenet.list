@@ -37,16 +37,11 @@ ntp
 openldap
 portmap
 pth
-rsync
-rp-pppoe
 telnet
 traceroute
 vsftpd
 whois
-wget
-wpa_supplicant
 openslp
-wireless_tools
 pptpclient
 pptpd
 #proxy

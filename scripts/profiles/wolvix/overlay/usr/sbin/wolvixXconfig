@@ -1,0 +1,42 @@
+#! /bin/sh
+if [ -z $DISPLAY ]
+   then
+   DIALOG=dialog
+   else
+    DIALOG=Xdialog
+   fi
+   
+tempfile=`tempfile 2>/dev/null` || tempfile=/tmp/test$$
+trap "rm -f $tempfile" 0 1 2 5 15
+
+$DIALOG --backtitle "Configure X-windows system" \
+	--title "Wolvix X configurator" --clear \
+        --radiolist "The following graphics hardware has been detected. \n\
+Select 'Test Config' to see if it works. If you \n\
+are satisfied with the result, click 'Yes' to  \n\
+save the new xorg.conf file. Otherwise, you can \n\
+revise the selections and re-test until you have \n\
+an optimal working configuration. Then click \n\
+'Close' and you're done." 37 54 10 \
+        "Graphics Card"  "Mohammed Rafi" off \
+        "Graphics Driver"    "Lata Mangeshkar" ON \
+        "Video Memory" "Hemant Kumar" off \
+        "Mouse Type"    "MannaDey" off \
+        "Monitor Type"    "Kishore Kumar" off \
+        "Resolution" "Hemant Kumar" off \
+        "Colour Depth"    "MannaDey" off \
+        "Refresh Rate"    "Kishore Kumar" off \
+        "Horizontal Freq"    "Kishore Kumar" off \
+        "Test Config"   "Test your configuration" off  2> $tempfile
+
+retval=$?
+
+choice=`cat $tempfile`
+case $retval in
+  0)
+    echo "You selected '$choice'";;
+  1)
+    echo "Cancel pressed.";;
+  255)
+    echo "ESC pressed.";;
+esac

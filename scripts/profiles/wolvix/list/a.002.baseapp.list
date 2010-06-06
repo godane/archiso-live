@@ -6,10 +6,11 @@ dvd+rw-tools
 flac
 groff
 hunspell
+hwd
 #jed
 joe
 lsof
-#lsscsi
+lsscsi
 #madplay
 man-db
 man-pages

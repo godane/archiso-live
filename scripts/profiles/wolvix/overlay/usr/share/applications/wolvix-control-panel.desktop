@@ -1,0 +1,11 @@
+[Desktop Entry]
+Encoding=UTF-8
+Exec=gksu /usr/sbin/wolvix-control-panel
+Name=Wolvix Control Panel
+GenericName=Control Panel
+Comment=Suite of admin utils for Wolvix
+Icon=/usr/share/pixmaps/wcp.png
+Terminal=false
+Categories=PackageManager;GTK;System;Config;
+StartupNotify=false
+Type=Application

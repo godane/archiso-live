@@ -1,0 +1,52 @@
+#!/bin/sh
+# Copyright (C) 2007 Christopher Rogers
+#
+# This program, aufs is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+# use auplink and aulchown aufs-20070122
+# 2007/02/09 12:34
+
+MODULE=$(basename $1)
+LIVE=/mnt/live/memory/images
+#if [ "$MODULE" = "" -o ! -e "$MODULE" -o -f "$MODULE" ]; then
+if [ "$MODULE" = "" ]; then
+   echo
+   echo "Remove module on the fly while running Live CD"
+   echo "Usage: $0 module.lzm"
+   exit 1
+fi
+
+#if [ "$(echo $MODULE | fgrep -i .lzm)" = "" ]; then
+#   echo
+#   echo "$(basename $MODULE): Module must end with .lzm"
+#   exit 2
+#fi
+
+PATH=.:$(dirname $0):/usr/lib:$PATH
+. liblinuxlive || exit 3
+
+allow_only_root
+
+# are we even using union?
+if [ "$(grep '^aufs / ' /proc/mounts)" = "" ]; then
+   echo "not in the live mode, can't continue."
+   exit 4
+fi
+
+mount -o remount,del:/mnt/live/memory/images/$MODULE /
+
+sleep 3
+
+umount $LIVE/$MODULE
+rmdir $LIVE/$MODULE

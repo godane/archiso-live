@@ -1,0 +1,962 @@
+#!/usr/bin/env python
+
+# example notebook.py
+
+import pygtk
+pygtk.require('2.0')
+import gtk, os, sys
+
+from mkbootloader import *
+from changekeybd import *
+from changelocale import *
+from frugalinstall import *
+from wolvixinstall import *
+from usbinstall import *
+from user_add import *
+from user_del import *
+from GRUBinstall import *
+from wolvixXconfig import *
+from networkconfig import *
+from pkg_del import *
+from module_del import *
+from date_time import *
+from wolvixsave import *
+from wolvixmount import *
+from kernelcompile import *
+from dev_format import *
+from wirelessconfig import *
+
+class Administrator:
+    def delete(self, widget, event=None):
+        gtk.main_quit()
+        return False
+
+    def sys_info(self, widget, event=None):
+        
+	def close_help (self):
+            window.destroy()
+	
+	os.system('xterm -e "hwd -s && /bin/bash"')
+	#file = open('/tmp/hwdata.txt')
+        #lines = file.read()
+        #file.close()
+
+    def hd_install(self, widget, event=None):
+        installer = WolvixInstall()
+	return True
+	
+    def frugal_install(self, widget, event=None):
+        installer = FrugalInstall()
+	return True
+	
+    def usb_install(self, widget, event=None):
+        installer = USBInstall()
+	return True
+	
+    def boot_disk(self, widget, event=None):
+	os.system("umount /mnt/floppy")
+	message = gtk.MessageDialog(None, gtk.DIALOG_MODAL, gtk.MESSAGE_INFO, gtk.BUTTONS_NONE, 
+                "You must have a working GRUB bootloader in your\ncurrent root filesystem in order to use this utility.\n\
+Insert floppy disk to use as boot disk, and click 'OK'\n\nWARNING: All data on the floppy disk will be destroyed!") 
+        message.add_button(gtk.STOCK_OK, gtk.RESPONSE_ACCEPT)
+        message.add_button(gtk.STOCK_CANCEL, gtk.RESPONSE_REJECT)
+        resp = message.run()
+        message.destroy()
+        if (resp == gtk.RESPONSE_ACCEPT):
+            os.system('touch /tmp/run')
+	    os.system("/usr/sbin/restart_status.py 'formatting disk...' & mke2fs /dev/fd0")
+            os.system('rm /tmp/run')
+	    os.system("mount -t ext2 /dev/fd0 /mnt/floppy")
+	    os.system('touch /tmp/run')
+	    os.system("/usr/sbin/restart_status.py 'installing GRUB...' & grub-install --root-directory=/mnt/floppy '(fd0)'")
+	    os.system('rm /tmp/run')
+	    os.system('touch /tmp/run')
+	    os.system("/usr/sbin/restart_status.py 'copying files...' & cp /boot/grub/menu.lst /mnt/floppy/boot/grub/")
+	    os.system('rm /tmp/run')
+	    os.system("umount /mnt/floppy")
+	else:
+            return(None)
+        message = gtk.MessageDialog(None, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_OK,
+		"Make boot disk complete.\n\
+You may now close the panel.")
+	resp = message.run()
+	message.destroy()
+	return True
+	
+    def install_grub(self, widget, event=None):
+	installer = InstallGRUB()
+	return True
+	
+    def module_remove(self, widget, event=None):
+	remove = ModDel()
+	return True
+	
+    def pkg_remove(self, widget, event=None):
+	remove = PkgDel()
+	return True
+	
+    def enable_gui(self, widget, event=None):
+	line_ask = gtk.Dialog("Startup with GUI?", None, gtk.DIALOG_MODAL, (gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        line_ask.set_size_request(200, 240)
+        line_ask.set_position(gtk.WIN_POS_CENTER)
+        help = gtk.Label("\nChoose whether to boot Wolvix to the command line, or to a GUI")
+        help.set_line_wrap(True)
+	help.show()
+        line_ask.vbox.pack_start(help, True, False, 20)
+        select1 = gtk.RadioButton(None, "Command Line", False)
+        select1.show()
+        line_ask.vbox.pack_start(select1, True, False, 10)
+        select2 = gtk.RadioButton(select1, "GUI Login prompt", False)
+        select2.show()
+	line_ask.vbox.pack_start(select2, True, False, 10)
+        response = line_ask.run()
+	line_ask.destroy()
+	file = open('/etc/inittab')
+        inittab = file.read()
+        file.close()
+        self.text = ""
+	self.found = False
+	os.unlink("/etc/inittab")
+        file = open("/etc/inittab", 'w')
+        lines = inittab.split("\n", sys.maxint)
+        for line in lines:
+	    line = line + "\n"
+            if (line.count("# Default runlevel. (Do not set to 0 or 6)")):
+		self.found = True
+		file.write(line)
+		if (select1.get_active()):
+		    newline = "id:3:initdefault:\n"
+		    self.text = "System will boot to CLI login on the next reboot" 
+		else:
+		    newline = "id:4:initdefault:\n"
+		    self.text = "System will boot to GUI login on the next reboot" 
+		file.write(newline)
+	    elif (self.found):
+	        self.found = False
+	    else:	
+		file.write(line)
+	file.close()
+	message = gtk.MessageDialog(None, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, self.text) 
+        resp = message.run()
+        message.destroy()
+	return True
+	
+    def screen_res(self, widget, event=None):
+	os.system('xfce-setting-show ui')
+	return True
+    
+    def x_config(self, widget, event=None):
+	xconfig = WolvixXconfig()
+	#os.system('wolvixXconfig &')
+	return True
+	
+    def x_restart(self, widget, event=None):
+	os.system('touch /tmp/run')
+	os.system("/usr/sbin/restart_status.py 'restarting X-windows...' & /sbin/init 2 & /sbin/init 4")
+	os.system('rm /tmp/run')
+        return True
+	
+    def mouse_config(self, widget, event=None):
+	os.system('xterm -e mouseconfig &')
+	return True
+
+    def netcard_conf(self, widget, event=None):
+	netconfig = NetConfig()
+	return True
+	
+    def dialup_conf(self, widget, event=None):
+	os.system('chestnut-dialer &')
+	return True
+	
+    def firewall_conf(self, widget, event=None):
+	os.system('firestarter &')
+	return True
+	
+    def wicd_client(self, widget, event=None):
+	os.system('chmod +x /etc/rc.d/rc.wicd &')
+	os.system('/etc/rc.d/rc.wicd restart &')
+	os.system('rm /var/run/wicd/wicd.pid &')
+	os.system('/usr/bin/wicd-client --no-tray &')
+	return True
+	
+    def alsa_config(self, widget, event=None):
+	os.system('xterm -e alsaconf &')
+	return True
+	
+    def test_sound(self, widget, event=None):
+	os.system('aplay /usr/share/alsa/speaker-test/howl.wav &')
+	return True
+	
+    def ssh_start(self, widget, event=None):
+	if os.path.exists("/etc/rc.d/rc.sshd"):
+            os.system('chmod +x /etc/rc.d/rc.sshd')
+	    os.system('/etc/rc.d/rc.sshd start')
+	else:
+	    message = gtk.MessageDialog(None, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, 
+		"ssh is not installed!")
+            resp = message.run()
+            message.destroy()
+	return True
+	
+    def ftp_start(self, widget, event=None):
+	#if os.path.exists("/etc/rc.d/rc.sshd"):
+        #    os.system('chmod +x /etc/rc.d/rc.sshd')
+	#    os.system('/etc/rc.d/rc.cups start')
+	#else:
+	    message = gtk.MessageDialog(None, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, 
+		"Not yet implemented!")
+            resp = message.run()
+            message.destroy()
+	#return True
+	
+    def no_cups(self):
+	message = gtk.MessageDialog(None, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, 
+		"Cups is not installed!")
+        resp = message.run()
+        message.destroy()
+	
+    def cups_start(self, widget, event=None):
+	if os.path.exists("/usr/sbin/cupsd"):
+            os.system('chmod +x /etc/rc.d/rc.cups')
+	    os.system('/etc/rc.d/rc.cups start')
+	else:
+	    self.no_cups()
+	return True
+	
+    def cups_stop(self, widget, event=None):
+	if os.path.exists("/usr/sbin/cupsd"):
+            os.system('/etc/rc.d/rc.cups stop')
+	else:
+	    self.no_cups()
+	return True
+	
+    def cups_config(self, widget, event=None):
+	if os.path.exists("/usr/sbin/cupsd"):
+            os.system('firefox http://localhost:631/admin')
+	else:
+	    self.no_cups()
+	return True
+	
+    def new_user(self, widget, event=None):
+	newuser = UserAdd()
+	return True
+	
+    def del_user(self, widget, event=None):
+	deluser = UserDel()
+	return True
+	
+    def passwd(self, widget, event=None):
+	   user_window = gtk.Dialog("Host/Domain Name", None, gtk.DIALOG_MODAL, 
+                (gtk.STOCK_OK, gtk.RESPONSE_ACCEPT, gtk.STOCK_CANCEL, gtk.RESPONSE_CANCEL))
+           user_window.set_position(gtk.WIN_POS_CENTER)
+           #user_window.connect("destroy", self.destroy_main)
+           user_window.set_title("Select User")
+           user_window.set_border_width(0)
+           #self.window.set_size_request(360, 360)
+
+           hbox1 = gtk.HBox(False, 0)
+           image = gtk.Image()
+           image.set_from_file("/usr/share/icons/Tango/scalable/stock/user-passwd.svg")
+           hbox1.pack_start(image, False, False, 15)
+           label1 = gtk.Label("Enter user name:")
+           label1.set_line_wrap(True)
+           hbox1.pack_start(label1, False, False, 15)
+           user_window.vbox.pack_start(hbox1, True, False, 10)
+           
+	   hbox2 = gtk.HBox(False, 0)
+           user_name = gtk.Entry(15)
+	   user_name.set_size_request(120, 25)
+           hbox2.pack_start(user_name, True, False, 10)
+           user_window.vbox.pack_start(hbox2, True, False, 15)
+           user_window.show_all()
+	   response = user_window.run()
+           if (response == gtk.RESPONSE_ACCEPT):
+                self.username = user_name.get_text()
+	   user_window.destroy()
+	   os.system('xterm -geometry 72x12 -e passwd %s' %self.username)
+	   return True
+	
+    def set_date_time(self, widget, event=None):
+	datetime = DateTime()
+	return True
+	
+    def synchronise(self, widget, event=None):
+	os.system("ls -la /etc/localtime-copied-from > /tmp/tz.txt")
+	for line in file('/tmp/tz.txt').readlines():
+	    word = line.split("/")
+	if (len(word)>9):
+		tz1 = word[6]+"->"+word[7]+"->"+word[8]+"->"+word[9]
+	elif (len(word)>8):
+		tz1 = word[6]+"->"+word[7]+"->"+word[8]
+	elif (len(word)>7):
+		tz1 = word[6]+"->"+word[7]
+	else:
+		tz1 = word[6]
+	os.system('touch /tmp/run')
+	os.system("/usr/sbin/restart_status.py 'synchronising clocks...' & ntpdate pool.ntp.org > /tmp/ntpdate.txt")
+        notify = gtk.Dialog("Synchronise clock", None, gtk.DIALOG_MODAL, (gtk.STOCK_OK, gtk.RESPONSE_ACCEPT))
+        notify.set_size_request(320, 240)
+        notify.set_position(gtk.WIN_POS_CENTER)
+	for line in file('/tmp/ntpdate.txt').readlines():
+	    word = line.split()
+        msg0 = gtk.Label("\nTime Zone: %s\nRun 'Change Time Zone' if incorrect." %tz1)
+        msg0.show()
+        notify.vbox.pack_start(msg0, True, False, 10)
+        hseparator = gtk.HSeparator()
+	hseparator.show()
+	notify.vbox.pack_start(hseparator, True, False, 10)
+	msg1 = gtk.Label("\nClock Synchronized to ntp server: %s" %word[7])
+        msg1.show()
+        notify.vbox.pack_start(msg1, True, False, 10)
+        msg2 = gtk.Label("\nDate and time: %s %s %s" %(word[0], word[1], word[2]))
+        msg2.show()
+        notify.vbox.pack_start(msg2, True, False, 10)
+        msg3 = gtk.Label("\nClock adjustment was: %s %s" %(word[9], word[10]))
+        msg3.show()
+        notify.vbox.pack_start(msg3, True, False, 10)
+        os.system('rm /tmp/run')
+	response = notify.run()
+	notify.destroy()
+	return True
+	
+    def time_zone(self, widget, event=None):
+	os.system('xterm -e timeconfig &')
+	return True
+	
+    def dev_mount(self, widget, event=None):
+	wolvixmount = WolvixMount()
+	return True
+	
+    def dev_format(self, widget, event=None):
+	dev_format = DevFormat()
+	return True
+	
+    def wolvix_save(self, widget, event=None):
+	wolvixsave = WolvixSave()
+	return True
+
+    def kernel_compile(self, widget, event=None):
+	message = gtk.MessageDialog(None, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, 
+				"Sorry - utility under development.\n" ) 
+	resp = message.run()
+	message.destroy()#kernelcompile = KernelCompile()
+	return True
+	
+    def builder(self, widget, event=None):
+	message = gtk.MessageDialog(None, 0, gtk.MESSAGE_INFO, gtk.BUTTONS_OK, 
+				"Sorry - utility under development.\n" ) 
+	resp = message.run()
+	message.destroy()#kernelcompile = KernelCompile()
+	#os.system('wolvix-builder &')
+	#builder = WolvixBuilder()
+	return True
+	
+    def __init__(self):
+        window = gtk.Window(gtk.WINDOW_TOPLEVEL)
+        window.connect("delete_event", self.delete)
+        window.set_title("Wolvix Control Panel")
+	window.set_border_width(0)
+	window.set_size_request(720, 220)
+	window.set_position(gtk.WIN_POS_CENTER)
+        
+        table = gtk.Table(10,6,False)
+        window.add(table)
+
+        # Create a new notebook, place the position of the tabs
+        notebook = gtk.Notebook()
+        notebook.set_tab_pos(gtk.POS_TOP)
+        table.attach(notebook, 0,6,0,8)
+        notebook.show()
+        self.show_tabs = True
+        self.show_border = True
+
+        # Append pages to the notebook
+	# The following are candidate titles: 'Introduction', 'HD-Install', , 'X-windows', 
+	# 'Network', 'Sound', 'Printer', 'User Admin', 'Packages', 'Time/Date']:
+        for title in ['About', 'HD-Install', 'X-windows', 'Network', 'Sound', 
+		'Printer', 'User Admin', 'Storage', 'Time/Date', 'Services','System']:
+            bufferl = "%s" % (title)
+
+            frame = gtk.Frame(None)
+            frame.set_border_width(0)
+            frame.set_size_request(520, 160)
+            frame.show()
+	
+	    if (title=='About'):
+                mainbox = gtk.HBox(False, 0)
+	        leftbox = gtk.VBox(False, 0)
+	        rightbox = gtk.VBox(False, 15)
+	        image = gtk.Image()
+		image.set_from_file("/usr/share/pixmaps/wcp.svg")
+                leftbox.pack_start(image, True, False, 0)
+	        image.show()
+		label = gtk.Label("\nWolvix GNU/Linux LiveCD Control Panel\n\n\
+  A planned comprehensive suite of admin \n\
+  utilities to configure a Wolvix Linux system.")
+                rightbox.pack_start(label, False, False, 10)
+		label.show()
+	
+		mainbox.pack_start(leftbox, False, False, 5)
+		mainbox.pack_start(rightbox, False, False, 5)
+		leftbox.show()
+		rightbox.show()
+		frame.add(mainbox)
+		mainbox.show()
+
+            if (title=='HD-Install'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/devices/drive-harddisk.svg")
+                HD_Install_button = gtk.ToolButton(image, "Full Install")
+		HD_Install_button.set_homogeneous(True)
+		HD_Install_button.set_expand(True)
+		HD_Install_button.connect("clicked", self.hd_install)
+		tooltip = gtk.Tooltips()
+		HD_Install_button.set_tooltip(tooltip, "Normal hard disk install", "")
+		image.show()
+		toolbox.insert(HD_Install_button, 0)
+		HD_Install_button.show()
+
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/devices/drive-harddisk.svg")
+                Frugal_Install_button = gtk.ToolButton(image, "Frugal Install")
+		Frugal_Install_button.set_homogeneous(True)
+		Frugal_Install_button.set_expand(True)
+		Frugal_Install_button.connect("clicked", self.frugal_install)
+		tooltip = gtk.Tooltips()
+		Frugal_Install_button.set_tooltip(tooltip, "Install in 'Live CD' mode to hard disk", "")
+		toolbox.insert(Frugal_Install_button, 1)
+		image.show()
+		Frugal_Install_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/devices/removable-usb.svg")
+                USB_Install_button = gtk.ToolButton(image, "USB Install")
+		USB_Install_button.set_homogeneous(True)
+		USB_Install_button.set_expand(True)
+		USB_Install_button.connect("clicked", self.usb_install)
+		tooltip = gtk.Tooltips()
+		USB_Install_button.set_tooltip(tooltip, "Install in 'Live CD' mode to USB device", "")
+		toolbox.insert(USB_Install_button, 2)
+		image.show()
+		USB_Install_button.show()
+		
+		if (os.path.isdir("/mnt/live/")):
+			image = gtk.Image()
+			image.set_from_file("/usr/share/icons/Tango/scalable/stock/document-save.svg")
+			Boot_disk_button = gtk.ToolButton(image, "GRUB Install")
+			Boot_disk_button.set_homogeneous(True)
+			Boot_disk_button.set_expand(True)
+			Boot_disk_button.connect("clicked", self.install_grub)
+			tooltip = gtk.Tooltips()
+			Boot_disk_button.set_tooltip(tooltip, "Install GRUB to MBR", "")
+			toolbox.insert(Boot_disk_button, 3)
+			image.show()
+			Boot_disk_button.show()
+		else:
+			image = gtk.Image()
+			image.set_from_file("/usr/share/icons/Tango/scalable/devices/media-floppy.svg")
+			Boot_disk_button = gtk.ToolButton(image, "Boot Disk")
+			Boot_disk_button.set_homogeneous(True)
+			Boot_disk_button.set_expand(True)
+			Boot_disk_button.connect("clicked", self.boot_disk)
+			tooltip = gtk.Tooltips()
+			Boot_disk_button.set_tooltip(tooltip, "Make a GRUB boot disk", "")
+			toolbox.insert(Boot_disk_button, 3)
+			image.show()
+			Boot_disk_button.show()
+		
+		frame.add(toolbox)
+		toolbox.show()
+
+            if (title=='X-windows'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/devices/video-display.svg")
+                X_config_button = gtk.ToolButton(image, "Configure\nX-windows")
+		X_config_button.set_homogeneous(True)
+		X_config_button.set_expand(True)
+		X_config_button.connect("clicked", self.x_config)
+		tooltip = gtk.Tooltips()
+		X_config_button.set_tooltip(tooltip, "Change the X-windows configuration", "")
+		image.show()
+		toolbox.insert(X_config_button, 0)
+		X_config_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/actions/view-refresh.svg")
+                X_config_button = gtk.ToolButton(image, "Restart\nX-windows")
+		X_config_button.set_homogeneous(True)
+		X_config_button.set_expand(True)
+		X_config_button.connect("clicked", self.x_restart)
+		tooltip = gtk.Tooltips()
+		X_config_button.set_tooltip(tooltip, "Restart X-windows system", "")
+		image.show()
+		toolbox.insert(X_config_button, 1)
+		X_config_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/gdm.svg")
+                GUI_Startup_button = gtk.ToolButton(image, "Run X at\nStart-Up")
+		GUI_Startup_button.set_homogeneous(True)
+		GUI_Startup_button.set_expand(True)
+		GUI_Startup_button.connect("clicked", self.enable_gui)
+		tooltip = gtk.Tooltips()
+		GUI_Startup_button.set_tooltip(tooltip, "Enable/disable load GUI on system startup", "")
+		image.show()
+		toolbox.insert(GUI_Startup_button, 2)
+		GUI_Startup_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/gnome-keyboard.svg")
+                KeyBrd_button = gtk.ToolButton(image, "Change \nKeyboard")
+		KeyBrd_button.set_homogeneous(True)
+		KeyBrd_button.set_expand(True)
+		KeyBrd_button.connect("clicked", change_keybd)
+		tooltip = gtk.Tooltips()
+		KeyBrd_button.set_tooltip(tooltip, "Change the X-windows keyboard", "")
+		image.show()
+		toolbox.insert(KeyBrd_button, 3)
+		KeyBrd_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/xfce4-mouse.svg")
+                Mouse_button = gtk.ToolButton(image, "Configure\n mouse")
+		Mouse_button.set_homogeneous(True)
+		Mouse_button.set_expand(True)
+		Mouse_button.connect("clicked", self.mouse_config)
+		tooltip = gtk.Tooltips()
+		Mouse_button.set_tooltip(tooltip, "Configure your  X-windows mouse", "")
+		image.show()
+		toolbox.insert(Mouse_button, 4)
+		Mouse_button.show()
+		
+		frame.add(toolbox)
+		toolbox.show()
+
+            if (title=='Network'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/devices/network-wired.svg")
+                NetCard_button = gtk.ToolButton(image, "Configure network\nadaptor")
+		NetCard_button.set_homogeneous(True)
+		NetCard_button.set_expand(True)
+		NetCard_button.connect("clicked", self.netcard_conf)
+		tooltip = gtk.Tooltips()
+		NetCard_button.set_tooltip(tooltip, "Configure your network adaptor", "")
+		image.show()
+		toolbox.insert(NetCard_button, 0)
+		NetCard_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Wolvix/tango/wicd-client.png")
+                Network_button = gtk.ToolButton(image, "Wicd Network\nManager")
+		Network_button.set_homogeneous(True)
+		Network_button.set_expand(True)
+		Network_button.connect("clicked", self.wicd_client)
+		tooltip = gtk.Tooltips()
+		Network_button.set_tooltip(tooltip, "Run WiCD\nClient", "")
+		image.show()
+		toolbox.insert(Network_button, 1)
+		Network_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/wcp-ppp.png")
+                DialUp_button = gtk.ToolButton(image, "Configure Dial-Up\nadaptor")
+		DialUp_button.set_homogeneous(True)
+		DialUp_button.set_expand(True)
+		DialUp_button.connect("clicked", self.dialup_conf)
+		tooltip = gtk.Tooltips()
+		DialUp_button.set_tooltip(tooltip, "Configure dial-up (modem) adaptor", "")
+		image.show()
+		toolbox.insert(DialUp_button, 2)
+		DialUp_button.show()
+
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/firewall.svg")
+                Firewall_button = gtk.ToolButton(image, "Configure\nFirewall")
+		Firewall_button.set_homogeneous(True)
+		Firewall_button.set_expand(True)
+		Firewall_button.connect("clicked", self.firewall_conf)
+		tooltip = gtk.Tooltips()
+		Firewall_button.set_tooltip(tooltip, "Configure firewall", "")
+		image.show()
+		toolbox.insert(Firewall_button, 3)
+		Firewall_button.show()
+		
+
+		frame.add(toolbox)
+		toolbox.show()
+
+	    if (title=='Sound'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/devices/audio-card.svg")
+                ALSA_config_button = gtk.ToolButton(image, "Configure\nSound")
+		ALSA_config_button.set_homogeneous(True)
+		ALSA_config_button.set_expand(True)
+		ALSA_config_button.connect("clicked", self.alsa_config)
+		tooltip = gtk.Tooltips()
+		ALSA_config_button.set_tooltip(tooltip, "Configure ALSA sound system", "")
+		image.show()
+		toolbox.insert(ALSA_config_button, 0)
+		ALSA_config_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/preferences-desktop-sound.svg")
+                Play_Snd_button = gtk.ToolButton(image, "Play test\nsound")
+		Play_Snd_button.set_homogeneous(True)
+		Play_Snd_button.set_expand(True)
+		Play_Snd_button.connect("clicked", self.test_sound)
+		tooltip = gtk.Tooltips()
+		Play_Snd_button.set_tooltip(tooltip, "Play test sound", "")
+		image.show()
+		toolbox.insert(Play_Snd_button, 1)
+		Play_Snd_button.show()
+		
+		frame.add(toolbox)
+		toolbox.show()
+
+	    if (title=='Printer'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/printer.svg")
+                Detect_Pr_button = gtk.ToolButton(image, "Start CUPS")
+		Detect_Pr_button.set_homogeneous(True)
+		Detect_Pr_button.set_expand(True)
+		Detect_Pr_button.connect("clicked", self.cups_start)
+		tooltip = gtk.Tooltips()
+		Detect_Pr_button.set_tooltip(tooltip, "Start CUPS Printing System", "")
+		image.show()
+		toolbox.insert(Detect_Pr_button, 0)
+		Detect_Pr_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/printer.svg")
+                CUPS_conf_button = gtk.ToolButton(image, "Stop CUPS")
+		CUPS_conf_button.set_homogeneous(True)
+		CUPS_conf_button.set_expand(True)
+		CUPS_conf_button.connect("clicked", self.cups_stop)
+		tooltip = gtk.Tooltips()
+		CUPS_conf_button.set_tooltip(tooltip, "Stop CUPS Printing System", "")
+		image.show()
+		toolbox.insert(CUPS_conf_button, 1)
+		CUPS_conf_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/printer.svg")
+                CUPS_web_button = gtk.ToolButton(image, "Configure CUPS")
+		CUPS_web_button.set_homogeneous(True)
+		CUPS_web_button.set_expand(True)
+		CUPS_web_button.connect("clicked", self.cups_config)
+		tooltip = gtk.Tooltips()
+		CUPS_web_button.set_tooltip(tooltip, "Configure CUPSprinter - Web interface", "")
+		image.show()
+		toolbox.insert(CUPS_web_button, 2)
+		CUPS_web_button.show()
+		
+		frame.add(toolbox)
+		toolbox.show()
+
+	    if (title=='User Admin'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/config-users.svg")
+                Add_user_button = gtk.ToolButton(image, "Add\nUser")
+		Add_user_button.set_homogeneous(True)
+		Add_user_button.set_expand(True)
+		Add_user_button.connect("clicked", self.new_user)
+		tooltip = gtk.Tooltips()
+		Add_user_button.set_tooltip(tooltip, "Add a new user to your system", "")
+		image.show()
+		toolbox.insert(Add_user_button, 0)
+		Add_user_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/stock/removeuser.svg")
+                User_del_button = gtk.ToolButton(image, "Remove\nUser")
+		User_del_button.set_homogeneous(True)
+		User_del_button.set_expand(True)
+		User_del_button.connect("clicked", self.del_user)
+		tooltip = gtk.Tooltips()
+		User_del_button.set_tooltip(tooltip, "Remove a user from your system", "")
+		image.show()
+		toolbox.insert(User_del_button, 1)
+		User_del_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/stock/user-passwd.svg")
+                Passwd_button = gtk.ToolButton(image, "Change\nPassword")
+		Passwd_button.set_homogeneous(True)
+		Passwd_button.set_expand(True)
+		Passwd_button.connect("clicked", self.passwd)
+		tooltip = gtk.Tooltips()
+		Passwd_button.set_tooltip(tooltip, "Change a user's password", "")
+		image.show()
+		toolbox.insert(Passwd_button, 2)
+		Passwd_button.show()
+		
+		frame.add(toolbox)
+		toolbox.show()
+
+            if (title=='Storage'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/actions/go-home.svg")
+                Scan_button = gtk.ToolButton(image, "Create\nWolvixSave")
+		Scan_button.set_homogeneous(True)
+		Scan_button.set_expand(True)
+		Scan_button.connect("clicked", self.wolvix_save)
+		tooltip = gtk.Tooltips()
+		Scan_button.set_tooltip(tooltip, "Create wolvixsave.xfs to make changes persistent", "")
+		image.show()
+		toolbox.insert(Scan_button, 0)
+		Scan_button.show()
+
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/devices/drive-mount.svg")
+                Mount_button = gtk.ToolButton(image, "Mount/Unmount\nDevice")
+		Mount_button.set_homogeneous(True)
+		Mount_button.set_expand(True)
+		Mount_button.connect("clicked", self.dev_mount)
+		tooltip = gtk.Tooltips()
+		Mount_button.set_tooltip(tooltip, "Mount or unmount storage media", "")
+		image.show()
+		toolbox.insert(Mount_button, 1)
+		Mount_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/devices/drive-format.svg")
+                Format_button = gtk.ToolButton(image, "Format\nDisk")
+		Format_button.set_homogeneous(True)
+		Format_button.set_expand(True)
+		Format_button.connect("clicked", self.dev_format)
+		tooltip = gtk.Tooltips()
+		Format_button.set_tooltip(tooltip, "Format storage media", "")
+		image.show()
+		toolbox.insert(Format_button, 2)
+		Format_button.show()
+		
+		frame.add(toolbox)
+		toolbox.show()
+
+	    if (title=='Time/Date'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/date.svg")
+                Time_button = gtk.ToolButton(image, "Set Date/Time")
+		Time_button.set_homogeneous(True)
+		Time_button.set_expand(True)
+		Time_button.connect("clicked", self.set_date_time)
+		tooltip = gtk.Tooltips()
+		Time_button.set_tooltip(tooltip, "Set your system date & time", "")
+		image.show()
+		toolbox.insert(Time_button, 0)
+		Time_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/actions/appointment-new.svg")
+                Synch_button = gtk.ToolButton(image, "Synchronise\nClock")
+		Synch_button.set_homogeneous(True)
+		Synch_button.set_expand(True)
+		Synch_button.connect("clicked", self.synchronise)
+		tooltip = gtk.Tooltips()
+		Synch_button.set_tooltip(tooltip, "Synchronise clock to web timeserver", "")
+		image.show()
+		toolbox.insert(Synch_button, 1)
+		Synch_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/preferences-desktop-locale.svg")
+                Tzconf_button = gtk.ToolButton(image, "Change\nTime zone")
+		Tzconf_button.set_homogeneous(True)
+		Tzconf_button.set_expand(True)
+		Tzconf_button.connect("clicked", self.time_zone)
+		tooltip = gtk.Tooltips()
+		Tzconf_button.set_tooltip(tooltip, "change default system time zone", "")
+		image.show()
+		toolbox.insert(Tzconf_button, 2)
+		Tzconf_button.show()
+
+		frame.add(toolbox)
+		toolbox.show()
+
+            if (title=='Develop'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/administration.svg")
+                PkgList_Update_button = gtk.ToolButton(image, "Compile\nNew Kernel")
+		PkgList_Update_button.set_homogeneous(True)
+		PkgList_Update_button.set_expand(True)
+		PkgList_Update_button.connect("clicked", self.kernel_compile)
+		tooltip = gtk.Tooltips()
+		PkgList_Update_button.set_tooltip(tooltip, "Compile a new kernel from source", "")
+		image.show()
+		toolbox.insert(PkgList_Update_button, 0)
+		PkgList_Update_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/applications-development.svg")
+                Install_Pkg_button = gtk.ToolButton(image, "Wolvix\nBuilder")
+		Install_Pkg_button.set_homogeneous(True)
+		Install_Pkg_button.set_expand(True)
+		Install_Pkg_button.connect("clicked", self.builder)
+		tooltip = gtk.Tooltips()
+		Install_Pkg_button.set_tooltip(tooltip, "Install local package", "")
+		image.show()
+		toolbox.insert(Install_Pkg_button, 1)
+		Install_Pkg_button.show()
+		
+		frame.add(toolbox)
+		toolbox.show()
+
+            if (title=='Services'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/status/network-receive.svg")
+                PkgList_Update_button = gtk.ToolButton(image, "Start secure\nshell (ssh)")
+		PkgList_Update_button.set_homogeneous(True)
+		PkgList_Update_button.set_expand(True)
+		PkgList_Update_button.connect("clicked", self.ssh_start)
+		tooltip = gtk.Tooltips()
+		PkgList_Update_button.set_tooltip(tooltip, "Remove or insert live modules on the fly.", "")
+		image.show()
+		toolbox.insert(PkgList_Update_button, 0)
+		PkgList_Update_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/status/network-transmit.svg")
+                PkgList_Update_button = gtk.ToolButton(image, "Start ftp\nserver")
+		PkgList_Update_button.set_homogeneous(True)
+		PkgList_Update_button.set_expand(True)
+		PkgList_Update_button.connect("clicked", self.ftp_start)
+		tooltip = gtk.Tooltips()
+		PkgList_Update_button.set_tooltip(tooltip, "Update list of available packages", "")
+		image.show()
+		toolbox.insert(PkgList_Update_button, 1)
+		PkgList_Update_button.show()
+		
+		frame.add(toolbox)
+		toolbox.show()
+
+	    if (title=='System'):
+		toolbox = gtk.Toolbar()
+		toolbox.set_orientation(gtk.ORIENTATION_HORIZONTAL)
+		toolbox.set_style(gtk.TOOLBAR_BOTH)
+		toolbox.set_border_width(0)
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Wolvix/tango/module.svg")
+                PkgList_Update_button = gtk.ToolButton(image, "Remove/Insert\nLive Modules")
+		PkgList_Update_button.set_homogeneous(True)
+		PkgList_Update_button.set_expand(True)
+		PkgList_Update_button.connect("clicked", self.module_remove)
+		tooltip = gtk.Tooltips()
+		PkgList_Update_button.set_tooltip(tooltip, "Remove or insert live modules on the fly.", "")
+		image.show()
+		toolbox.insert(PkgList_Update_button, 0)
+		PkgList_Update_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/stock/removepkg.svg")
+                PkgList_Update_button = gtk.ToolButton(image, "View/Remove\nPackages")
+		PkgList_Update_button.set_homogeneous(True)
+		PkgList_Update_button.set_expand(True)
+		PkgList_Update_button.connect("clicked", self.pkg_remove)
+		tooltip = gtk.Tooltips()
+		PkgList_Update_button.set_tooltip(tooltip, "Update list of available packages", "")
+		image.show()
+		toolbox.insert(PkgList_Update_button, 1)
+		PkgList_Update_button.show()
+		
+		image = gtk.Image()
+		image.set_from_file("/usr/share/icons/Tango/scalable/apps/preferences-desktop-locale.svg")
+                PkgList_Update_button = gtk.ToolButton(image, "Change\nLocale")
+		PkgList_Update_button.set_homogeneous(True)
+		PkgList_Update_button.set_expand(True)
+		PkgList_Update_button.connect("clicked", change_locale)
+		tooltip = gtk.Tooltips()
+		PkgList_Update_button.set_tooltip(tooltip, "Change system locale", "")
+		image.show()
+		toolbox.insert(PkgList_Update_button, 1)
+		PkgList_Update_button.show()
+		
+		frame.add(toolbox)
+		toolbox.show()
+
+            frame.show()
+            label = gtk.Label(bufferl)
+            notebook.append_page(frame, label)
+      
+        # Set what page to start at (page 4)
+        notebook.set_current_page(0)
+
+        # Create a bunch of buttons
+        button = gtk.Button("HW Info")
+	button.connect("clicked", self.sys_info)
+	button.set_size_request(100, 30)
+        table.attach(button, 0,1,8,9, gtk.EXPAND, gtk.EXPAND)
+	button.show()
+
+	button = gtk.Button("Close")
+        button.connect("clicked", self.delete)
+        button.set_size_request(100, 30)
+        table.attach(button, 2,3,8,9, gtk.EXPAND, gtk.EXPAND)
+        button.show()
+
+        table.show()
+        window.show()
+
+def main():
+    uid = os.getuid()
+    if (uid != 0):
+        mb = gtk.MessageDialog(None, 0, gtk.MESSAGE_ERROR, gtk.BUTTONS_CLOSE, "Sorry, you must have root\nprivileges to run this program.");
+        response = mb.run()
+        mb.destroy()
+    else:
+        gtk.main()
+    return 0
+
+if __name__ == "__main__":
+    Administrator()
+    main()

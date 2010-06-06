@@ -74,3 +74,8 @@ net-tools
 bridge-utils
 netkit-bsd-finger
 ethtool
+rp-pppoe
+dnsutils
+wget
+wpa_supplicant
+wireless_tools
