@@ -5,7 +5,7 @@ _kernver=2.6.34-ARCH
 
 pkgname=intel-537
 pkgver=2.60.80.0
-pkgrel=68live
+pkgrel=67live
 pkgdesc="Intel Modem Drivers for 537 chipsets. For stock arch 2.6 kernel"
 arch=(i686 x86_64)
 license=('custom:"INTEL537"')

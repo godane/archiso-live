@@ -4,7 +4,7 @@
 pkgname=ndiswrapper
 _kernver=2.6.34-ARCH
 pkgver=1.56
-pkgrel=4live
+pkgrel=3live
 pkgdesc="Module for NDIS (Windows Network Drivers) drivers supplied by vendors. For stock arch 2.6 kernel."
 license=('GPL')
 arch=(i686 x86_64)

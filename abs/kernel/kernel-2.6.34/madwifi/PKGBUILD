@@ -6,7 +6,7 @@ _kernver=2.6.34-ARCH
 
 pkgname=madwifi
 pkgver=0.9.4.4119
-pkgrel=3live
+pkgrel=2live
 pkgdesc="Madwifi drivers for Atheros wireless chipsets. For stock arch 2.6 kernel"
 arch=(i686 x86_64)
 license=('GPL')
