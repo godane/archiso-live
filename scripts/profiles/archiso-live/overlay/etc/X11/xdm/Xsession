@@ -131,6 +131,9 @@ xfce)
 lxde)
 	exec startlxde
 	;;
+fvwm)
+	exec fvwm-crystal
+	;;
 lxlauncher)
 	exec lxlauncher
 	;;
@@ -199,10 +202,14 @@ if [ -x $HOME/.xsession ]; then
         exec $HOME/.xsession $@
 fi
 
+if [ -x /usr/bin/mkgtkrc ]; then
+	/usr/bin/mkgtkrc
+fi
+
 # If the user doesn't have their own xsession and none was specified in
 # $SESSION, then run the system default session type:
 session="`cmdline_value session`"
-if [ "$session" != "" ]; then
+if [ -f /etc/X11/xinit/xinitrc.${session} ]; then
 	exec /etc/X11/xinit/xinitrc.${session}
 else
 	exec /etc/X11/xinit/xinitrc

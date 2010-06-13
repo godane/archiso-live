@@ -9,3 +9,4 @@ PUBLISHER="http://godane.wordpress.com/"
 AUTHOR="Christopher Rogers aka Godane"
 NOLZMA=n
 MKOPTION="-comp lzma -b 256k"
+RMSTUFF=y
