@@ -7,7 +7,7 @@ pkgname=('kernel26' 'kernel26-headers' 'kernel26-docs') # Build stock -ARCH kern
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.34
 pkgver=${_basekernel}
-pkgrel=2live
+pkgrel=3live
 _patchname="patch-${pkgver}-1-ARCH"
 arch=(i686 x86_64)
 license=('GPL2')
@@ -20,7 +20,7 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         kernel26.preset)
 md5sums=('10eebcb0178fb4540e2165bfd7efc7ad'
          'db3d9ce492ae1f0c56cb7ba6210b4055'
-         '66ca2fe6ac3046150e194e258acd02df'
+         '86dcf7ab34cebeeedc7c4bc578a72f58'
          '19bfea318a532c0e55cdccf5cccca870'
          '25584700a0a679542929c4bed31433b6')
 
@@ -168,8 +168,10 @@ package_kernel26-headers() {
   # add dvb headers for external modules
   # in reference to:
   # http://bugs.archlinux.org/task/11194
-  mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/include/config/dvb/
-  cp include/config/dvb/*.h ${pkgdir}/usr/src/linux-${_kernver}/include/config/dvb/
+  if [ -d include/config/dvb ]; then
+  	mkdir -p ${pkgdir}/usr/src/linux-${_kernver}/include/config/dvb/
+  	cp include/config/dvb/*.h ${pkgdir}/usr/src/linux-${_kernver}/include/config/dvb/
+  fi
   # add dvb headers for http://mcentral.de/hg/~mrec/em28xx-new
   # in reference to:
   # http://bugs.archlinux.org/task/13146

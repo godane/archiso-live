@@ -3,7 +3,7 @@
 
 pkgname=aufs2
 pkgver=2.6.34_20100517
-pkgrel=1live
+pkgrel=2live
 #_kernver=${pkgver%_*}-ARCH
 _kernver=2.6.34-ARCH
 pkgdesc="Another Unionfs Implementation"
