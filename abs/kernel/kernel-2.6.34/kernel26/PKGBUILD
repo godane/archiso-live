@@ -2,12 +2,12 @@
 # Maintainer: Tobias Powalowski <tpowa@archlinux.org>
 # Maintainer: Thomas Baechler <thomas@archlinux.org>
 pkgbase="kernel26"
-pkgname=('kernel26' 'kernel26-headers' 'kernel26-docs') # Build stock -ARCH kernel
+pkgname=('kernel26' 'kernel26-headers') # Build stock -ARCH kernel
 # pkgname=kernel26-custom       # Build kernel with a different name
 _kernelname=${pkgname#kernel26}
 _basekernel=2.6.34
 pkgver=${_basekernel}
-pkgrel=2live
+pkgrel=3live
 _patchname="patch-${pkgver}-1-ARCH"
 arch=(i686 x86_64)
 license=('GPL2')
@@ -20,8 +20,8 @@ source=(ftp://ftp.kernel.org/pub/linux/kernel/v2.6/linux-$_basekernel.tar.bz2
         kernel26.preset)
 md5sums=('10eebcb0178fb4540e2165bfd7efc7ad'
          'db3d9ce492ae1f0c56cb7ba6210b4055'
-         '66ca2fe6ac3046150e194e258acd02df'
-         '19bfea318a532c0e55cdccf5cccca870'
+         '7c57b85a6e58d647e63713bcbe33b87f'
+         '4604318982a5852d5de6cf59828d8908'
          '25584700a0a679542929c4bed31433b6')
 
 build() {
@@ -198,16 +198,4 @@ package_kernel26-headers() {
   find ${pkgdir}/usr/src/linux-${_kernver} -type d -exec chmod 755 {} \;
   # remove unneeded architectures
   rm -rf ${pkgdir}/usr/src/linux-${_kernver}/arch/{alpha,arm,arm26,avr32,blackfin,cris,frv,h8300,ia64,m32r,m68k,m68knommu,mips,microblaze,mn10300,parisc,powerpc,ppc,s390,sh,sh64,sparc,sparc64,um,v850,xtensa}
-}
-
-package_kernel26-docs() {
-pkgdesc="Kernel hackers manual - HTML documentation that comes with the Linux kernel."
-
-cd ${srcdir}/linux-$_basekernel
-mkdir -p $pkgdir/usr/src/linux-$pkgver-ARCH
-mv Documentation $pkgdir/usr/src/linux-$pkgver-ARCH
-find $pkgdir -type f -exec chmod 444 {} \;
-find $pkgdir -type d -exec chmod 755 {} \;
-# remove a file already in kernel26 package
-rm -f $pkgdir/usr/src/linux-$pkgver-ARCH/Documentation/DocBook/Makefile
 }
